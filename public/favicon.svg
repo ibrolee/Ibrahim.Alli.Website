@@ -1,1 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" fill="#171714"/><text x="32" y="43" text-anchor="middle" font-family="Georgia,serif" font-size="34" fill="#e7ff45">IA</text></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <rect width="64" height="64" rx="14" fill="#11110f"/>
+  <path d="M15 45 26 19h6l11 26h-7l-2.4-6H24.4L22 45h-7Zm11.6-12h5L29 26l-2.4 7Z" fill="#f4f0e8"/>
+  <path d="M42 19h7v26h-7z" fill="#d7ff3f"/>
+</svg>
