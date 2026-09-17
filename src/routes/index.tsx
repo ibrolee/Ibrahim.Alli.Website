@@ -25,7 +25,19 @@ function Home() {
     event.preventDefault();
     const form = event.currentTarget;
     if (!form.reportValidity()) return;
-    setFormNote("Direct email has not been connected yet, so this form is not sending messages.");
+
+    const data = new FormData(form);
+    const name = String(data.get("name") || "").trim();
+    const email = String(data.get("email") || "").trim();
+    const message = String(data.get("message") || "").trim();
+
+    const subject = `Message from ${name} — Ibrahim Alli Website`;
+    const body = `Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`;
+
+    window.location.href =
+      `mailto:alliibrahim3@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+
+    setFormNote("Opening your email app…");
   }
 
   return (
@@ -90,7 +102,7 @@ function Home() {
 
       <section id="contact" className="contact-section section">
         <div className="section-inner contact-inner">
-          <div className="contact-copy"><p className="eyebrow">04 / Contact</p><h2 className="section-title">Have something<br /><em>in mind?</em></h2><p>For a website, digital project, business idea or simply a conversation — get in touch.</p><a className="email-placeholder" href="mailto:">Email Ibrahim <ExternalLink /></a></div>
+          <div className="contact-copy"><p className="eyebrow">04 / Contact</p><h2 className="section-title">Have something<br /><em>in mind?</em></h2><p>For a website, digital project, business idea or simply a conversation — get in touch.</p><a className="email-placeholder" href="mailto:alliibrahim3@gmail.com">alliibrahim3@gmail.com <ExternalLink /></a></div>
           <form onSubmit={handleSubmit} className="contact-form">
             <label>Name<input required name="name" autoComplete="name" placeholder="Your name" /></label>
             <label>Email<input required type="email" name="email" autoComplete="email" placeholder="you@example.com" /></label>
