@@ -85,11 +85,18 @@ function Home() {
         <div className="section-inner contact-inner">
           <div className="contact-copy"><p className="eyebrow">04 / Contact</p><h2 className="section-title">Have something<br /><em>in mind?</em></h2><p>For a website, digital project, business idea or simply a conversation — get in touch.</p><a className="email-placeholder" href="mailto:alliibrahim3@gmail.com">alliibrahim3@gmail.com <ExternalLink /></a></div>
           <div className="contact-actions" aria-label="Contact options">
-            <a className="contact-icon-link" href="mailto:alliibrahim3@gmail.com" aria-label="Email Ibrahim Alli" title="Email Ibrahim Alli">
-              <span aria-hidden="true">✉</span>
+            <a className="contact-icon-link" href="mailto:alliibrahim3@gmail.com" aria-label="Email Ibrahim Alli via Gmail" title="Email Ibrahim Alli">
+              <svg className="brand-icon gmail-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M3 5.5A2.5 2.5 0 0 1 5.5 3h13A2.5 2.5 0 0 1 21 5.5v13a2.5 2.5 0 0 1-2.5 2.5h-13A2.5 2.5 0 0 1 3 18.5v-13Z" fill="none" stroke="currentColor" strokeWidth="1.5"/>
+                <path d="m4.5 6 7.5 6 7.5-6" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M4.5 18V6m15 12V6" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+              </svg>
             </a>
             <a className="contact-icon-link" href="https://wa.me/905488534011" target="_blank" rel="noreferrer" aria-label="WhatsApp Ibrahim Alli" title="WhatsApp Ibrahim Alli">
-              <span aria-hidden="true">◉</span>
+              <svg className="brand-icon whatsapp-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 3.25a8.75 8.75 0 0 0-7.5 13.27L3.25 21l4.62-1.2A8.75 8.75 0 1 0 12 3.25Z" fill="none" stroke="currentColor" strokeWidth="1.6"/>
+                <path d="M9.15 8.2c-.25-.55-.52-.57-.76-.58h-.65c-.23 0-.6.09-.91.43-.31.34-1.18 1.15-1.18 2.8s1.21 3.25 1.38 3.47c.17.22 2.34 3.75 5.79 5.1 2.86 1.12 3.45.9 4.07.84.62-.06 2-.81 2.28-1.6.28-.79.28-1.46.2-1.6-.08-.14-.31-.22-.65-.39-.34-.17-2-.99-2.31-1.1-.31-.11-.53-.17-.76.17-.23.34-.87 1.1-1.06 1.32-.2.22-.39.25-.73.08-.34-.17-1.43-.53-2.72-1.68-1.01-.9-1.69-2-1.89-2.34-.2-.34-.02-.52.15-.69.15-.15.34-.39.51-.59.17-.2.22-.34.34-.56.11-.22.06-.42-.03-.59-.08-.17-.73-1.81-1.02-2.48Z" fill="currentColor"/>
+              </svg>
             </a>
           </div>
         </div>
