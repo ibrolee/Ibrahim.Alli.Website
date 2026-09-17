@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowDown, ArrowRight, ExternalLink, MoveUpRight } from "lucide-react";
-import { useState, type FormEvent } from "react";
+
 import { Button } from "@/components/ui/button";
 import { projects } from "@/lib/portfolio-content";
 
@@ -20,25 +20,6 @@ export const Route = createFileRoute("/")({
 });
 
 function Home() {
-  const [formNote, setFormNote] = useState("");
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    const form = event.currentTarget;
-    if (!form.reportValidity()) return;
-
-    const data = new FormData(form);
-    const name = String(data.get("name") || "").trim();
-    const email = String(data.get("email") || "").trim();
-    const message = String(data.get("message") || "").trim();
-
-    const subject = `Message from ${name} — Ibrahim Alli Website`;
-    const body = `Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`;
-
-    window.location.href =
-      `mailto:alliibrahim3@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-
-    setFormNote("Opening your email app…");
-  }
 
   return (
     <main>
@@ -103,12 +84,14 @@ function Home() {
       <section id="contact" className="contact-section section">
         <div className="section-inner contact-inner">
           <div className="contact-copy"><p className="eyebrow">04 / Contact</p><h2 className="section-title">Have something<br /><em>in mind?</em></h2><p>For a website, digital project, business idea or simply a conversation — get in touch.</p><a className="email-placeholder" href="mailto:alliibrahim3@gmail.com">alliibrahim3@gmail.com <ExternalLink /></a></div>
-          <form onSubmit={handleSubmit} className="contact-form">
-            <label>Name<input required name="name" autoComplete="name" placeholder="Your name" /></label>
-            <label>Email<input required type="email" name="email" autoComplete="email" placeholder="you@example.com" /></label>
-            <label>Message<textarea required name="message" rows={4} placeholder="Tell me a little about it..." /></label>
-            <div><Button type="submit" size="lg">Send message <ArrowRight /></Button>{formNote && <p role="status" className="form-note">{formNote}</p>}</div>
-          </form>
+          <div className="contact-actions" aria-label="Contact options">
+            <a className="contact-icon-link" href="mailto:alliibrahim3@gmail.com" aria-label="Email Ibrahim Alli" title="Email Ibrahim Alli">
+              <span aria-hidden="true">✉</span>
+            </a>
+            <a className="contact-icon-link" href="https://wa.me/905488534011" target="_blank" rel="noreferrer" aria-label="WhatsApp Ibrahim Alli" title="WhatsApp Ibrahim Alli">
+              <span aria-hidden="true">◉</span>
+            </a>
+          </div>
         </div>
       </section>
     </main>
