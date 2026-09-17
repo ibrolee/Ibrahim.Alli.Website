@@ -20,7 +20,6 @@ export const Route = createFileRoute("/")({
 });
 
 function Home() {
-
   return (
     <main>
       <section className="home-hero">
@@ -37,8 +36,23 @@ function Home() {
             <div className="hero-intro">
               <p>I build useful things across business, design and the digital world — from websites and e-commerce experiences to practical business systems.</p>
               <div className="hero-actions">
-                <Button asChild size="lg"><a href="#work">Explore the work <ArrowRight /></a></Button>
-                <Button asChild variant="outline" size="lg"><Link to="/about">About Ibrahim <MoveUpRight /></Link></Button>
+                <Button asChild size="lg">
+                  <a href="#work">Explore the work <ArrowRight /></a>
+                </Button>
+                <Button
+                  asChild
+                  variant="outline"
+                  size="lg"
+                  style={{
+                    backgroundColor: "#f9f6ed",
+                    color: "#171713",
+                    borderColor: "#f9f6ed",
+                  }}
+                >
+                  <Link to="/about" style={{ color: "#171713" }}>
+                    Get to know me <MoveUpRight />
+                  </Link>
+                </Button>
               </div>
             </div>
           </div>
