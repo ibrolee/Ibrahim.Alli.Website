@@ -14,8 +14,8 @@ export const Route = createFileRoute("/about")({
 
 const experience = [
   { period: "2025 — Present", role: "Business Manager / Digital Operations", company: "Super Plus Fitness & Spa", place: "Lagos, Nigeria", body: "Managing day-to-day business operations while developing the company’s website, digital marketing, staff systems, membership processes and customer-facing digital tools." },
-  { period: "2024", role: "Construction Worker", company: "Construction", place: "", body: "Practical site experience covering site preparation, material handling, general construction support and team-oriented physical work." },
-  { period: "Earlier experience", role: "Kitchen Team Lead", company: "Hungry House", place: "Lefkosa, North Cyprus", body: "Supported kitchen operations, coordinated team workflow and helped maintain smooth daily restaurant operations." },
+  { period: "2024 — Present", role: "Construction Worker", company: "Northernland Construction and Real Estate Company", place: "North Cyprus", body: "Practical site experience covering site preparation, material handling, general construction support and team-oriented physical work." },
+  { period: "2023 — 2024", role: "Kitchen Team Lead", company: "Hungry House", place: "Lefkosa & Girne, North Cyprus", body: "Supported kitchen operations, coordinated team workflow and helped maintain smooth daily restaurant operations." },
 ];
 
 const personal = [
@@ -54,7 +54,7 @@ function About() {
 
       <section className="about-block skills-block section"><div className="section-inner about-grid"><div><p className="eyebrow">05 / Skills</p><h2 className="section-title">What I can<br /><em>work with.</em></h2></div><div className="skills-groups">{Object.entries(skills).map(([group, items]) => <div className="skill-group" key={group}><h3>{group}</h3><div>{items.map(item => <span key={item}>{item}</span>)}</div></div>)}</div></div></section>
 
-      <section className="about-block interests-block section"><div className="section-inner about-grid"><div><p className="eyebrow">06 / Interests</p><h2 className="section-title">Life outside<br /><em>the screen.</em></h2></div><div className="interest-grid-about">{["Technology","Gaming","Photography","Design","Business","Aviation","Learning new skills","Exploring new ideas"].map((item, index) => <div key={item}><span>0{index + 1}</span><strong>{item}</strong></div>)}</div></div><div className="section-inner hobby-note"><p><strong>Photography</strong> is a personal hobby and creative outlet — a way to pay attention to light, composition and everyday details. It isn’t presented here as a professional photography service.</p></div></section>
+      <section className="about-block interests-block section"><div className="section-inner about-grid"><div><p className="eyebrow">06 / Interests</p><h2 className="section-title">Life outside<br /><em>the screen.</em></h2></div><div className="interest-grid-about">{["Technology","Gaming","Photography","Design","Business","Learning new skills","Exploring new ideas"].map((item, index) => <div key={item}><span>0{index + 1}</span><strong>{item}</strong></div>)}</div></div><div className="section-inner hobby-note"><p><strong>Photography</strong> is a personal hobby and creative outlet — a way to pay attention to light, composition and everyday details. It isn’t presented here as a professional photography service.</p></div></section>
 
       <section className="about-cta"><div className="section-inner"><p className="eyebrow light">07 / What’s next</p><h2>Still building.<br /><em>Still learning.</em></h2><Link to="/" hash="contact" className="text-link light-link">Start a conversation <ArrowRight /></Link></div></section>
     </main>
