@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowDown, ArrowRight, ExternalLink } from "lucide-react";
+import { ArrowDown, ArrowRight } from "lucide-react";
 import { useState, type FormEvent } from "react";
 import { Button } from "@/components/ui/button";
 import { projects, skills, timeline } from "@/lib/portfolio-content";
