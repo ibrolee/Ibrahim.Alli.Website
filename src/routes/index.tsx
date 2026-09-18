@@ -78,7 +78,7 @@ function Home() {
             {projects.map((project, index) => (
               <article className={`project-card project-card-${index + 1}`} key={project.slug}>
                 <Link to="/projects/$slug" params={{ slug: project.slug }} className="project-image-wrap">
-                  <img src={project.image} alt={`${project.name} project`} className="project-image" />
+                  <img src={project.image} alt={`${project.name} project`} width={1600} height={1000} loading="lazy" decoding="async" className="project-image" />
                   <span className="project-open"><MoveUpRight /></span>
                 </Link>
                 <div className="project-meta"><span>PROJECT {project.number}</span><span>{project.type}</span></div>
@@ -129,7 +129,7 @@ function Home() {
               <span>Email me</span><MoveUpRight size={18} aria-hidden="true" />
             </a>
             <a className="contact-button contact-button-whatsapp" href="https://wa.me/905488534011" target="_blank" rel="noopener noreferrer" aria-label="Chat with Ibrahim Alli on WhatsApp">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M12 3a9 9 0 0 0-7.7 13.7L3 21l4.4-1.3A9 9 0 1 0 12 3Z" /><path d="M8.5 8.5c.3-.3.6-.3.8.1l1 1.8c.1.3.1.5-.2.8l-.6.6c.7 1.3 1.8 2.4 3.1 3.1l.6-.6c.3-.3.5-.3.8-.2l1.8 1c.4.2.4.5.1.8-2.8-.8-5.2-3.2-6-6-.3-.9 0-1.8 1-2.2Z" /></svg>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M12 3a9 9 0 0 0-7.7 13.7L3 21l4.4-1.3A9 9 0 1 0 12 3Z" /><path d="M8.5 8.5c.3-.3.6-.3.8.1l1 1.8c.1.3.1.5-.2.8l-.6.6c.7 1.3 1.8 2.4 3.1 3.1l.6-.6c.3-.3.5-.3.8-.2l1.8 1c.4.2.4.5.1.8-.6.8-1.5 1.1-2.4.8-2.8-.8-5.2-3.2-6-6-.3-.9 0-1.8 1-2.2Z" /></svg>
               <span>Chat on WhatsApp</span><MoveUpRight size={18} aria-hidden="true" />
             </a>
           </div>
