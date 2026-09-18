@@ -39,26 +39,32 @@ export const Route = createFileRoute("/")({
 function Home() {
   return (
     <main>
-      <section className="home-hero">
+      <section className="home-hero" style={{ minHeight: "100svh", alignItems: "stretch", paddingBottom: "clamp(2rem, 5vw, 4rem)", background: "radial-gradient(ellipse at 92% 15%, rgba(213,244,119,.075), transparent 43%), var(--ink)" }}>
         <div className="hero-noise" aria-hidden="true" />
-        <div className="hero-monogram" aria-hidden="true">IA</div>
-        <div className="hero-content">
-          <div className="hero-kicker">Personal portfolio</div>
-          <h1 className="hero-wordmark" aria-label="Ibrahim Alli" style={{ fontWeight: 400, letterSpacing: "-0.055em", lineHeight: 0.78 }}>
-            <span style={{ display: "block", fontStyle: "normal", color: "var(--paper)" }}>Ibrahim</span>
-            <span style={{ display: "block", fontStyle: "normal", letterSpacing: "-0.055em", paddingLeft: "clamp(1.5rem, 9vw, 9rem)", color: "var(--paper)" }}>Alli</span>
+        <div className="hero-monogram" aria-hidden="true" style={{ opacity: 0.5 }}>IA</div>
+        <div className="hero-content" style={{ display: "flex", flexDirection: "column", justifyContent: "center", paddingTop: "clamp(2rem, 5vw, 5rem)" }}>
+          <div className="hero-kicker" style={{ justifyContent: "space-between", width: "100%", maxWidth: "1100px", borderBottom: "1px solid rgba(245,242,231,.18)", paddingBottom: "1rem", marginBottom: "clamp(2.5rem, 6vw, 6rem)" }}>
+            <span style={{ color: "var(--accent)" }}>IBRAHIM ALLI / PORTFOLIO</span>
+            <span style={{ color: "rgba(245,242,231,.6)" }}>DESIGN · DIGITAL · BUSINESS</span>
+          </div>
+          <h1 className="hero-wordmark" aria-label="Ibrahim Alli" style={{ display: "flex", flexDirection: "column", fontWeight: 400, fontSize: "clamp(4.5rem, 13.2vw, 12.8rem)", lineHeight: 0.81, letterSpacing: "-0.065em", maxWidth: "100%", margin: 0 }}>
+            <span style={{ display: "block", paddingLeft: 0, color: "var(--paper)" }}>Ibrahim</span>
+            <span style={{ display: "block", paddingLeft: "clamp(1.25rem, 13vw, 12rem)", color: "var(--paper)", fontStyle: "normal", letterSpacing: "-0.065em" }}>Alli</span>
           </h1>
-          <div className="hero-bottom">
-            <p className="hero-role"><span>Builder.</span><span>Creator.</span><span>Entrepreneur.</span></p>
-            <div className="hero-intro">
-              <p>I build useful things across business, design and the digital world — from websites and e-commerce experiences to practical business systems.</p>
-              <div className="hero-actions">
-                <Button asChild size="lg"><a href="#work">Explore the work <ArrowRight /></a></Button>
-                <Button asChild variant="outline" size="lg"><Link to="/about">About Ibrahim <MoveUpRight /></Link></Button>
+          <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: "1rem", marginTop: "clamp(2.5rem, 5vw, 5rem)", paddingTop: "1.25rem", borderTop: "1px solid rgba(245,242,231,.2)" }}>
+            <p style={{ margin: 0, fontFamily: "var(--font-display)", fontSize: "clamp(1.45rem, 3vw, 2.8rem)", lineHeight: 1.05, color: "var(--accent)" }}>I turn ideas into digital experiences.</p>
+            <span style={{ fontSize: ".65rem", fontWeight: 700, letterSpacing: ".16em", textTransform: "uppercase", color: "rgba(245,242,231,.55)" }}>INDEPENDENT CREATIVE PORTFOLIO</span>
+          </div>
+          <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "end", gap: "2rem", marginTop: "clamp(2rem, 4vw, 3.5rem)" }}>
+            <div style={{ maxWidth: "510px" }}>
+              <p style={{ fontSize: "clamp(1rem, 1.3vw, 1.15rem)", lineHeight: 1.7, color: "rgba(245,242,231,.72)", margin: 0 }}>Builder. Creator. Entrepreneur. I create websites, e-commerce experiences and practical business systems that bring ideas to life.</p>
+              <div className="hero-actions" style={{ marginTop: "1.5rem" }}>
+                <Button asChild size="lg"><a href="#work">Explore my work <ArrowRight /></a></Button>
+                <Button asChild variant="outline" size="lg"><a href="#contact" style={{ border: "1px solid rgba(245,242,231,.45)", color: "var(--paper)", background: "transparent" }}>Start a project <MoveUpRight /></a></Button>
               </div>
             </div>
+            <a href="#work" className="hero-scroll" style={{ marginTop: 0, paddingBottom: ".5rem" }}><span>Scroll to explore</span><ArrowDown /></a>
           </div>
-          <a href="#work" className="hero-scroll"><span>Scroll to explore</span><ArrowDown /></a>
         </div>
       </section>
 
@@ -123,7 +129,7 @@ function Home() {
               <span>Email me</span><MoveUpRight size={18} aria-hidden="true" />
             </a>
             <a className="contact-button contact-button-whatsapp" href="https://wa.me/905488534011" target="_blank" rel="noopener noreferrer" aria-label="Chat with Ibrahim Alli on WhatsApp">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M12 3a9 9 0 0 0-7.7 13.7L3 21l4.4-1.3A9 9 0 1 0 12 3Z" /><path d="M8.5 8.5c.3-.3.6-.3.8.1l1 1.8c.1.3.1.5-.2.8l-.6.6c.7 1.3 1.8 2.4 3.1 3.1l.6-.6c.3-.3.5-.3.8-.2l1.8 1c.4.2.4.5.1.8-.6.8-1.5 1.1-2.4.8-2.8-.8-5.2-3.2-6-6-.3-.9 0-1.8 1-2.2Z" /></svg>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M12 3a9 9 0 0 0-7.7 13.7L3 21l4.4-1.3A9 9 0 1 0 12 3Z" /><path d="M8.5 8.5c.3-.3.6-.3.8.1l1 1.8c.1.3.1.5-.2.8l-.6.6c.7 1.3 1.8 2.4 3.1 3.1l.6-.6c.3-.3.5-.3.8-.2l1.8 1c.4.2.4.5.1.8-2.8-.8-5.2-3.2-6-6-.3-.9 0-1.8 1-2.2Z" /></svg>
               <span>Chat on WhatsApp</span><MoveUpRight size={18} aria-hidden="true" />
             </a>
           </div>
