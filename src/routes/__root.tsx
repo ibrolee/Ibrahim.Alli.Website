@@ -70,7 +70,7 @@ function ErrorComponent({
           </button>
           <a
             href="/"
-            className="inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-accent"
+            className="inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium text-foreground hover:bg-accent"
           >
             Go home
           </a>
@@ -80,16 +80,21 @@ function ErrorComponent({
   );
 }
 
-/**
- * Adds subtle reveal animations to existing site elements.
- * No changes to individual homepage, About or project files are required.
- */
+/** Adds subtle reveal animations to short, non-interactive site elements. */
 function ScrollAnimations() {
   const router = useRouter();
   const location = router.state.location;
 
   useEffect(() => {
     if (typeof window === "undefined") return;
+
+    // The expandable story can grow much taller than the viewport. Observing
+    // its entire container with an intersection threshold can leave it
+    // permanently transparent after opening, so it must never be animated.
+    document.querySelectorAll<HTMLElement>(".personal-story-trigger").forEach((element) => {
+      element.classList.remove("scroll-reveal", "scroll-reveal-visible");
+      element.style.removeProperty("--reveal-delay");
+    });
 
     const reducedMotion = window.matchMedia(
       "(prefers-reduced-motion: reduce)"
@@ -107,7 +112,7 @@ function ScrollAnimations() {
       ".contact-copy",
       ".contact-actions",
       ".about-hero-grid > div",
-      ".personal-list > div",
+      ".personal-list > div:not(.personal-story-trigger)",
       ".about-prose",
       ".education-card",
       ".experience-card",
