@@ -135,10 +135,10 @@ function Home() {
 
           <div className="hero-bottom">
             <p className="hero-role">
-  <span>Builder.</span>
-  <span>Creator.</span>
-  <span>Entrepreneur.</span>
-</p>
+              <span>Builder.</span>
+              <span>Creator.</span>
+              <span>Entrepreneur.</span>
+            </p>
 
             <div className="hero-intro">
               <p>
@@ -386,75 +386,55 @@ function Home() {
               For a website, digital project, business idea or simply a
               conversation — get in touch.
             </p>
-
-            <a
-              className="email-placeholder"
-              href="mailto:alliibrahim3@gmail.com"
-            >
-              alliibrahim3@gmail.com <ExternalLink />
-            </a>
           </div>
 
           <div className="contact-actions" aria-label="Contact options">
             <a
-              className="contact-icon-link"
+              className="contact-button contact-button-email"
               href="mailto:alliibrahim3@gmail.com"
               aria-label="Email Ibrahim Alli"
-              title="Email Ibrahim Alli"
             >
               <svg
-                className="brand-icon gmail-icon"
                 viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.8"
+                strokeLinecap="round"
+                strokeLinejoin="round"
                 aria-hidden="true"
               >
-                <path
-                  d="M3 5.5A2.5 2.5 0 0 1 5.5 3h13A2.5 2.5 0 0 1 21 5.5v13a2.5 2.5 0 0 1-2.5 2.5h-13A2.5 2.5 0 1 1 3 18.5v-13Z"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                />
-                <path
-                  d="m4.5 6 7.5 6 7.5-6"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.8"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-                <path
-                  d="M4.5 18V6m15 12V6"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                />
+                <rect x="3" y="5" width="18" height="14" rx="2" />
+                <path d="m3 7 9 6 9-6" />
               </svg>
+
+              <span>Email me</span>
+
+              <MoveUpRight size={18} aria-hidden="true" />
             </a>
 
             <a
-              className="contact-icon-link"
+              className="contact-button contact-button-whatsapp"
               href="https://wa.me/905488534011"
               target="_blank"
-              rel="noreferrer"
-              aria-label="WhatsApp Ibrahim Alli"
-              title="WhatsApp Ibrahim Alli"
+              rel="noopener noreferrer"
+              aria-label="Chat with Ibrahim Alli on WhatsApp"
             >
               <svg
-                className="brand-icon whatsapp-icon"
                 viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.8"
+                strokeLinecap="round"
+                strokeLinejoin="round"
                 aria-hidden="true"
               >
-                <path
-                  d="M12 3.25a8.75 8.75 0 0 0-7.5 13.27L3.25 21l4.62-1.2A8.75 8.75 0 1 0 12 3.25Z"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.6"
-                />
-                <path
-                  d="M9.15 8.2c-.25-.55-.52-.57-.76-.58h-.65c-.23 0-.6.09-.91.43-.31.34-1.18 1.15-1.18 2.8s1.21 3.25 1.38 3.47c.17.22 2.34 3.75 5.79 5.1 2.86 1.12 3.45.9 4.07.84.62-.06 2-.81 2.28-1.6.28-.79.28-1.46.2-1.6-.08-.14-.31-.22-.65-.39-.17-.08-.73-.36-1.25-.61-.52-.25-1.02-.49-1.06-.51-.31-.11-.53-.17-.76.17-.23.34-.87 1.1-1.06 1.32-.2.22-.39.25-.73.08-.34-.17-1.43-.53-2.72-1.68-1.01-.9-1.69-2-1.89-2.34-.2-.34-.02-.52.15-.69.15-.15.34-.39.51-.59.17-.2.22-.34.34-.56.11-.22.06-.42-.03-.59-.08-.17-.73-1.81-1.02-2.48Z"
-                  fill="currentColor"
-                />
+                <path d="M12 3a9 9 0 0 0-7.7 13.7L3 21l4.4-1.3A9 9 0 1 0 12 3Z" />
+                <path d="M8.5 8.5c.3-.3.6-.3.8.1l1 1.8c.1.3.1.5-.2.8l-.6.6c.7 1.3 1.8 2.4 3.1 3.1l.6-.6c.3-.3.5-.3.8-.2l1.8 1c.4.2.4.5.1.8-.6.8-1.5 1.1-2.4.8-2.8-.8-5.2-3.2-6-6-.3-.9 0-1.8 1-2.2Z" />
               </svg>
+
+              <span>Chat on WhatsApp</span>
+
+              <MoveUpRight size={18} aria-hidden="true" />
             </a>
           </div>
         </div>
