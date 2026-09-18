@@ -12,6 +12,7 @@ import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 
 import appCss from "../styles.css?url";
+import aboutCss from "../about-editorial.css?url";
 
 function NotFoundComponent() {
   return (
@@ -27,7 +28,7 @@ function NotFoundComponent() {
         <div className="mt-6">
           <Link
             to="/"
-            className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+            className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-accent"
           >
             Go home
           </Link>
@@ -192,6 +193,10 @@ export const Route =
         {
           rel: "stylesheet",
           href: appCss,
+        },
+        {
+          rel: "stylesheet",
+          href: aboutCss,
         },
         {
           rel: "icon",
