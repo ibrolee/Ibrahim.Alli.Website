@@ -23,3 +23,12 @@
   .hero-actions>a{width:100%;justify-content:center}
   .hero-wordmark{overflow-wrap:normal}
 }
+
+/* Keep the story panel dark when mobile browsers retain :hover after a tap.
+   The generic personal-list hover previously overrode its dark background. */
+.personal-list > div.personal-story-trigger,
+.personal-list > div.personal-story-trigger:hover,
+.personal-list > div.personal-story-trigger:focus-within {
+  background: var(--ink);
+  color: var(--paper);
+}
