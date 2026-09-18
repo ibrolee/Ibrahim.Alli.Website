@@ -396,3 +396,11 @@
     line-height: 1.4;
   }
 }
+/* Larger horizontal hero role on mobile */
+@media (max-width: 767px) {
+  .hero-role {
+    font-size: clamp(1.25rem, 5vw, 1.75rem);
+    letter-spacing: -0.055em;
+    white-space: nowrap;
+  }
+}
