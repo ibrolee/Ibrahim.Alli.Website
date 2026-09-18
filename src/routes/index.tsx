@@ -44,9 +44,9 @@ function Home() {
         <div className="hero-monogram" aria-hidden="true">IA</div>
         <div className="hero-content">
           <div className="hero-kicker">Personal portfolio</div>
-          <h1 className="hero-wordmark" aria-label="Ibrahim Alli" style={{ fontWeight: 400, letterSpacing: "-0.065em", lineHeight: 0.79 }}>
-            <span style={{ display: "block", fontStyle: "normal" }}>Ibrahim</span>
-            <span style={{ display: "block", fontStyle: "italic", letterSpacing: "-0.075em", paddingLeft: "clamp(2rem, 12vw, 12rem)", color: "#d5f477" }}>Alli</span>
+          <h1 className="hero-wordmark" aria-label="Ibrahim Alli" style={{ fontWeight: 400, letterSpacing: "-0.055em", lineHeight: 0.78 }}>
+            <span style={{ display: "block", fontStyle: "normal", color: "var(--paper)" }}>Ibrahim</span>
+            <span style={{ display: "block", fontStyle: "normal", letterSpacing: "-0.055em", paddingLeft: "clamp(1.5rem, 9vw, 9rem)", color: "var(--paper)" }}>Alli</span>
           </h1>
           <div className="hero-bottom">
             <p className="hero-role"><span>Builder.</span><span>Creator.</span><span>Entrepreneur.</span></p>
