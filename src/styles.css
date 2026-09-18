@@ -141,3 +141,41 @@
   .contact-icon-link { width: 3.6rem; height: 3.6rem; }
   .contact-icon-link .brand-icon { width: 1.6rem; height: 1.6rem; }
 }
+/* Web development services — readable dark cards */
+
+.build-copy article {
+  background: #22231f !important;
+  border: 1px solid #41443a !important;
+  border-radius: 8px !important;
+}
+
+.build-copy article h3 {
+  color: #fffdf2 !important;
+}
+
+.build-copy article p {
+  color: #e5e5d9 !important;
+}
+
+.build-copy article > span {
+  color: #d5f477 !important;
+}
+
+/* Keep the service heading and introduction readable */
+.build-copy > p {
+  color: #20221c;
+}
+
+/* Keep the call-to-action clearly visible */
+.build-copy > div:last-child > a:first-child {
+  background: #20221c !important;
+  color: #fffdf2 !important;
+}
+
+.build-copy > div:last-child > a:first-child:hover {
+  background: #34372d !important;
+}
+
+.build-copy .light-link {
+  color: #20221c;
+}
