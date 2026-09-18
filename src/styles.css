@@ -179,3 +179,127 @@
 .build-copy .light-link {
   color: #20221c;
 }
+/* =========================================
+   PROJECT CASE STUDIES — EDITORIAL REDESIGN
+   ========================================= */
+
+/* Give the case-study section comfortable spacing */
+.case-sections {
+  display: grid;
+  gap: 0;
+  width: 100%;
+  min-width: 0;
+  border-top: 1px solid var(--border);
+}
+
+/* Each stage becomes a clearly separated editorial row */
+.case-sections > article {
+  display: grid;
+  grid-template-columns: 3.5rem minmax(0, 1fr);
+  align-items: start;
+  gap: 1.5rem;
+  padding: 2.5rem 0;
+  border-bottom: 1px solid var(--border);
+}
+
+/* Small lime number badges */
+.case-sections > article > span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.8rem;
+  height: 2.8rem;
+  border-radius: 50%;
+  background: var(--accent);
+  color: var(--accent-foreground);
+  font-family: var(--font-sans);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+/* Prevent long text from overflowing on phones */
+.case-sections > article > div {
+  min-width: 0;
+}
+
+/* Elegant serif headings */
+.case-sections h3 {
+  margin: 0 0 1rem;
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 3.2vw, 3.5rem);
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: -0.025em;
+  color: var(--foreground);
+}
+
+/* Readable descriptions with controlled line length */
+.case-sections article p {
+  max-width: 42rem;
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: clamp(0.98rem, 1.15vw, 1.08rem);
+  font-weight: 400;
+  line-height: 1.85;
+  color: var(--muted-foreground);
+  overflow-wrap: break-word;
+}
+
+/* Style the existing technology/tool tags */
+.case-sections article:last-child > div > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-top: 1.5rem;
+}
+
+.case-sections article:last-child > div > div > span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.3rem;
+  padding: 0.6rem 0.9rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--soft);
+  color: var(--foreground);
+  font-size: 0.7rem;
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: 0.02em;
+}
+
+/* Mobile refinements */
+@media (max-width: 640px) {
+  .case-sections > article {
+    grid-template-columns: 2.65rem minmax(0, 1fr);
+    gap: 0.9rem;
+    padding: 2rem 0;
+  }
+
+  .case-sections > article > span {
+    width: 2.35rem;
+    height: 2.35rem;
+    font-size: 0.65rem;
+  }
+
+  .case-sections h3 {
+    margin-bottom: 0.85rem;
+    font-size: clamp(1.85rem, 8vw, 2.6rem);
+    line-height: 1.05;
+  }
+
+  .case-sections article p {
+    font-size: 0.95rem;
+    line-height: 1.75;
+  }
+
+  .case-sections article:last-child > div > div {
+    gap: 0.45rem;
+  }
+
+  .case-sections article:last-child > div > div > span {
+    padding: 0.5rem 0.7rem;
+    font-size: 0.65rem;
+  }
+}
