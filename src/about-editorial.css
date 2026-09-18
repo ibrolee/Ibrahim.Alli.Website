@@ -24,16 +24,23 @@
   .hero-wordmark{overflow-wrap:normal}
 }
 
-/* Explicitly pin background AND text for all mobile tap/disclosure states.
-   Important prevents a generic hover, focus or animated class from overriding contrast. */
+/* The expanded story can be far taller than the viewport. Never fade or
+   translate this interactive panel as one scroll-reveal element: otherwise
+   its opacity can remain near zero while its dark background fades to cream. */
 .personal-block .personal-list > div.personal-story-trigger,
 .personal-block .personal-list > div.personal-story-trigger:hover,
 .personal-block .personal-list > div.personal-story-trigger:active,
 .personal-block .personal-list > div.personal-story-trigger:focus-within,
-.personal-block .personal-list > div.personal-story-trigger:has(details[open]) {
+.personal-block .personal-list > div.personal-story-trigger:has(details[open]),
+.personal-block .personal-list > div.personal-story-trigger.scroll-reveal,
+.personal-block .personal-list > div.personal-story-trigger.scroll-reveal-visible {
   background: #1b1b17 !important;
   background-image: none !important;
   color: #f5f2e7 !important;
+  opacity: 1 !important;
+  transform: none !important;
+  transition: none !important;
+  will-change: auto !important;
 }
 .personal-block .personal-story-trigger > strong,
 .personal-block .personal-story-trigger .personal-story,
