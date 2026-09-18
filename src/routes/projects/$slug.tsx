@@ -3,106 +3,48 @@ import { ArrowLeft, ArrowRight, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { projects } from "@/lib/portfolio-content";
 
-const SITE_URL = "https://ibrahimalli.com";
-const OG_IMAGE = `${SITE_URL}/og-image.jpg`;
-
 export const Route = createFileRoute("/projects/$slug")({
   loader: ({ params }) => {
     const project = projects.find((item) => item.slug === params.slug);
-
-    if (!project) {
-      throw notFound();
-    }
-
+    if (!project) throw notFound();
     return project;
   },
-
-  head: ({ loaderData, params }) => {
-    const title = loaderData
-      ? `${loaderData.name} — Ibrahim Alli`
-      : "Project unavailable — Ibrahim Alli";
-
-    const description =
-      loaderData?.summary ?? "Project case study by Ibrahim Alli.";
-
-    const pageUrl = `${SITE_URL}/projects/${encodeURIComponent(params.slug)}`;
-
-    return {
-      meta: [
-        {
-          title,
-        },
-        {
-          name: "description",
-          content: description,
-        },
-        {
-          property: "og:title",
-          content: title,
-        },
-        {
-          property: "og:description",
-          content: description,
-        },
-        {
-          property: "og:type",
-          content: "article",
-        },
-        {
-          property: "og:url",
-          content: pageUrl,
-        },
-        {
-          property: "og:image",
-          content: OG_IMAGE,
-        },
-        {
-          property: "og:image:width",
-          content: "1200",
-        },
-        {
-          property: "og:image:height",
-          content: "630",
-        },
-        {
-          property: "og:image:alt",
-          content: "Ibrahim Alli — Builder. Creator. Entrepreneur.",
-        },
-        {
-          name: "twitter:card",
-          content: "summary_large_image",
-        },
-        {
-          name: "twitter:title",
-          content: title,
-        },
-        {
-          name: "twitter:description",
-          content: description,
-        },
-        {
-          name: "twitter:image",
-          content: OG_IMAGE,
-        },
-        ...(!loaderData
-          ? [
-              {
-                name: "robots",
-                content: "noindex",
-              },
-            ]
-          : []),
-      ],
-
-      links: [
-        {
-          rel: "canonical",
-          href: pageUrl,
-        },
-      ],
-    };
-  },
-
+  head: ({ loaderData, params }) => ({
+    meta: [
+      {
+        title: loaderData
+          ? `${loaderData.name} — Ibrahim Alli`
+          : "Project unavailable — Ibrahim Alli",
+      },
+      {
+        name: "description",
+        content: loaderData?.summary ?? "Project case study by Ibrahim Alli.",
+      },
+      {
+        property: "og:title",
+        content: loaderData
+          ? `${loaderData.name} — Ibrahim Alli`
+          : "Project — Ibrahim Alli",
+      },
+      {
+        property: "og:description",
+        content: loaderData?.summary ?? "Project case study by Ibrahim Alli.",
+      },
+      { property: "og:type", content: "article" },
+      {
+        property: "og:url",
+        content: `https://ibrahimalli.com/projects/${params.slug}`,
+      },
+      { name: "twitter:card", content: "summary_large_image" },
+      ...(!loaderData ? [{ name: "robots", content: "noindex" }] : []),
+    ],
+    links: [
+      {
+        rel: "canonical",
+        href: `https://ibrahimalli.com/projects/${params.slug}`,
+      },
+    ],
+  }),
   component: ProjectPage,
 });
 
@@ -115,17 +57,15 @@ function ProjectPage() {
         <div className="mx-auto max-w-[1480px]">
           <Link
             to="/"
-            hash="projects"
+            hash="work"
             className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground hover:text-foreground"
           >
-            <ArrowLeft className="size-4" />
-            Back to projects
+            <ArrowLeft className="size-4" /> Back to projects
           </Link>
 
           <div className="mt-14 grid gap-9 lg:grid-cols-[1fr_0.8fr] lg:items-end">
             <div>
               <p className="eyebrow">Case study / {project.number}</p>
-
               <h1 className="mt-5 max-w-5xl font-display text-[clamp(3.8rem,8vw,8.5rem)] leading-[0.88]">
                 {project.name}
               </h1>
@@ -135,18 +75,13 @@ function ProjectPage() {
               <p className="text-sm font-medium text-accent-mark">
                 {project.type}
               </p>
-
               <p className="mt-5 text-lg leading-8 text-muted-foreground">
                 {project.summary}
               </p>
 
               {project.url && (
                 <Button asChild className="mt-7">
-                  <a
-                    href={project.url}
-                    target="_blank"
-                    rel="noreferrer"
-                  >
+                  <a href={project.url} target="_blank" rel="noreferrer">
                     Visit Website <ExternalLink />
                   </a>
                 </Button>
@@ -172,7 +107,6 @@ function ProjectPage() {
         <div className="section-inner grid gap-12 lg:grid-cols-[0.7fr_1.5fr]">
           <div>
             <p className="eyebrow">The work</p>
-
             <h2 className="section-title">
               From need to something usable.
             </h2>
@@ -187,7 +121,6 @@ function ProjectPage() {
             ].map(([title, body], i) => (
               <article key={title}>
                 <span>0{i + 1}</span>
-
                 <div>
                   <h3>{title}</h3>
                   <p>{body}</p>
@@ -197,10 +130,8 @@ function ProjectPage() {
 
             <article>
               <span>05</span>
-
               <div>
                 <h3>Technology / Tools</h3>
-
                 <div className="mt-5 flex flex-wrap gap-2">
                   {project.tools.map((tool) => (
                     <span
@@ -223,16 +154,12 @@ function ProjectPage() {
             <p className="eyebrow text-accent-foreground/60">
               Next conversation
             </p>
-
             <p className="mt-5 font-display text-5xl md:text-7xl">
               Have a project in mind?
             </p>
           </div>
 
-          <Button
-            asChild
-            className="bg-ink text-paper hover:bg-ink/90"
-          >
+          <Button asChild className="bg-ink text-paper hover:bg-ink/90">
             <Link to="/" hash="contact">
               Let’s Work Together <ArrowRight />
             </Link>
