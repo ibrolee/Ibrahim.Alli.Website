@@ -404,3 +404,24 @@
     white-space: nowrap;
   }
 }
+/* Bigger, evenly spaced homepage role */
+
+@media (max-width: 767px) {
+  .hero-role {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    width: 100%;
+    gap: 0.35rem;
+    margin-right: 0;
+    font-size: clamp(1.35rem, 5.4vw, 1.65rem);
+    letter-spacing: -0.055em;
+    line-height: 1.3;
+    white-space: nowrap;
+  }
+
+  .hero-role span {
+    color: inherit;
+    flex-shrink: 1;
+  }
+}
