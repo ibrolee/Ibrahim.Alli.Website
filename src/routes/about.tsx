@@ -2,75 +2,14 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { skills } from "@/lib/portfolio-content";
 
-const PAGE_URL = "https://ibrahimalli.com/about";
-const OG_IMAGE = "https://ibrahimalli.com/og-image.jpg";
-
 export const Route = createFileRoute("/about")({
   head: () => ({
     meta: [
-      {
-        title: "About Ibrahim Alli | Background, Experience & Skills",
-      },
+      { title: "About Ibrahim Alli" },
       {
         name: "description",
         content:
-          "Get to know Ibrahim Alli: his background, education, work experience, skills and interests across business, technology and creative work.",
-      },
-      {
-        property: "og:title",
-        content: "About Ibrahim Alli | Background, Experience & Skills",
-      },
-      {
-        property: "og:description",
-        content:
-          "The person behind the projects. Explore Ibrahim Alli's background, education, experience and interests.",
-      },
-      {
-        property: "og:type",
-        content: "profile",
-      },
-      {
-        property: "og:url",
-        content: PAGE_URL,
-      },
-      {
-        property: "og:image",
-        content: OG_IMAGE,
-      },
-      {
-        property: "og:image:width",
-        content: "1200",
-      },
-      {
-        property: "og:image:height",
-        content: "630",
-      },
-      {
-        property: "og:image:alt",
-        content: "Ibrahim Alli — Builder. Creator. Entrepreneur.",
-      },
-      {
-        name: "twitter:card",
-        content: "summary_large_image",
-      },
-      {
-        name: "twitter:title",
-        content: "About Ibrahim Alli | Background, Experience & Skills",
-      },
-      {
-        name: "twitter:description",
-        content:
-          "Background, education, work experience and interests of Ibrahim Alli.",
-      },
-      {
-        name: "twitter:image",
-        content: OG_IMAGE,
-      },
-    ],
-    links: [
-      {
-        rel: "canonical",
-        href: PAGE_URL,
+          "Background, education, experience, skills and interests of Ibrahim Alli.",
       },
     ],
   }),
@@ -144,7 +83,7 @@ function About() {
       <section className="about-block personal-block section">
         <div className="section-inner about-grid">
           <div>
-            <p className="eyebrow">01 / Personal</p>
+            <p className="eyebrow">Personal</p>
             <h2 className="section-title">
               The person
               <br />
@@ -186,9 +125,7 @@ function About() {
                   </article>
 
                   <article>
-                    <p className="story-label">
-                      2010 — Technology &amp; Gaming
-                    </p>
+                    <p className="story-label">2010 — Technology & Gaming</p>
                     <p>
                       Some of my strongest interests started developing around
                       2010, when I was in JSS. Technology and video gaming were
@@ -202,10 +139,10 @@ function About() {
                     <p>
                       My parents also played a big part in nurturing that
                       curiosity. Whenever they could, they did their best to
-                      get me whatever new technology or gadget I was
-                      interested in. Those experiences made technology feel
-                      less like something distant and more like something I
-                      could explore and understand myself.
+                      get me whatever new technology or gadget I was interested
+                      in. Those experiences made technology feel less like
+                      something distant and more like something I could explore
+                      and understand myself.
                     </p>
                   </article>
 
@@ -224,7 +161,7 @@ function About() {
 
                   <article>
                     <p className="story-label">
-                      NYSC — Leadership &amp; Service
+                      NYSC — Leadership & Service
                     </p>
                     <p>
                       Leadership had actually been part of my life long before
@@ -232,16 +169,16 @@ function About() {
                       responsibilities, including serving as an Art Department
                       class captain, Press Club role and Library Prefect.
                       During NYSC, I continued taking on leadership
-                      responsibilities, including serving as MCLO of the Ibiono
-                      Ibom Local Government MCAN group and later as President
-                      of the Drug-Free CDS group. I also worked with the
-                      Ibiono Ibom Local Government during my service year.
+                      responsibilities, including serving as MCLO of the
+                      Ibiono Ibom Local Government MCAN group and later as
+                      President of the Drug-Free CDS group. I also worked with
+                      the Ibiono Ibom Local Government during my service year.
                     </p>
                   </article>
 
                   <article>
                     <p className="story-label">
-                      Lagos — Love, Family &amp; A New Chapter
+                      Lagos — Love, Family & A New Chapter
                     </p>
                     <p>
                       After NYSC, I returned to Lagos and eventually
@@ -341,8 +278,8 @@ function About() {
                     <p>
                       <strong>
                         When I look at my journey so far, I can see how each
-                        of those pieces has shaped the person I am today — and
-                        I'm still becoming.
+                        of those pieces has shaped the person I am today —
+                        and I'm still becoming.
                       </strong>
                     </p>
                   </article>
@@ -363,7 +300,7 @@ function About() {
       <section className="about-block background-block section">
         <div className="section-inner about-grid">
           <div>
-            <p className="eyebrow">02 / Background</p>
+            <p className="eyebrow">Background</p>
             <h2 className="section-title">
               Different rooms.
               <br />
@@ -383,7 +320,7 @@ function About() {
         <div className="section-inner">
           <div className="section-heading-row">
             <div>
-              <p className="eyebrow">03 / Education</p>
+              <p className="eyebrow">Education</p>
               <h2 className="section-title">
                 What I
                 <br />
@@ -406,7 +343,7 @@ function About() {
               <span>2023</span>
               <div>
                 <h3>
-                  Master’s in Political Science &amp; International Relations
+                  Master’s in Political Science & International Relations
                 </h3>
                 <p>Bahçeşehir Cyprus University</p>
                 <small>Postgraduate degree</small>
@@ -420,7 +357,7 @@ function About() {
         <div className="section-inner">
           <div className="section-heading-row">
             <div>
-              <p className="eyebrow">04 / Work experience</p>
+              <p className="eyebrow">Work experience</p>
               <h2 className="section-title">
                 Where I’ve
                 <br />
@@ -436,7 +373,9 @@ function About() {
           <div className="experience-list">
             {experience.map((item, index) => (
               <article className="experience-card" key={item.company}>
-                <div className="experience-number">0{index + 1}</div>
+                <div className="experience-number">
+                  0{index + 1}
+                </div>
 
                 <div className="experience-main">
                   <p className="experience-period">{item.period}</p>
@@ -457,7 +396,7 @@ function About() {
       <section className="about-block skills-block section">
         <div className="section-inner about-grid">
           <div>
-            <p className="eyebrow">05 / Skills</p>
+            <p className="eyebrow">Skills</p>
             <h2 className="section-title">
               What I can
               <br />
@@ -483,7 +422,7 @@ function About() {
       <section className="about-block interests-block section">
         <div className="section-inner about-grid">
           <div>
-            <p className="eyebrow">06 / Interests</p>
+            <p className="eyebrow">Interests</p>
             <h2 className="section-title">
               Life outside
               <br />
@@ -512,16 +451,16 @@ function About() {
         <div className="section-inner hobby-note">
           <p>
             <strong>Photography</strong> is a personal hobby and creative
-            outlet — a way to pay attention to light, composition and everyday
-            details. It isn’t presented here as a professional photography
-            service.
+            outlet — a way to pay attention to light, composition and
+            everyday details. It isn’t presented here as a professional
+            photography service.
           </p>
         </div>
       </section>
 
       <section className="about-cta">
         <div className="section-inner">
-          <p className="eyebrow light">07 / What’s next</p>
+          <p className="eyebrow light">What’s next</p>
           <h2>
             Still building.
             <br />
