@@ -303,3 +303,18 @@
     font-size: 0.65rem;
   }
 }
+/* Fix invisible About Ibrahim button on homepage */
+.hero-actions a[href="/about"] {
+  background: transparent !important;
+  color: #fffdf2 !important;
+  border: 1px solid rgba(255, 253, 242, 0.65) !important;
+}
+
+.hero-actions a[href="/about"]:hover {
+  background: #fffdf2 !important;
+  color: #20221c !important;
+}
+
+.hero-actions a[href="/about"] svg {
+  color: inherit !important;
+}
