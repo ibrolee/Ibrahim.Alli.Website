@@ -5,6 +5,7 @@
 .personal-story article>p:not(.story-label){color:rgba(245,242,231,.85)}
 .personal-story article{border-bottom-color:rgba(245,242,231,.22)}
 .personal-story-trigger details{border-top-color:rgba(245,242,231,.3)}
+.experience-block .experience-number{color:var(--accent)}
 .about-cta .eyebrow{color:var(--accent-foreground)}
 
 /* Audit: protect narrow phones without changing the approved desktop design. */
