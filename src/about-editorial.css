@@ -1,1 +1,24 @@
 .about-page{overflow:hidden}.about-hero{position:relative;background:var(--ink);color:var(--paper);min-height:76vh;display:flex;align-items:center;isolation:isolate}.about-hero::before{content:"ABOUT / IA";position:absolute;right:-.04em;bottom:-.2em;font:400 clamp(10rem,28vw,32rem)/1 var(--font-display);letter-spacing:-.08em;color:rgba(255,255,255,.035);white-space:nowrap;pointer-events:none;z-index:-1}.about-hero .back-link{color:var(--paper);opacity:.75;transition:opacity .25s}.about-hero .back-link:hover{opacity:1}.about-hero-grid{margin-top:clamp(4rem,10vh,8rem);align-items:end;gap:clamp(2rem,6vw,7rem)}.about-hero .eyebrow{color:var(--accent);margin-bottom:1.6rem}.about-title{font-size:clamp(5rem,12vw,12rem);line-height:.83;letter-spacing:-.055em;font-weight:400}.about-title em{color:var(--accent);font-weight:400}.about-lead{max-width:31rem;font-size:clamp(1.15rem,1.8vw,1.65rem);line-height:1.5;color:rgba(255,255,255,.74);padding-bottom:.65rem}.about-block{border-bottom:1px solid var(--border)}.about-block .section-title{letter-spacing:-.035em}.personal-block{background:var(--paper)}.personal-list{border-top:1px solid var(--border)}.personal-list>div{transition:background .25s,padding .25s}.personal-list>div:hover{background:rgba(0,0,0,.025)}.personal-story-trigger{background:var(--ink);color:var(--paper);padding:clamp(1.5rem,3vw,3rem)!important;margin-bottom:1rem}.personal-story-trigger>span{color:var(--accent)!important}.personal-story-trigger strong{color:var(--paper)}.personal-story-trigger summary{color:var(--accent);cursor:pointer}.personal-story{color:var(--paper)}.background-block{background:var(--soft)}.about-prose p:first-child{font-size:clamp(1.4rem,2.3vw,2.2rem);line-height:1.4;color:var(--ink)}.education-card,.experience-card{transition:background .25s,transform .25s}.education-card:hover,.experience-card:hover{background:rgba(0,0,0,.025)}.education-card>span,.experience-number{color:var(--accent-mark)}.skills-block{background:var(--ink);color:var(--paper)}.skills-block .eyebrow{color:var(--accent)}.skills-block .section-title{color:var(--paper)}.skills-block .section-title em{color:var(--accent)}.skills-block .skill-group{border-color:rgba(255,255,255,.2)}.skills-block .skill-group h3{color:var(--paper)}.skills-block .skill-group span{border-color:rgba(255,255,255,.22);color:var(--paper)}.interests-block{background:var(--paper)}.interest-grid-about>div{transition:background .25s,transform .25s}.interest-grid-about>div:hover{background:var(--soft);transform:translateY(-2px)}.about-cta{position:relative;overflow:hidden}.about-cta::after{content:"IA";position:absolute;right:-.05em;bottom:-.4em;font:400 clamp(14rem,35vw,40rem)/1 var(--font-display);color:rgba(255,255,255,.04);pointer-events:none}.about-cta .section-inner{position:relative;z-index:1}.about-cta h2{letter-spacing:-.045em}@media(max-width:768px){.about-hero{min-height:70svh}.about-hero-grid{margin-top:3.5rem}.about-title{font-size:clamp(4.3rem,15vw,7rem)}.about-lead{font-size:1.1rem}.personal-story-trigger{padding:1.5rem!important}.about-cta::after{bottom:-.2em}}@media(prefers-reduced-motion:reduce){.about-page *{transition:none!important}}
+
+/* Audit: story text had inherited dark-on-dark colors when the disclosure was opened. */
+.personal-story .story-label{color:var(--accent)}
+.personal-story article>p:not(.story-label){color:rgba(245,242,231,.85)}
+.personal-story article{border-bottom-color:rgba(245,242,231,.22)}
+.personal-story-trigger details{border-top-color:rgba(245,242,231,.3)}
+.about-cta .eyebrow{color:var(--accent-foreground)}
+
+/* Audit: protect narrow phones without changing the approved desktop design. */
+@media(max-width:640px){
+  .hero-kicker{flex-wrap:wrap;row-gap:.5rem}
+  .hero-scroll{color:rgba(245,242,231,.8)}
+  .build-title{font-size:clamp(3.45rem,12vw,5.4rem)}
+  .footer-brand{font-size:clamp(3rem,11vw,5.5rem)}
+  .about-title{font-size:clamp(3.7rem,14vw,6.8rem)}
+  .about-cta h2{font-size:clamp(3.4rem,12vw,6rem);line-height:.86}
+  .personal-list>div:not(.personal-story-trigger){grid-template-columns:minmax(0,6rem) minmax(0,1fr)}
+  .personal-list strong,.education-card h3,.experience-main h3{overflow-wrap:break-word}
+}
+@media(max-width:360px){
+  .hero-actions>a{width:100%;justify-content:center}
+  .hero-wordmark{overflow-wrap:normal}
+}
