@@ -34,18 +34,26 @@ export function SiteHeader() {
           <Link to="/" hash="contact" className="nav-cta">Let’s talk <span>↗</span></Link>
         </nav>
 
-        <Button variant="ghost" size="icon" className="mobile-trigger" aria-label={open ? "Close menu" : "Open menu"} onClick={() => setOpen(!open)}>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="mobile-trigger"
+          aria-label={open ? "Close menu" : "Open menu"}
+          onClick={() => setOpen(!open)}
+        >
           {open ? <X /> : <Menu />}
         </Button>
       </div>
 
       <div className={open ? "mobile-menu open" : "mobile-menu"}>
         <nav aria-label="Mobile navigation">
-          <Link to="/" onClick={() => setOpen(false)}>Home <span>01</span></Link>
-          <Link to="/about" onClick={() => setOpen(false)}>About <span>02</span></Link>
-          <Link to="/" hash="work" onClick={() => setOpen(false)}>Work <span>03</span></Link>
-          <Link to="/" hash="web-development" onClick={() => setOpen(false)}>Web Development <span>04</span></Link>
-          <Link to="/" hash="contact" onClick={() => setOpen(false)} className="mobile-talk">Let’s talk <span>↗</span></Link>
+          <Link to="/" onClick={() => setOpen(false)}>Home</Link>
+          <Link to="/about" onClick={() => setOpen(false)}>About</Link>
+          <Link to="/" hash="work" onClick={() => setOpen(false)}>Work</Link>
+          <Link to="/" hash="web-development" onClick={() => setOpen(false)}>Web Development</Link>
+          <Link to="/" hash="contact" onClick={() => setOpen(false)} className="mobile-talk">
+            Let’s talk <span>↗</span>
+          </Link>
         </nav>
       </div>
     </header>
