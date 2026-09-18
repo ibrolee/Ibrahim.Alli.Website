@@ -318,3 +318,17 @@
 .hero-actions a[href="/about"] svg {
   color: inherit !important;
 }
+/* Make project labels and tags easier to read */
+
+.project-meta {
+  color: #44463c;
+  font-weight: 700;
+}
+
+.project-tags span {
+  color: #24251f;
+  background: #eeeee4;
+  border: 1px solid #a5a69a;
+  font-weight: 600;
+  opacity: 1;
+}
