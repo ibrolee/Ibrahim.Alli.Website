@@ -214,7 +214,7 @@ function Home() {
                 </Link>
 
                 <div className="project-meta">
-                  <span>{project.number}</span>
+                  <span>PROJECT {project.number}</span>
                   <span>{project.type}</span>
                 </div>
 
