@@ -1,11 +1,43 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowDown, ArrowRight, ExternalLink, MoveUpRight } from "lucide-react";
+import {
+  ArrowDown,
+  ArrowRight,
+  ExternalLink,
+  MoveUpRight,
+} from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { projects } from "@/lib/portfolio-content";
 
 const SITE_URL = "https://ibrahimalli.com";
 const OG_IMAGE = `${SITE_URL}/og-image.jpg`;
+
+const webServices = [
+  {
+    number: "01",
+    title: "Business websites",
+    description:
+      "Professional, mobile-friendly websites that help businesses and personal brands present themselves clearly and make it easy for customers to get in touch.",
+  },
+  {
+    number: "02",
+    title: "E-commerce stores",
+    description:
+      "Online storefronts with organised product listings, shopping carts and straightforward checkout experiences designed around the customer journey.",
+  },
+  {
+    number: "03",
+    title: "Business systems",
+    description:
+      "Practical digital tools for everyday operations, including membership management, staff portals and QR-based check-in systems.",
+  },
+  {
+    number: "04",
+    title: "Website improvements",
+    description:
+      "Updates and redesigns that improve an existing website’s appearance, mobile experience, content structure and ease of use.",
+  },
+];
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -49,8 +81,7 @@ export const Route = createFileRoute("/")({
       },
       {
         property: "og:image:alt",
-        content:
-          "Ibrahim Alli — Builder. Creator. Entrepreneur.",
+        content: "Ibrahim Alli — Builder. Creator. Entrepreneur.",
       },
       {
         name: "twitter:card",
@@ -85,6 +116,7 @@ function Home() {
     <main>
       <section className="home-hero">
         <div className="hero-noise" aria-hidden="true" />
+
         <div className="hero-monogram" aria-hidden="true">
           IA
         </div>
@@ -145,6 +177,7 @@ function Home() {
           <div className="section-heading-row">
             <div>
               <p className="eyebrow">02 / Selected work</p>
+
               <h2 className="section-title">
                 Things I’ve
                 <br />
@@ -174,6 +207,7 @@ function Home() {
                     alt={`${project.name} project`}
                     className="project-image"
                   />
+
                   <span className="project-open">
                     <MoveUpRight />
                   </span>
@@ -213,6 +247,7 @@ function Home() {
         <div className="section-inner build-inner">
           <div>
             <p className="eyebrow light">03 / Web development</p>
+
             <h2 className="build-title">
               I build
               <br />
@@ -222,20 +257,118 @@ function Home() {
 
           <div className="build-copy">
             <p className="build-lead">
-              What started as learning how to improve my own businesses has
-              grown into a real creative and technical skill.
+              Websites and digital tools built around real business needs.
             </p>
 
             <p>
-              I design and build responsive websites, e-commerce experiences
-              and digital systems for small businesses and personal brands. I
-              care about how something looks, but also whether it actually
-              works.
+              What started as improving my own businesses has grown into
+              designing and building digital experiences for others. I focus
+              on clear design, mobile-friendly layouts and functionality
+              that makes everyday tasks easier.
             </p>
 
-            <Link to="/about" className="text-link light-link">
-              See my background <ArrowRight />
-            </Link>
+            <p
+              style={{
+                marginTop: "1.5rem",
+                marginBottom: "0.75rem",
+                fontSize: "0.75rem",
+                fontWeight: 700,
+                letterSpacing: "0.16em",
+                textTransform: "uppercase",
+                opacity: 0.7,
+              }}
+            >
+              What I can help you with
+            </p>
+
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+                gap: "0.85rem",
+                marginTop: "1rem",
+                marginBottom: "2rem",
+              }}
+            >
+              {webServices.map((service) => (
+                <article
+                  key={service.number}
+                  style={{
+                    border: "1px solid rgba(255,255,255,0.2)",
+                    borderRadius: "4px",
+                    padding: "1.35rem",
+                    background: "rgba(255,255,255,0.035)",
+                  }}
+                >
+                  <span
+                    style={{
+                      display: "block",
+                      marginBottom: "1.2rem",
+                      fontSize: "0.75rem",
+                      fontWeight: 700,
+                      letterSpacing: "0.12em",
+                      color: "#d5f477",
+                    }}
+                  >
+                    {service.number} / SERVICE
+                  </span>
+
+                  <h3
+                    style={{
+                      margin: "0 0 0.75rem",
+                      color: "#ffffff",
+                      fontSize: "1.25rem",
+                      lineHeight: 1.25,
+                      fontWeight: 600,
+                    }}
+                  >
+                    {service.title}
+                  </h3>
+
+                  <p
+                    style={{
+                      margin: 0,
+                      fontSize: "0.92rem",
+                      lineHeight: 1.7,
+                      color: "rgba(255,255,255,0.72)",
+                    }}
+                  >
+                    {service.description}
+                  </p>
+                </article>
+              ))}
+            </div>
+
+            <div
+              style={{
+                display: "flex",
+                flexWrap: "wrap",
+                alignItems: "center",
+                gap: "1.5rem",
+              }}
+            >
+              <a
+                href="#contact"
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: "0.65rem",
+                  padding: "0.95rem 1.3rem",
+                  background: "#d5f477",
+                  color: "#171713",
+                  textDecoration: "none",
+                  fontSize: "0.9rem",
+                  fontWeight: 700,
+                }}
+              >
+                Discuss a project <ArrowRight size={17} />
+              </a>
+
+              <Link to="/about" className="text-link light-link">
+                See my background <ArrowRight />
+              </Link>
+            </div>
           </div>
         </div>
       </section>
@@ -320,7 +453,7 @@ function Home() {
                   strokeWidth="1.6"
                 />
                 <path
-                  d="M9.15 8.2c-.25-.55-.52-.57-.76-.58h-.65c-.23 0-.6.09-.91.43-.31.34-1.18 1.15-1.18 2.8s1.21 3.25 1.38 3.47c.17.22 2.34 3.75 5.79 5.1 2.86 1.12 3.45.9 4.07.84.62-.06 2-.81 2.28-1.6.28-.79.28-1.46.2-1.6-.08-.14-.31-.22-.65-.39-.34-.17-2-.99-2.31-1.1-.31-.11-.53-.17-.76.17-.23.34-.87 1.1-1.06 1.32-.2.22-.39.25-.73.08-.34-.17-1.43-.53-2.72-1.68-1.01-.9-1.69-2-1.89-2.34-.2-.34-.02-.52.15-.69.15-.15.34-.39.51-.59.17-.2.22-.34.34-.56.11-.22.06-.42-.03-.59-.08-.17-.73-1.81-1.02-2.48Z"
+                  d="M9.15 8.2c-.25-.55-.52-.57-.76-.58h-.65c-.23 0-.6.09-.91.43-.31.34-1.18 1.15-1.18 2.8s1.21 3.25 1.38 3.47c.17.22 2.34 3.75 5.79 5.1 2.86 1.12 3.45.9 4.07.84.62-.06 2-.99-2.31-1.1-.31-.11-.53-.17-.76.17-.23.34-.87 1.1-1.06 1.32-.2.22-.39.25-.73.08-.34-.17-1.43-.53-2.72-1.68-1.01-.9-1.69-2-1.89-2.34-.2-.34-.02-.52.15-.69.15-.15.34-.39.51-.59.17-.2.22-.34.34-.56.11-.22.06-.42-.03-.59-.08-.17-.73-1.81-1.02-2.48Z"
                   fill="currentColor"
                 />
               </svg>
