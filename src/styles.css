@@ -332,3 +332,50 @@
   font-weight: 600;
   opacity: 1;
 }
+/* =========================================
+   SMOOTH SCROLL REVEAL ANIMATIONS
+   ========================================= */
+
+@media (prefers-reduced-motion: no-preference) {
+  .scroll-reveal {
+    opacity: 0;
+    transform: translate3d(0, 28px, 0);
+    transition:
+      opacity 750ms cubic-bezier(0.22, 1, 0.36, 1),
+      transform 750ms cubic-bezier(0.22, 1, 0.36, 1);
+    transition-delay: var(--reveal-delay, 0ms);
+    will-change: opacity, transform;
+  }
+
+  .scroll-reveal.scroll-reveal-visible {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+
+  .project-image {
+    transition: transform 850ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .project-image-wrap:hover .project-image {
+    transform: scale(1.045);
+  }
+
+  .text-link svg,
+  .hero-actions svg {
+    transition: transform 250ms ease;
+  }
+
+  .text-link:hover svg,
+  .hero-actions a:hover svg {
+    transform: translateX(4px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scroll-reveal,
+  .scroll-reveal.scroll-reveal-visible {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+}
