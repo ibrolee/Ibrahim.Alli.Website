@@ -425,3 +425,74 @@
     flex-shrink: 1;
   }
 }
+/* =========================================
+   CONTACT BUTTONS
+   ========================================= */
+
+.contact-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+}
+
+.contact-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  min-height: 58px;
+  padding: 0.9rem 1.2rem;
+  border-radius: 999px;
+  font-family: "DM Sans", sans-serif;
+  font-size: 0.95rem;
+  font-weight: 600;
+  line-height: 1.2;
+  text-decoration: none;
+  transition:
+    transform 250ms ease,
+    box-shadow 250ms ease,
+    background-color 250ms ease;
+}
+
+.contact-button svg {
+  width: 21px;
+  height: 21px;
+  flex-shrink: 0;
+}
+
+.contact-button-email {
+  background: #171713;
+  color: #ffffff;
+}
+
+.contact-button-whatsapp {
+  background: #25d366;
+  color: #102b19;
+}
+
+.contact-button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+@media (max-width: 767px) {
+  .contact-actions {
+    gap: 0.75rem;
+  }
+
+  .contact-button {
+    width: 100%;
+    justify-content: space-between;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .contact-button {
+    transition: none;
+  }
+
+  .contact-button:hover {
+    transform: none;
+  }
+}
