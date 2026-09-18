@@ -18,7 +18,9 @@ function NotFoundComponent() {
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="max-w-md text-center">
         <h1 className="text-7xl font-bold text-foreground">404</h1>
-        <h2 className="mt-4 text-xl font-semibold text-foreground">Page not found</h2>
+        <h2 className="mt-4 text-xl font-semibold text-foreground">
+          Page not found
+        </h2>
         <p className="mt-2 text-sm text-muted-foreground">
           The page you're looking for doesn't exist or has been moved.
         </p>
@@ -35,11 +37,15 @@ function NotFoundComponent() {
   );
 }
 
-function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
+function ErrorComponent({
+  error,
+  reset,
+}: {
+  error: Error;
+  reset: () => void;
+}) {
   console.error(error);
   const router = useRouter();
-  useEffect(() => {
-  }, [error]);
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
@@ -48,7 +54,8 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
           This page didn't load
         </h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          Something went wrong on our end. You can try refreshing or head back home.
+          Something went wrong on our end. You can try refreshing or head back
+          home.
         </p>
         <div className="mt-6 flex flex-wrap justify-center gap-2">
           <button
@@ -72,32 +79,146 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   );
 }
 
-export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
-  head: () => ({
-    meta: [
-      { charSet: "utf-8" },
-      { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { name: "author", content: "Ibrahim Alli" },
-      { property: "og:site_name", content: "Ibrahim Alli" },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
-          ],
-    links: [
-      {
-        rel: "stylesheet",
-        href: appCss,
+/**
+ * Adds subtle reveal animations to existing site elements.
+ * No changes to individual homepage, About or project files are required.
+ */
+function ScrollAnimations() {
+  const router = useRouter();
+  const location = router.state.location;
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const reducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)"
+    ).matches;
+
+    if (reducedMotion || !("IntersectionObserver" in window)) {
+      return;
+    }
+
+    const selectors = [
+      ".section-heading-row",
+      ".project-card",
+      ".build-inner > div",
+      ".service-card",
+      ".contact-copy",
+      ".contact-actions",
+      ".about-hero-grid > div",
+      ".personal-list > div",
+      ".about-prose",
+      ".education-card",
+      ".experience-card",
+      ".skill-group",
+      ".interest-grid-about > div",
+      ".hobby-note",
+      ".about-cta .section-inner",
+      ".project-detail section",
+      ".case-study section",
+    ].join(", ");
+
+    const elements = Array.from(
+      document.querySelectorAll<HTMLElement>(selectors)
+    );
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+
+          const element = entry.target as HTMLElement;
+          element.classList.add("scroll-reveal-visible");
+          observer.unobserve(element);
+        });
       },
-      { rel: "icon", href: "/favicon.svg", type: "image/svg+xml" },
-      { rel: "preconnect", href: "https://fonts.googleapis.com" },
-      { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
-      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Instrument+Serif:ital@0;1&display=swap" },
-    ],
-  }),
-  shellComponent: RootShell,
-  component: RootComponent,
-  notFoundComponent: NotFoundComponent,
-  errorComponent: ErrorComponent,
-});
+      {
+        threshold: 0.08,
+        rootMargin: "0px 0px -35px 0px",
+      }
+    );
+
+    elements.forEach((element, index) => {
+      if (element.classList.contains("scroll-reveal-visible")) return;
+
+      // Do not hide content already visible when the page loads.
+      const bounds = element.getBoundingClientRect();
+      const initiallyVisible =
+        bounds.top < window.innerHeight && bounds.bottom > 0;
+
+      if (initiallyVisible) return;
+
+      element.classList.add("scroll-reveal");
+
+      // Small stagger for neighbouring cards, without excessive delays.
+      element.style.setProperty(
+        "--reveal-delay",
+        `${(index % 3) * 65}ms`
+      );
+
+      observer.observe(element);
+    });
+
+    return () => {
+      observer.disconnect();
+
+      // Prevent elements from remaining invisible during navigation.
+      elements.forEach((element) => {
+        element.classList.remove("scroll-reveal");
+        element.classList.remove("scroll-reveal-visible");
+        element.style.removeProperty("--reveal-delay");
+      });
+    };
+  }, [location.pathname]);
+
+  return null;
+}
+
+export const Route =
+  createRootRouteWithContext<{ queryClient: QueryClient }>()({
+    head: () => ({
+      meta: [
+        { charSet: "utf-8" },
+        {
+          name: "viewport",
+          content: "width=device-width, initial-scale=1",
+        },
+        { name: "author", content: "Ibrahim Alli" },
+        { property: "og:site_name", content: "Ibrahim Alli" },
+        { property: "og:type", content: "website" },
+        { name: "twitter:card", content: "summary_large_image" },
+      ],
+      links: [
+        {
+          rel: "stylesheet",
+          href: appCss,
+        },
+        {
+          rel: "icon",
+          href: "/favicon.svg",
+          type: "image/svg+xml",
+        },
+        {
+          rel: "preconnect",
+          href: "https://fonts.googleapis.com",
+        },
+        {
+          rel: "preconnect",
+          href: "https://fonts.gstatic.com",
+          crossOrigin: "anonymous",
+        },
+        {
+          rel: "stylesheet",
+          href: "https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Instrument+Serif:ital@0;1&display=swap",
+        },
+      ],
+    }),
+
+    shellComponent: RootShell,
+    component: RootComponent,
+    notFoundComponent: NotFoundComponent,
+    errorComponent: ErrorComponent,
+  });
 
 function RootShell({ children }: { children: ReactNode }) {
   return (
@@ -119,6 +240,7 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <SiteHeader />
+      <ScrollAnimations />
       <Outlet />
       <SiteFooter />
     </QueryClientProvider>
