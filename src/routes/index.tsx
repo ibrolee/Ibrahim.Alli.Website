@@ -135,12 +135,8 @@ function Home() {
 
           <div className="hero-bottom">
             <p className="hero-role">
-              Builder.
-              <br />
-              Creator.
-              <br />
-              Entrepreneur.
-            </p>
+  Builder. <span>·</span> Creator. <span>·</span> Entrepreneur.
+</p>
 
             <div className="hero-intro">
               <p>
