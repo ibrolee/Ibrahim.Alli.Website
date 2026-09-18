@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowDown, ArrowRight, MoveUpRight } from "lucide-react";
+import { ArrowDown, ArrowRight, MoveUpRight, Mail, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { projects } from "@/lib/portfolio-content";
 
@@ -118,22 +118,25 @@ function Home() {
         </div>
       </section>
 
-      <section id="contact" className="contact-section section">
-        <div className="section-inner contact-inner">
-          <div className="contact-copy">
-            <p className="eyebrow">Get in touch</p>
-            <h2 className="section-title">Have something<br /><em>in mind?</em></h2>
-            <p>For a website, digital project, business idea or simply a conversation — get in touch.</p>
+      <section id="contact" className="contact-section section" aria-labelledby="contact-heading">
+        <div className="section-inner contact-inner" style={{ alignItems: "start", gap: "clamp(2rem, 5vw, 5rem)" }}>
+          <div className="contact-copy" style={{ minWidth: 0 }}>
+            <p className="eyebrow">Get in touch / Start a conversation</p>
+            <h2 id="contact-heading" className="section-title" style={{ overflowWrap: "break-word" }}>Have something<br /><em>in mind?</em></h2>
+            <p style={{ maxWidth: "36rem", lineHeight: 1.75 }}>Need a business website, an online store, a practical digital system or improvements to an existing site? Tell me what you have in mind and what you’d like it to achieve.</p>
+            <p style={{ marginTop: "1.25rem", fontSize: ".75rem", fontWeight: 700, letterSpacing: ".13em", textTransform: "uppercase", opacity: .7 }}>Websites · E-commerce · Business systems · Redesigns</p>
           </div>
-          <div className="contact-actions" aria-label="Contact options">
-            <a className="contact-button contact-button-email" href="mailto:alliibrahim3@gmail.com" aria-label="Email Ibrahim Alli">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2" /><path d="m3 7 9 6 9-6" /></svg>
-              <span>Email me</span><MoveUpRight size={18} aria-hidden="true" />
+          <div className="contact-actions" aria-label="Choose how to contact Ibrahim" style={{ width: "100%", minWidth: 0, display: "flex", flexDirection: "column", gap: ".85rem" }}>
+            <p style={{ margin: "0 0 .4rem", fontSize: ".75rem", fontWeight: 700, letterSpacing: ".15em", textTransform: "uppercase", opacity: .7 }}>Choose how to reach me</p>
+            <a className="contact-button contact-button-email" href="mailto:alliibrahim3@gmail.com?subject=Project%20enquiry%20%E2%80%94%20Ibrahim%20Alli" aria-label="Email Ibrahim Alli about a project" style={{ width: "100%", minWidth: 0, display: "flex", alignItems: "center", gap: "1rem", padding: "clamp(1rem, 2vw, 1.5rem)" }}>
+              <Mail size={23} strokeWidth={1.7} aria-hidden="true" />
+              <span style={{ flex: 1, minWidth: 0, textAlign: "left" }}>Email me <small style={{ display: "block", marginTop: ".35rem", fontSize: ".75rem", fontWeight: 400, opacity: .75, overflowWrap: "anywhere" }}>alliibrahim3@gmail.com</small></span><MoveUpRight size={19} aria-hidden="true" />
             </a>
-            <a className="contact-button contact-button-whatsapp" href="https://wa.me/905488534011" target="_blank" rel="noopener noreferrer" aria-label="Chat with Ibrahim Alli on WhatsApp">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M12 3a9 9 0 0 0-7.7 13.7L3 21l4.4-1.3A9 9 0 1 0 12 3Z" /><path d="M8.5 8.5c.3-.3.6-.3.8.1l1 1.8c.1.3.1.5-.2.8l-.6.6c.7 1.3 1.8 2.4 3.1 3.1l.6-.6c.3-.3.5-.3.8-.2l1.8 1c.4.2.4.5.1.8-.6.8-1.5 1.1-2.4.8-2.8-.8-5.2-3.2-6-6-.3-.9 0-1.8 1-2.2Z" /></svg>
-              <span>Chat on WhatsApp</span><MoveUpRight size={18} aria-hidden="true" />
+            <a className="contact-button contact-button-whatsapp" href="https://wa.me/905488534011?text=Hi%20Ibrahim%2C%20I%27d%20like%20to%20discuss%20a%20project." target="_blank" rel="noopener noreferrer" aria-label="Start a WhatsApp conversation with Ibrahim Alli about a project" style={{ width: "100%", minWidth: 0, display: "flex", alignItems: "center", gap: "1rem", padding: "clamp(1rem, 2vw, 1.5rem)" }}>
+              <MessageCircle size={23} strokeWidth={1.7} aria-hidden="true" />
+              <span style={{ flex: 1, minWidth: 0, textAlign: "left" }}>Chat on WhatsApp <small style={{ display: "block", marginTop: ".35rem", fontSize: ".75rem", fontWeight: 400, opacity: .75 }}>Start a conversation</small></span><MoveUpRight size={19} aria-hidden="true" />
             </a>
+            <p style={{ margin: ".5rem 0 0", fontSize: ".85rem", lineHeight: 1.6, opacity: .7 }}>A short description of your idea is a great place to start.</p>
           </div>
         </div>
       </section>
