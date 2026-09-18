@@ -39,13 +39,15 @@ export function SiteHeader() {
           size="icon"
           className="mobile-trigger"
           aria-label={open ? "Close menu" : "Open menu"}
+          aria-controls="mobile-site-menu"
+          aria-expanded={open}
           onClick={() => setOpen(!open)}
         >
           {open ? <X /> : <Menu />}
         </Button>
       </div>
 
-      <div className={open ? "mobile-menu open" : "mobile-menu"}>
+      <div id="mobile-site-menu" className={open ? "mobile-menu open" : "mobile-menu"} aria-hidden={!open} inert={!open}>
         <nav aria-label="Mobile navigation">
           <Link to="/" onClick={() => setOpen(false)}>Home</Link>
           <Link to="/about" onClick={() => setOpen(false)}>About</Link>
