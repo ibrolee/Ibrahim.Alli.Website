@@ -68,23 +68,25 @@ function Home() {
         </div>
       </section>
 
-      <section id="work" className="work-section section">
+      <section id="work" className="work-section section" aria-labelledby="work-heading">
         <div className="section-inner">
           <div className="section-heading-row">
-            <div><p className="eyebrow">Selected work</p><h2 className="section-title">Things I’ve<br /><em>built.</em></h2></div>
-            <p className="heading-note">A few projects across business, e-commerce and creative product design.</p>
+            <div><p className="eyebrow">Selected work / 01—02</p><h2 id="work-heading" className="section-title">Things I’ve<br /><em>built.</em></h2></div>
+            <p className="heading-note">A closer look at the websites and practical digital experiences I’m building for real businesses.</p>
           </div>
-          <div className="project-grid">
+          <div className="project-grid" style={{ alignItems: "start" }}>
             {projects.map((project, index) => (
-              <article className={`project-card project-card-${index + 1}`} key={project.slug}>
-                <Link to="/projects/$slug" params={{ slug: project.slug }} className="project-image-wrap">
-                  <img src={project.image} alt={`${project.name} project`} width={1600} height={1000} loading="lazy" decoding="async" className="project-image" />
-                  <span className="project-open"><MoveUpRight /></span>
+              <article className={`project-card project-card-${index + 1}`} key={project.slug} style={{ minWidth: 0 }}>
+                <Link to="/projects/$slug" params={{ slug: project.slug }} className="project-image-wrap" aria-label={`Explore ${project.name} case study`} style={{ isolation: "isolate", border: "1px solid var(--border)", borderRadius: "3px" }}>
+                  <img src={project.image} alt={`${project.name} project preview`} width={1600} height={1000} loading="lazy" decoding="async" className="project-image" style={{ aspectRatio: "16 / 10", objectFit: "cover" }} />
+                  <span className="project-open" aria-hidden="true"><MoveUpRight /></span>
+                  <span aria-hidden="true" style={{ position: "absolute", left: "clamp(.75rem, 2vw, 1.5rem)", bottom: "clamp(.75rem, 2vw, 1.5rem)", display: "inline-flex", alignItems: "center", gap: ".5rem", padding: ".65rem .85rem", background: "var(--ink)", color: "var(--paper)", fontSize: ".65rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".1em", boxShadow: "0 5px 20px rgba(0,0,0,.18)" }}>View case study <ArrowRight size={14} /></span>
                 </Link>
-                <div className="project-meta"><span>PROJECT {project.number}</span><span>{project.type}</span></div>
-                <Link to="/projects/$slug" params={{ slug: project.slug }} className="project-name">{project.name}</Link>
-                <p className="project-summary">{project.summary}</p>
-                <div className="project-tags">{project.tags.map((tag) => <span key={tag}>{tag}</span>)}</div>
+                <div className="project-meta" style={{ paddingTop: "1.25rem", borderBottom: "1px solid var(--border)", paddingBottom: ".85rem", flexWrap: "wrap", alignItems: "baseline", rowGap: ".5rem" }}><span>PROJECT {project.number} / {index === 0 ? "LIVE BUSINESS" : "IN DEVELOPMENT"}</span><span>{project.type}</span></div>
+                <Link to="/projects/$slug" params={{ slug: project.slug }} className="project-name" style={{ marginTop: "1.2rem", overflowWrap: "break-word", display: "inline-block", lineHeight: ".98" }}>{project.name} <MoveUpRight size={22} style={{ display: "inline", verticalAlign: "middle", marginLeft: ".15em" }} aria-hidden="true" /></Link>
+                <p className="project-summary" style={{ marginTop: "1rem", maxWidth: "36rem" }}>{project.summary}</p>
+                <div className="project-tags" style={{ marginTop: "1.4rem", paddingTop: "1rem", borderTop: "1px solid var(--border)" }}>{project.tags.map((tag) => <span key={tag}>{tag}</span>)}</div>
+                <Link to="/projects/$slug" params={{ slug: project.slug }} className="text-link" style={{ marginTop: "1.5rem", color: "var(--foreground)" }}>Explore the project <ArrowRight aria-hidden="true" /></Link>
               </article>
             ))}
           </div>
