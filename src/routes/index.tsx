@@ -123,7 +123,7 @@ function Home() {
 
         <div className="hero-content">
           <div className="hero-kicker">
-            <span>01</span> Personal website · 2026
+            Personal portfolio
           </div>
 
           <div className="hero-wordmark" aria-label="Ibrahim Alli">
@@ -176,7 +176,7 @@ function Home() {
         <div className="section-inner">
           <div className="section-heading-row">
             <div>
-              <p className="eyebrow">02 / Selected work</p>
+              <p className="eyebrow">Selected work</p>
 
               <h2 className="section-title">
                 Things I’ve
@@ -246,7 +246,7 @@ function Home() {
 
         <div className="section-inner build-inner">
           <div>
-            <p className="eyebrow light">03 / Web development</p>
+            <p className="eyebrow light">Web development</p>
 
             <h2 className="build-title">
               I build
@@ -376,7 +376,7 @@ function Home() {
       <section id="contact" className="contact-section section">
         <div className="section-inner contact-inner">
           <div className="contact-copy">
-            <p className="eyebrow">04 / Contact</p>
+            <p className="eyebrow">Get in touch</p>
 
             <h2 className="section-title">
               Have something
@@ -410,7 +410,7 @@ function Home() {
                 aria-hidden="true"
               >
                 <path
-                  d="M3 5.5A2.5 2.5 0 0 1 5.5 3h13A2.5 2.5 0 0 1 21 5.5v13a2.5 2.5 0 0 1-2.5 2.5h-13A2.5 2.5 0 0 1 3 18.5v-13Z"
+                  d="M3 5.5A2.5 2.5 0 0 1 5.5 3h13A2.5 2.5 0 0 1 21 5.5v13a2.5 2.5 0 0 1-2.5 2.5h-13A2.5 2.5 0 1 1 3 18.5v-13Z"
                   fill="none"
                   stroke="currentColor"
                   strokeWidth="1.5"
@@ -453,7 +453,7 @@ function Home() {
                   strokeWidth="1.6"
                 />
                 <path
-                  d="M9.15 8.2c-.25-.55-.52-.57-.76-.58h-.65c-.23 0-.6.09-.91.43-.31.34-1.18 1.15-1.18 2.8s1.21 3.25 1.38 3.47c.17.22 2.34 3.75 5.79 5.1 2.86 1.12 3.45.9 4.07.84.62-.06 2-.99-2.31-1.1-.31-.11-.53-.17-.76.17-.23.34-.87 1.1-1.06 1.32-.2.22-.39.25-.73.08-.34-.17-1.43-.53-2.72-1.68-1.01-.9-1.69-2-1.89-2.34-.2-.34-.02-.52.15-.69.15-.15.34-.39.51-.59.17-.2.22-.34.34-.56.11-.22.06-.42-.03-.59-.08-.17-.73-1.81-1.02-2.48Z"
+                  d="M9.15 8.2c-.25-.55-.52-.57-.76-.58h-.65c-.23 0-.6.09-.91.43-.31.34-1.18 1.15-1.18 2.8s1.21 3.25 1.38 3.47c.17.22 2.34 3.75 5.79 5.1 2.86 1.12 3.45.9 4.07.84.62-.06 2-.81 2.28-1.6.28-.79.28-1.46.2-1.6-.08-.14-.31-.22-.65-.39-.17-.08-.73-.36-1.25-.61-.52-.25-1.02-.49-1.06-.51-.31-.11-.53-.17-.76.17-.23.34-.87 1.1-1.06 1.32-.2.22-.39.25-.73.08-.34-.17-1.43-.53-2.72-1.68-1.01-.9-1.69-2-1.89-2.34-.2-.34-.02-.52.15-.69.15-.15.34-.39.51-.59.17-.2.22-.34.34-.56.11-.22.06-.42-.03-.59-.08-.17-.73-1.81-1.02-2.48Z"
                   fill="currentColor"
                 />
               </svg>
