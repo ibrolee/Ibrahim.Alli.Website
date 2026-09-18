@@ -379,3 +379,20 @@
     transition: none !important;
   }
 }
+/* Keep the homepage role on one horizontal line */
+
+.hero-role {
+  white-space: nowrap;
+}
+
+.hero-role span {
+  color: #d5f477;
+}
+
+@media (max-width: 767px) {
+  .hero-role {
+    font-size: clamp(0.95rem, 3.8vw, 1.5rem);
+    letter-spacing: -0.035em;
+    line-height: 1.4;
+  }
+}
