@@ -117,6 +117,7 @@ export const projects: Project[] = [
       "Responsive design",
       "Brand presentation",
     ],
+    url: "https://jisbeautyfashion.com",
     challenge:
       "Give a beauty and fragrance business a credible digital storefront where products and brand character could be presented together.",
     approach:
@@ -124,7 +125,7 @@ export const projects: Project[] = [
     build:
       "Product presentation, e-commerce functionality, brand-led layouts, responsive pages and a customer purchasing experience.",
     result:
-      "A mobile-responsive e-commerce experience designed around product discovery and purchasing. The storefront remains under development.",
+      "A live, mobile-responsive e-commerce storefront designed around product discovery and purchasing, now available at jisbeautyfashion.com.",
     tools: [
       "Website design",
       "E-commerce",
