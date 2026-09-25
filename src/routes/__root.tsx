@@ -4,6 +4,7 @@ import {
   Link,
   createRootRouteWithContext,
   useRouter,
+  useRouterState,
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
@@ -13,6 +14,7 @@ import { SiteFooter } from "@/components/site-footer";
 
 import appCss from "../styles.css?url";
 import aboutCss from "../about-editorial.css?url";
+import dayyahCss from "../dayyah-couture.css?url";
 
 function NotFoundComponent() {
   return (
@@ -204,6 +206,10 @@ export const Route =
           href: aboutCss,
         },
         {
+          rel: "stylesheet",
+          href: dayyahCss,
+        },
+        {
           rel: "icon",
           href: "/favicon.svg",
           type: "image/svg+xml",
@@ -246,13 +252,17 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const pathname = useRouterState({
+    select: (state) => state.location.pathname,
+  });
+  const isDayyahConcept = pathname.startsWith("/dayyah-couture");
 
   return (
     <QueryClientProvider client={queryClient}>
-      <SiteHeader />
+      {!isDayyahConcept && <SiteHeader />}
       <ScrollAnimations />
       <Outlet />
-      <SiteFooter />
+      {!isDayyahConcept && <SiteFooter />}
     </QueryClientProvider>
   );
 }
