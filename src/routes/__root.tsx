@@ -14,7 +14,8 @@ import { SiteFooter } from "@/components/site-footer";
 
 import appCss from "../styles.css?url";
 import aboutCss from "../about-editorial.css?url";
-import dayyahCss from "../dayyah-couture.css?url";\nimport safiyyrCss from "../safiyyr.css?url";
+import dayyahCss from "../dayyah-couture.css?url";
+import safiyyrCss from "../safiyyr.css?url";
 
 function NotFoundComponent() {
   return (
@@ -259,7 +260,9 @@ function RootComponent() {
   const pathname = useRouterState({
     select: (state) => state.location.pathname,
   });
-  const isDayyahConcept = pathname.startsWith("/dayyah-couture");\n  const isSafiyyrConcept = pathname.startsWith("/safiyyr");\n  const isStandaloneConcept = isDayyahConcept || isSafiyyrConcept;
+  const isDayyahConcept = pathname.startsWith("/dayyah-couture");
+  const isSafiyyrConcept = pathname.startsWith("/safiyyr");
+  const isStandaloneConcept = isDayyahConcept || isSafiyyrConcept;
 
   return (
     <QueryClientProvider client={queryClient}>
