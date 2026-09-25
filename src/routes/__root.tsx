@@ -15,6 +15,7 @@ import { SiteFooter } from "@/components/site-footer";
 import appCss from "../styles.css?url";
 import aboutCss from "../about-editorial.css?url";
 import dayyahCss from "../dayyah-couture.css?url";
+import safiyyrCss from "../safiyyr.css?url";
 
 function NotFoundComponent() {
   return (
@@ -210,6 +211,10 @@ export const Route =
           href: dayyahCss,
         },
         {
+          rel: "stylesheet",
+          href: safiyyrCss,
+        },
+        {
           rel: "icon",
           href: "/favicon.svg",
           type: "image/svg+xml",
@@ -256,13 +261,15 @@ function RootComponent() {
     select: (state) => state.location.pathname,
   });
   const isDayyahConcept = pathname.startsWith("/dayyah-couture");
+  const isSafiyyrConcept = pathname.startsWith("/safiyyr");
+  const isStandaloneConcept = isDayyahConcept || isSafiyyrConcept;
 
   return (
     <QueryClientProvider client={queryClient}>
-      {!isDayyahConcept && <SiteHeader />}
+      {!isStandaloneConcept && <SiteHeader />}
       <ScrollAnimations />
       <Outlet />
-      {!isDayyahConcept && <SiteFooter />}
+      {!isStandaloneConcept && <SiteFooter />}
     </QueryClientProvider>
   );
 }
