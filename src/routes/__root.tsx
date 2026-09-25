@@ -210,6 +210,10 @@ export const Route =
           href: dayyahCss,
         },
         {
+          rel: "stylesheet",
+          href: safiyyrCss,
+        },
+        {
           rel: "icon",
           href: "/favicon.svg",
           type: "image/svg+xml",
