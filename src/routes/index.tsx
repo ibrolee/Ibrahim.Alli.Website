@@ -44,7 +44,7 @@ function Home() {
         <div className="hero-monogram" aria-hidden="true" style={{ opacity: 0.5 }}>IA</div>
         <div className="hero-content" style={{ display: "flex", flexDirection: "column", justifyContent: "center", paddingTop: "clamp(2rem, 5vw, 5rem)" }}>
           <div className="hero-kicker" style={{ justifyContent: "space-between", width: "100%", maxWidth: "1100px", borderBottom: "1px solid rgba(245,242,231,.18)", paddingBottom: "1rem", marginBottom: "clamp(2.5rem, 6vw, 6rem)" }}>
-            <span style={{ color: "var(--accent)" }}>IBRAHIM ALLI / PORTFOLIO</span>
+            <span style={{ color: "var(--accent)" }}>PERSONAL PORTFOLIO</span>
             <span style={{ color: "rgba(245,242,231,.6)" }}>DESIGN · DIGITAL · BUSINESS</span>
           </div>
           <h1 className="hero-wordmark" aria-label="Ibrahim Alli" style={{ display: "flex", flexDirection: "column", fontWeight: 400, fontSize: "clamp(4.5rem, 13.2vw, 12.8rem)", lineHeight: 0.81, letterSpacing: "-0.065em", maxWidth: "100%", margin: 0 }}>
@@ -60,6 +60,7 @@ function Home() {
               <p style={{ fontSize: "clamp(1rem, 1.3vw, 1.15rem)", lineHeight: 1.7, color: "rgba(245,242,231,.72)", margin: 0 }}>Builder. Creator. Entrepreneur. I create websites, e-commerce experiences and practical business systems that bring ideas to life.</p>
               <div className="hero-actions" style={{ marginTop: "1.5rem" }}>
                 <Button asChild size="lg"><a href="#work">Explore my work <ArrowRight /></a></Button>
+                <Button asChild variant="outline" size="lg"><Link to="/about">About me <ArrowRight /></Link></Button>
                 <Button asChild variant="outline" size="lg"><a href="#contact" style={{ border: "1px solid rgba(245,242,231,.45)", color: "var(--paper)", background: "transparent" }}>Start a project <MoveUpRight /></a></Button>
               </div>
             </div>
