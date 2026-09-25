@@ -18,7 +18,7 @@ export function SiteHeader() {
     <header className="site-header">
       <div className="header-inner">
         <Link to="/" className="brand-mark" aria-label="Ibrahim Alli home">
-          <span>Ibrahim</span><strong>Alli</strong><i>.</i>
+          {onHome ? <><strong>IA</strong><i>.</i></> : <><span>Ibrahim</span><strong>Alli</strong><i>.</i></>}
         </Link>
 
         <nav aria-label="Primary navigation" className="desktop-nav">
