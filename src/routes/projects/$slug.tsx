@@ -2,6 +2,7 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { ArrowLeft, ArrowRight, ExternalLink, Check, Smartphone, Users, QrCode, CreditCard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { projects } from "@/lib/portfolio-content";
+import { JisProjectVisual } from "@/components/jis-project-visual";
 
 export const Route = createFileRoute("/projects/$slug")({
   loader: ({ params }) => {
@@ -61,7 +62,11 @@ function ProjectPage() {
 
       <div className="px-5 md:px-10">
         <figure className="mx-auto max-w-[1480px] overflow-hidden">
-          <img src={project.image} alt={`${project.name} project presentation`} width={1600} height={1000} decoding="async" className="block h-auto w-full" />
+          {project.slug === "jis-beauty-fashion" ? (
+            <JisProjectVisual className="jis-portfolio-case-hero" />
+          ) : (
+            <img src={project.image} alt={`${project.name} project presentation`} width={1600} height={1000} decoding="async" className="block h-auto w-full" />
+          )}
           {isFitness && <figcaption className="border-b border-border py-4 text-xs leading-5 text-muted-foreground">Project presentation · Explore the live website for the current customer experience.</figcaption>}
         </figure>
       </div>
