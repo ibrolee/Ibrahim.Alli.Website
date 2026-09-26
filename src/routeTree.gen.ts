@@ -10,17 +10,17 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as ProjectsSlugRouteImport } from './routes/projects/$slug'
 import { Route as AboutRouteImport } from './routes/about'
+import { Route as DayyahCoutureIndexRouteImport } from './routes/dayyah-couture/index'
+import { Route as DayyahCouturePageRouteImport } from './routes/dayyah-couture/$page'
+import { Route as ProjectsSlugRouteImport } from './routes/projects/$slug'
+import { Route as SafiyyrIndexRouteImport } from './routes/safiyyr/index'
+import { Route as SafiyyrShopRouteImport } from './routes/safiyyr/shop'
+import { Route as SafiyyrProductSlugRouteImport } from './routes/safiyyr/product/$slug'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ProjectsSlugRoute = ProjectsSlugRouteImport.update({
-  id: '/projects/$slug',
-  path: '/projects/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AboutRoute = AboutRouteImport.update({
@@ -28,35 +28,110 @@ const AboutRoute = AboutRouteImport.update({
   path: '/about',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DayyahCoutureIndexRoute = DayyahCoutureIndexRouteImport.update({
+  id: '/dayyah-couture/',
+  path: '/dayyah-couture/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DayyahCouturePageRoute = DayyahCouturePageRouteImport.update({
+  id: '/dayyah-couture/$page',
+  path: '/dayyah-couture/$page',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProjectsSlugRoute = ProjectsSlugRouteImport.update({
+  id: '/projects/$slug',
+  path: '/projects/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SafiyyrIndexRoute = SafiyyrIndexRouteImport.update({
+  id: '/safiyyr/',
+  path: '/safiyyr/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SafiyyrShopRoute = SafiyyrShopRouteImport.update({
+  id: '/safiyyr/shop',
+  path: '/safiyyr/shop',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SafiyyrProductSlugRoute = SafiyyrProductSlugRouteImport.update({
+  id: '/safiyyr/product/$slug',
+  path: '/safiyyr/product/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/projects/$slug': typeof ProjectsSlugRoute
   '/about': typeof AboutRoute
+  '/dayyah-couture/$page': typeof DayyahCouturePageRoute
+  '/projects/$slug': typeof ProjectsSlugRoute
+  '/safiyyr/shop': typeof SafiyyrShopRoute
+  '/dayyah-couture/': typeof DayyahCoutureIndexRoute
+  '/safiyyr/': typeof SafiyyrIndexRoute
+  '/safiyyr/product/$slug': typeof SafiyyrProductSlugRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/projects/$slug': typeof ProjectsSlugRoute
   '/about': typeof AboutRoute
+  '/dayyah-couture/$page': typeof DayyahCouturePageRoute
+  '/projects/$slug': typeof ProjectsSlugRoute
+  '/safiyyr/shop': typeof SafiyyrShopRoute
+  '/dayyah-couture': typeof DayyahCoutureIndexRoute
+  '/safiyyr': typeof SafiyyrIndexRoute
+  '/safiyyr/product/$slug': typeof SafiyyrProductSlugRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/projects/$slug': typeof ProjectsSlugRoute
   '/about': typeof AboutRoute
+  '/dayyah-couture/$page': typeof DayyahCouturePageRoute
+  '/projects/$slug': typeof ProjectsSlugRoute
+  '/safiyyr/shop': typeof SafiyyrShopRoute
+  '/dayyah-couture/': typeof DayyahCoutureIndexRoute
+  '/safiyyr/': typeof SafiyyrIndexRoute
+  '/safiyyr/product/$slug': typeof SafiyyrProductSlugRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/projects/$slug' | '/about'
+  fullPaths:
+    | '/'
+    | '/about'
+    | '/dayyah-couture/$page'
+    | '/projects/$slug'
+    | '/safiyyr/shop'
+    | '/dayyah-couture/'
+    | '/safiyyr/'
+    | '/safiyyr/product/$slug'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/projects/$slug' | '/about'
-  id: '__root__' | '/' | '/projects/$slug' | '/about'
+  to:
+    | '/'
+    | '/about'
+    | '/dayyah-couture/$page'
+    | '/projects/$slug'
+    | '/safiyyr/shop'
+    | '/dayyah-couture'
+    | '/safiyyr'
+    | '/safiyyr/product/$slug'
+  id:
+    | '__root__'
+    | '/'
+    | '/about'
+    | '/dayyah-couture/$page'
+    | '/projects/$slug'
+    | '/safiyyr/shop'
+    | '/dayyah-couture/'
+    | '/safiyyr/'
+    | '/safiyyr/product/$slug'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  ProjectsSlugRoute: typeof ProjectsSlugRoute
   AboutRoute: typeof AboutRoute
+  DayyahCouturePageRoute: typeof DayyahCouturePageRoute
+  ProjectsSlugRoute: typeof ProjectsSlugRoute
+  SafiyyrShopRoute: typeof SafiyyrShopRoute
+  DayyahCoutureIndexRoute: typeof DayyahCoutureIndexRoute
+  SafiyyrIndexRoute: typeof SafiyyrIndexRoute
+  SafiyyrProductSlugRoute: typeof SafiyyrProductSlugRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -68,13 +143,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/projects/$slug': {
-      id: '/projects/$slug'
-      path: '/projects/$slug'
-      fullPath: '/projects/$slug'
-      preLoaderRoute: typeof ProjectsSlugRouteImport
-      parentRoute: typeof rootRouteImport
-    },
     '/about': {
       id: '/about'
       path: '/about'
@@ -82,13 +150,60 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AboutRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/dayyah-couture/': {
+      id: '/dayyah-couture/'
+      path: '/dayyah-couture'
+      fullPath: '/dayyah-couture/'
+      preLoaderRoute: typeof DayyahCoutureIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dayyah-couture/$page': {
+      id: '/dayyah-couture/$page'
+      path: '/dayyah-couture/$page'
+      fullPath: '/dayyah-couture/$page'
+      preLoaderRoute: typeof DayyahCouturePageRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/projects/$slug': {
+      id: '/projects/$slug'
+      path: '/projects/$slug'
+      fullPath: '/projects/$slug'
+      preLoaderRoute: typeof ProjectsSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/safiyyr/': {
+      id: '/safiyyr/'
+      path: '/safiyyr'
+      fullPath: '/safiyyr/'
+      preLoaderRoute: typeof SafiyyrIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/safiyyr/shop': {
+      id: '/safiyyr/shop'
+      path: '/safiyyr/shop'
+      fullPath: '/safiyyr/shop'
+      preLoaderRoute: typeof SafiyyrShopRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/safiyyr/product/$slug': {
+      id: '/safiyyr/product/$slug'
+      path: '/safiyyr/product/$slug'
+      fullPath: '/safiyyr/product/$slug'
+      preLoaderRoute: typeof SafiyyrProductSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  ProjectsSlugRoute: ProjectsSlugRoute,
   AboutRoute: AboutRoute,
+  DayyahCouturePageRoute: DayyahCouturePageRoute,
+  ProjectsSlugRoute: ProjectsSlugRoute,
+  SafiyyrShopRoute: SafiyyrShopRoute,
+  DayyahCoutureIndexRoute: DayyahCoutureIndexRoute,
+  SafiyyrIndexRoute: SafiyyrIndexRoute,
+  SafiyyrProductSlugRoute: SafiyyrProductSlugRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

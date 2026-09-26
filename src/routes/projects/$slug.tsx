@@ -37,7 +37,7 @@ function ProjectPage() {
   const isFitness = project.slug === "super-plus-fitness";
 
   return (
-    <main className="pt-18">
+    <main id="main-content" className="pt-18 premium-project-page">
       <section className="px-5 pb-12 pt-16 md:px-10 md:pb-20 md:pt-24">
         <div className="mx-auto max-w-[1480px]">
           <Link to="/" hash="work" className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground hover:text-foreground">
