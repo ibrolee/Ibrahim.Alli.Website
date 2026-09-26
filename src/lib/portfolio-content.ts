@@ -130,7 +130,9 @@ export const projects: Project[] = [
       "Website design",
       "E-commerce",
       "Responsive design",
-      "Canva",
+      "GitHub",
+      "Vercel",
+      "Supabase",
     ],
   },
 ];
