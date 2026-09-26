@@ -1322,3 +1322,11 @@
     transform: none !important;
   }
 }
+
+/* Preserve explicit button contrast inside the portfolio link reset. */
+.portfolio-shell a.bg-primary {
+  color: var(--primary-foreground);
+}
+.portfolio-shell a.bg-ink {
+  color: var(--paper);
+}
