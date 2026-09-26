@@ -1346,7 +1346,11 @@
     linear-gradient(135deg,#fff6f1 0%,#ffeef4 50%,#f5f1ff 100%);
 }
 .jis-portfolio-fill{height:100%;aspect-ratio:auto}
-.jis-portfolio-case-hero{min-height:560px}
+.jis-portfolio-case-hero{
+  min-height:0;
+  height:auto;
+  aspect-ratio:1.62;
+}
 .jis-portfolio-glow{
   position:absolute;border-radius:999px;filter:blur(42px);opacity:.55
 }
@@ -1530,8 +1534,16 @@
 
 @media (max-width:700px){
   .jis-portfolio-visual{aspect-ratio:1.38}
+  .jis-portfolio-case-hero{
+    min-height:0;
+    height:auto;
+    aspect-ratio:1.22;
+  }
   .jis-portfolio-home{left:3.5%;top:13%;width:32%;height:72%}
   .jis-portfolio-categories{left:33.5%;top:7%;width:34%;height:78%}
   .jis-portfolio-men{right:3.5%;top:13%;width:32%;height:72%}
+  .jis-portfolio-case-hero .jis-portfolio-home{left:5%;top:16%;width:29%;height:66%}
+  .jis-portfolio-case-hero .jis-portfolio-categories{left:35%;top:10%;width:30%;height:72%}
+  .jis-portfolio-case-hero .jis-portfolio-men{right:5%;top:16%;width:29%;height:66%}
   .jis-live-badge{left:4%;bottom:2.5%}
 }
