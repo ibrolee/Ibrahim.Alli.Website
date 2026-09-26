@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowDown, ArrowRight, MoveUpRight, Mail, MessageCircle } from "lucide-react";
 
 import { projects } from "@/lib/portfolio-content";
+import { JisProjectVisual } from "@/components/jis-project-visual";
 
 const SITE_URL = "https://ibrahimalli.com";
 const OG_IMAGE = `${SITE_URL}/og-image.jpg`;
@@ -108,13 +109,7 @@ function Home() {
                   aria-label="Explore JIS Beauty & Fashion"
                 >
                   <div className="p-featured-image">
-                    <img
-                      src={featured.image}
-                      alt="JIS Beauty & Fashion digital storefront project presentation"
-                      width={1600}
-                      height={1000}
-                      fetchPriority="high"
-                    />
+                    <JisProjectVisual className="jis-portfolio-fill" />
                   </div>
                   <div className="p-featured-caption">
                     <span>
@@ -185,14 +180,18 @@ function Home() {
                   className="p-project-image"
                   aria-label={`View ${project.name} case study`}
                 >
-                  <img
-                    src={project.image}
-                    alt={`${project.name} project presentation`}
-                    loading="lazy"
-                    decoding="async"
-                    width={1600}
-                    height={1000}
-                  />
+                  {project.slug === "jis-beauty-fashion" ? (
+                    <JisProjectVisual className="jis-portfolio-fill" />
+                  ) : (
+                    <img
+                      src={project.image}
+                      alt={`${project.name} project presentation`}
+                      loading="lazy"
+                      decoding="async"
+                      width={1600}
+                      height={1000}
+                    />
+                  )}
                   <span className="p-project-view">
                     View case study <MoveUpRight size={17} />
                   </span>
