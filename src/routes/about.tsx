@@ -55,7 +55,7 @@ const background = [
 
 function About() {
   return (
-    <main className="about-page">
+    <main id="main-content" className="about-page">
       <section className="about-hero section">
         <div className="section-inner">
           <Link to="/" className="back-link">
