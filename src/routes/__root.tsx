@@ -16,6 +16,7 @@ import appCss from "../styles.css?url";
 import aboutCss from "../about-editorial.css?url";
 import dayyahCss from "../dayyah-couture.css?url";
 import safiyyrCss from "../safiyyr.css?url";
+import sallysCss from "../sallys-apparel.css?url";
 import premiumCss from "../premium.css?url";
 
 function NotFoundComponent() {
@@ -198,6 +199,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         rel: "stylesheet",
         href: safiyyrCss,
       },
+      {
+        rel: "stylesheet",
+        href: sallysCss,
+      },
       { rel: "stylesheet", href: premiumCss },
       {
         rel: "icon",
@@ -247,7 +252,8 @@ function RootComponent() {
   });
   const isDayyahConcept = pathname.startsWith("/dayyah-couture");
   const isSafiyyrConcept = pathname.startsWith("/safiyyr");
-  const isStandaloneConcept = isDayyahConcept || isSafiyyrConcept;
+  const isSallysConcept = pathname.startsWith("/sallys-apparel");
+  const isStandaloneConcept = isDayyahConcept || isSafiyyrConcept || isSallysConcept;
 
   return (
     <QueryClientProvider client={queryClient}>
