@@ -2,6 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { Gamepad2, Headphones, Laptop, Menu, Smartphone, Tablet, Watch, X } from "lucide-react";
 import { useId, useState } from "react";
 import type { ReactNode } from "react";
+import { spsExactTemplates } from "@/lib/sps-exact-templates";
 
 export const SPS_ASSETS = {
   logo: "https://solaire-house-lagos.floot.app/_cdn/static/40a35046-e03f-4fd1-82ca-bf0bd3040825-super-plus-studios-logo.png",
@@ -79,10 +80,58 @@ function phoneVisual(model:string){
 
 export function SpsPhonePreview({model,skin,finish}:{model:string;skin:string;finish?:string}){
   const visual=phoneVisual(model);
+  const exact=spsExactTemplates[model];
   const rawId=useId().replace(/:/g,"");
   const patternId=`spsSkin${rawId}`;
   const frameId=`spsFrame${rawId}`;
   const shineId=`spsShine${rawId}`;
+
+  if(exact){
+    const [vx,vy,vw,vh]=exact.viewBox.split(" ").map(Number);
+    const exactLens=(cx:number,cy:number,r:number)=>(
+      <g>
+        <circle cx={cx} cy={cy} r={r+3.2} fill="#151922" stroke="rgba(255,255,255,.42)" strokeWidth="1.2"/>
+        <circle cx={cx} cy={cy} r={r} fill="#020409"/>
+        <circle cx={cx} cy={cy} r={r*.72} fill="#07111f"/>
+        <circle cx={cx-r*.23} cy={cy-r*.25} r={r*.16} fill="#7ba7d0" opacity=".78"/>
+        <circle cx={cx+r*.17} cy={cy+r*.22} r={r*.22} fill="#02060d"/>
+      </g>
+    );
+    return <div className={`sps-phone-stage exact-template finish-${(finish||"Matte").toLowerCase()}`}>
+      <svg className="sps-phone-render sps-exact-phone-render" viewBox={exact.viewBox} role="img" aria-label={model+" exact skin template preview"}>
+        <defs>
+          <pattern id={patternId} patternUnits="userSpaceOnUse" x={vx} y={vy} width={vw} height={vh}>
+            <image href={skin} x={vx} y={vy} width={vw} height={vh} preserveAspectRatio="xMidYMid slice"/>
+          </pattern>
+          <linearGradient id={frameId} x1="0" x2="1" y1="0" y2="1">
+            <stop offset="0" stopColor="#f4f5f7"/>
+            <stop offset=".2" stopColor="#8f959e"/>
+            <stop offset=".52" stopColor="#30343b"/>
+            <stop offset=".82" stopColor="#aeb3ba"/>
+            <stop offset="1" stopColor="#f0f1f3"/>
+          </linearGradient>
+          <linearGradient id={shineId} x1="0" x2="1">
+            <stop offset="0" stopColor="#fff" stopOpacity=".22"/>
+            <stop offset=".28" stopColor="#fff" stopOpacity=".02"/>
+            <stop offset=".72" stopColor="#000" stopOpacity=".10"/>
+            <stop offset="1" stopColor="#fff" stopOpacity=".16"/>
+          </linearGradient>
+        </defs>
+        <rect x={vx+2} y={vy+2} width={vw-4} height={vh-4} rx={Math.min(vw*.18,38)} fill={`url(#${frameId})`}/>
+        <path d={exact.body} fill={`url(#${patternId})`} fillRule="evenodd" stroke="rgba(255,255,255,.48)" strokeWidth="2.2"/>
+        <path d={exact.body} fill={`url(#${shineId})`} fillRule="evenodd" opacity=".38"/>
+        <path d={exact.camera} fill={`url(#${patternId})`} fillRule="evenodd" stroke="rgba(255,255,255,.40)" strokeWidth="1.4"/>
+        <path d={exact.camera} fill="#05070b" fillRule="evenodd" opacity=".08"/>
+        {exact.lenses.map((l,i)=><g key={i}>{exactLens(l.cx,l.cy,l.r)}</g>)}
+        {exact.sensors.map((s,i)=>s.kind==="flash"
+          ? <g key={i}><circle cx={s.cx} cy={s.cy} r={s.r+1.8} fill="#d9c98f"/><circle cx={s.cx} cy={s.cy} r={s.r} fill="#fff0bd"/></g>
+          : <circle key={i} cx={s.cx} cy={s.cy} r={s.r} fill={s.kind==="mic"?"#12161e":"#0b111a"} stroke="#657181" strokeWidth=".8"/>
+        )}
+      </svg>
+      <div className="sps-phone-shadow"/>
+      <span className="sps-phone-model">{model} · exact template</span>
+    </div>;
+  }
 
   const lens=(cx:number,cy:number,r=20)=>(
     <g>
