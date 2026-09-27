@@ -111,3 +111,81 @@
   .sps-phone-stage{min-height:445px;transform:scale(.92);transform-origin:center}
   .sps-studio-preview{padding-bottom:1.5rem}
 }
+
+
+/* Studio v3: device + design together, preview always visible */
+.sps-build-panel{max-width:780px}
+.sps-build-device-row{margin-top:1rem;display:flex;gap:.5rem;overflow-x:auto;padding-bottom:.25rem;scrollbar-width:none}
+.sps-build-device-row::-webkit-scrollbar{display:none}
+.sps-device-pill{min-width:150px;min-height:62px;padding:.55rem .65rem;display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:.5rem;border:1px solid #d9dde5;border-radius:.9rem;background:#fff;text-align:left}
+.sps-device-pill>svg{color:#2757ff}.sps-device-pill span strong,.sps-device-pill span small{display:block}.sps-device-pill span strong{font-size:.62rem}.sps-device-pill span small{margin-top:.12rem;color:#8b929b;font-size:.45rem}
+.sps-device-pill.active{min-width:180px;border:2px solid #2757ff;background:#f4f6ff}.sps-device-pill.coming{opacity:.58;cursor:not-allowed}
+.sps-device-pill.coming>svg:last-child{color:#999}
+.sps-build-section-label{margin-top:1.05rem;display:flex;justify-content:space-between;align-items:center}.sps-build-section-label span{color:#777f8a;font-size:.54rem;font-weight:800}.sps-build-section-label b{color:#2757ff;font-size:.54rem}
+.sps-design-carousel{margin-top:.5rem;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.55rem}
+.sps-design-carousel>button{padding:.4rem;display:grid;grid-template-columns:64px 1fr auto;align-items:center;gap:.5rem;border:1px solid #d9dde5;border-radius:.85rem;background:#fff;text-align:left;min-width:0}
+.sps-design-carousel>button.active{border:2px solid #2757ff;background:#f4f6ff}
+.sps-design-carousel img{width:64px;height:64px;object-fit:cover;border-radius:.62rem}
+.sps-design-carousel strong,.sps-design-carousel small{display:block}.sps-design-carousel strong{font-size:.58rem}.sps-design-carousel small{margin-top:.15rem;color:#8b929b;font-size:.43rem}.sps-design-carousel svg{color:#2757ff}
+.sps-model-field{margin-top:.75rem}
+.sps-model-field select{height:46px}
+
+/* Mobile behaves like a configurator, not a long page */
+@media(max-width:760px){
+  .sps-studio-page{height:100dvh;overflow:hidden}
+  .sps-studio-page .sps-topbar{height:30px;min-height:30px}
+  .sps-studio-page .sps-header{height:68px}
+  .sps-studio-page .sps-studio-shell{height:calc(100dvh - 98px);min-height:0;display:grid;grid-template-columns:1fr;grid-template-rows:40% 60%;overflow:hidden}
+  .sps-studio-page .sps-studio-preview{height:100%;min-height:0;padding:.6rem .85rem .45rem;display:grid;grid-template-rows:auto 1fr auto;background:linear-gradient(145deg,#141b35,#2e1c68);overflow:hidden}
+  .sps-studio-page .sps-preview-topline{font-size:.43rem}
+  .sps-studio-page .sps-preview-summary,.sps-studio-page .sps-preview-price{display:none}
+  .sps-studio-page .sps-phone-stage{--phone-w:102px;--phone-h:205px;min-height:0;height:100%;margin:0;transform:none;justify-content:center}
+  .sps-studio-page .sps-phone-stage.plus{--phone-w:109px;--phone-h:220px}
+  .sps-studio-page .sps-phone-stage.mini{--phone-w:90px;--phone-h:184px}
+  .sps-studio-page .sps-phone-stage.air{--phone-w:94px;--phone-h:211px}
+  .sps-studio-page .sps-phone-device{border-width:3px;border-radius:22px;transform:perspective(700px) rotateY(-5deg) rotateX(1deg)}
+  .sps-studio-page .sps-phone-stage.mini .sps-phone-device{border-radius:19px}
+  .sps-studio-page .sps-phone-stage.air .sps-phone-device{border-width:2px;border-radius:21px}
+  .sps-studio-page .sps-camera-block{transform:scale(.56);transform-origin:top left;top:7px;left:7px}
+  .sps-studio-page .camera-triple-plateau .sps-camera-block,.sps-studio-page .camera-single-plateau .sps-camera-block{transform:scale(.56);width:160%;transform-origin:top left}
+  .sps-studio-page .sps-phone-branding{bottom:9px;font-size:.24rem}
+  .sps-studio-page .sps-phone-personal{left:8px;right:8px;bottom:34px;padding:.25rem;font-size:.36rem}
+  .sps-studio-page .sps-phone-shadow{height:10px;filter:blur(7px)}
+  .sps-studio-page .sps-phone-model{margin-top:.2rem;font-size:.45rem}
+  .sps-studio-page .sps-preview-swatch-row{margin:0;gap:.3rem}
+  .sps-studio-page .sps-preview-swatch-row button{width:32px;height:32px;padding:2px;border-radius:.55rem}
+  .sps-studio-page .sps-preview-swatch-row img{border-radius:.38rem}
+
+  .sps-studio-page .sps-studio-builder{height:100%;min-height:0;padding:.55rem .9rem 1rem;justify-content:flex-start;overflow-y:auto;overscroll-behavior:contain;background:#f8f7f3;border-radius:1.15rem 1.15rem 0 0;box-shadow:0 -12px 28px rgba(8,12,24,.14)}
+  .sps-studio-page .sps-progress{position:sticky;top:0;z-index:3;margin:-.1rem -.1rem 0;padding:.25rem .1rem .45rem;background:#f8f7f3;font-size:.42rem}
+  .sps-studio-page .sps-builder-panel{margin-top:.45rem;max-width:none}
+  .sps-studio-page .sps-builder-panel h1{margin:.3rem 0 0;font-size:2.25rem;line-height:.88}
+  .sps-studio-page .sps-panel-label{font-size:.44rem}
+  .sps-studio-page .sps-builder-copy{display:none}
+  .sps-studio-page .sps-build-device-row{margin-top:.55rem;gap:.35rem}
+  .sps-studio-page .sps-device-pill{min-width:116px;min-height:47px;padding:.38rem .45rem;border-radius:.7rem;gap:.35rem}
+  .sps-studio-page .sps-device-pill.active{min-width:132px}
+  .sps-studio-page .sps-device-pill>svg{width:15px;height:15px}
+  .sps-studio-page .sps-device-pill span strong{font-size:.51rem}.sps-studio-page .sps-device-pill span small{font-size:.38rem}
+  .sps-studio-page .sps-model-field{margin-top:.5rem}.sps-studio-page .sps-field>span{font-size:.46rem}.sps-studio-page .sps-model-field select{height:39px;border-radius:.68rem;font-size:.72rem}
+  .sps-studio-page .sps-build-section-label{margin-top:.55rem}.sps-studio-page .sps-build-section-label span,.sps-studio-page .sps-build-section-label b{font-size:.45rem}
+  .sps-studio-page .sps-design-carousel{display:flex;overflow-x:auto;gap:.4rem;margin-top:.35rem;padding-bottom:.2rem;scrollbar-width:none}
+  .sps-studio-page .sps-design-carousel::-webkit-scrollbar{display:none}
+  .sps-studio-page .sps-design-carousel>button{min-width:135px;grid-template-columns:48px 1fr auto;padding:.3rem;gap:.35rem;border-radius:.68rem}
+  .sps-studio-page .sps-design-carousel img{width:48px;height:48px;border-radius:.48rem}
+  .sps-studio-page .sps-design-carousel strong{font-size:.48rem}.sps-studio-page .sps-design-carousel small{font-size:.36rem}
+  .sps-studio-page .sps-next{min-height:42px;margin-top:.6rem;padding:0 .8rem;font-size:.55rem}
+  .sps-studio-page .sps-note{display:none}
+  .sps-studio-page .sps-back{margin-bottom:.35rem}
+  .sps-studio-page .sps-choice>div{margin-top:.45rem}
+  .sps-studio-page .sps-choice button{min-height:36px;padding:0 .7rem}
+  .sps-studio-page .sps-field{margin-top:.65rem}
+  .sps-studio-page .sps-field input{height:42px}
+  .sps-studio-page .sps-personal-preview{margin-top:.5rem;padding:.65rem}
+  .sps-studio-page .sps-service-options{margin-top:.5rem;gap:.35rem}
+  .sps-studio-page .sps-service-options>button{padding:.55rem .65rem}
+  .sps-studio-page .sps-service-options strong{font-size:.55rem}.sps-studio-page .sps-service-options small{font-size:.42rem}
+  .sps-studio-page .sps-contact-grid{margin-top:.55rem;gap:.45rem}
+  .sps-studio-page .sps-contact-grid input{height:40px}
+  .sps-studio-page .sps-order-total{margin-top:.55rem;padding:.65rem}
+}
