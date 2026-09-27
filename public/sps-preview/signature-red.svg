@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 768 1024" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <linearGradient id="base" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#08090c"/>
+      <stop offset=".48" stop-color="#15181d"/>
+      <stop offset="1" stop-color="#050507"/>
+    </linearGradient>
+    <linearGradient id="silver" x1="0" y1="0" x2="1" y2=".2">
+      <stop offset="0" stop-color="#3d434a"/>
+      <stop offset=".38" stop-color="#e2e4e6"/>
+      <stop offset=".65" stop-color="#737980"/>
+      <stop offset="1" stop-color="#1b1f24"/>
+    </linearGradient>
+    <linearGradient id="red" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ff2a2f"/>
+      <stop offset=".48" stop-color="#c80910"/>
+      <stop offset="1" stop-color="#6f0207"/>
+    </linearGradient>
+    <pattern id="brush" width="14" height="14" patternUnits="userSpaceOnUse" patternTransform="rotate(-18)">
+      <path d="M0 2h14M0 7h14M0 12h14" stroke="#fff" stroke-opacity=".06" stroke-width=".8"/>
+    </pattern>
+  </defs>
+  <rect width="768" height="1024" fill="url(#base)"/>
+  <path d="M-140 115 320 -40 520 90 40 255Z" fill="#1d2126"/>
+  <path d="M-70 265 470 55 585 155 30 382Z" fill="url(#silver)"/>
+  <path d="M370 -30 840 155 760 280 300 90Z" fill="url(#red)"/>
+  <path d="M-120 455 330 250 455 345 10 565Z" fill="#0c0e12"/>
+  <path d="M230 375 840 160 800 395 335 555Z" fill="url(#red)"/>
+  <path d="M-95 650 335 470 500 595 25 795Z" fill="url(#silver)"/>
+  <path d="M400 545 850 410 785 650 345 790Z" fill="#171a20"/>
+  <path d="M-150 875 255 675 425 785 35 995Z" fill="url(#red)"/>
+  <path d="M270 800 850 605 820 890 385 1035Z" fill="url(#silver)"/>
+  <path d="M-30 1010 380 820 760 1035 510 1130Z" fill="#0c0d10"/>
+  <g fill="none" stroke="#ff3438" stroke-width="8" opacity=".9">
+    <path d="M-60 350 520 125"/>
+    <path d="M215 742 825 525"/>
+  </g>
+  <g fill="none" stroke="#f4f4f4" stroke-width="2" opacity=".42">
+    <path d="M-90 450 440 258"/>
+    <path d="M45 810 610 595"/>
+  </g>
+  <rect width="768" height="1024" fill="url(#brush)" opacity=".7"/>
+</svg>
