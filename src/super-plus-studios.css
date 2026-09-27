@@ -189,3 +189,26 @@
   .sps-studio-page .sps-contact-grid input{height:40px}
   .sps-studio-page .sps-order-total{margin-top:.55rem;padding:.65rem}
 }
+
+
+/* Studio v4: realistic SVG device renderer */
+.sps-phone-render{width:var(--phone-w);height:auto;display:block;position:relative;z-index:2;filter:drop-shadow(0 24px 38px rgba(0,0,0,.34));transition:width .25s ease,filter .25s ease}
+.sps-phone-stage.plus .sps-phone-render{width:var(--phone-w)}
+.sps-phone-stage.mini .sps-phone-render{width:var(--phone-w)}
+.sps-phone-stage.air .sps-phone-render{width:var(--phone-w)}
+.finish-gloss .sps-svg-skin{filter:saturate(1.08) contrast(1.04)}
+.finish-satin .sps-svg-skin{filter:saturate(.96) contrast(.98)}
+.finish-matte .sps-svg-skin{filter:saturate(.9) contrast(.98)}
+.sps-phone-device,.sps-camera-block,.sps-phone-branding,.sps-phone-personal{display:none!important}
+.sps-finish-copy{max-width:560px;margin:.8rem 0 0;color:#7a828e;font-size:.62rem;line-height:1.7}
+.sps-finish-choice{margin-top:1.1rem}
+
+@media(max-width:760px){
+  .sps-studio-page .sps-phone-stage{--phone-w:114px;--phone-h:auto}
+  .sps-studio-page .sps-phone-stage.plus{--phone-w:122px}
+  .sps-studio-page .sps-phone-stage.mini{--phone-w:100px}
+  .sps-studio-page .sps-phone-stage.air{--phone-w:106px}
+  .sps-studio-page .sps-phone-render{width:var(--phone-w);height:auto;filter:drop-shadow(0 14px 19px rgba(0,0,0,.34))}
+  .sps-studio-page .sps-phone-model{margin-top:.3rem}
+  .sps-studio-page .sps-finish-copy{font-size:.5rem}
+}
