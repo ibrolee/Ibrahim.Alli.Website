@@ -12,8 +12,8 @@ export const SPS_ASSETS = {
   neon: "https://solaire-house-lagos.floot.app/_cdn/static/3c9794e5-97c1-44fb-a51a-cfbe57293805.png",
   custom: "https://solaire-house-lagos.floot.app/_cdn/static/deac7814-238e-4a98-9d3c-aa2963528ebf.png",
   install: "https://solaire-house-lagos.floot.app/_cdn/static/e0373c5e-3e68-4f4b-8175-b4341bd657dc.png",
-  stealthBlackArt: "https://solaire-house-lagos.floot.app/_cdn/static/8f52348f-aef7-4072-bcb0-b9f844ade388.png",
-  signatureRedArt: "https://solaire-house-lagos.floot.app/_cdn/static/e9641df0-5f7f-470f-98a2-fb380c69020f.png",
+  stealthBlackArt: "https://solaire-house-lagos.floot.app/_cdn/static/d5a0ed53-39d4-4954-a281-d4674bbc999f-sps-stealth-black-final.png",
+  signatureRedArt: "https://solaire-house-lagos.floot.app/_cdn/static/de7a3926-2129-43f5-b1ae-fb86acc2604d-sps-signature-red-final.png",
 };
 
 export const spsProducts = [
