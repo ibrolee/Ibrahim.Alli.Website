@@ -88,6 +88,8 @@ export function SpsPhonePreview({model,skin,finish}:{model:string;skin:string;fi
 
   if(exact){
     const [vx,vy,vw,vh]=exact.viewBox.split(" ").map(Number);
+    const outerBody=(exact.body.match(/^.*?z/i)?.[0] || exact.body).trim();
+    const outerCamera=(exact.camera.match(/^.*?z/i)?.[0] || exact.camera).trim();
     const exactLens=(cx:number,cy:number,r:number)=>(
       <g>
         <circle cx={cx} cy={cy} r={r+3.2} fill="#151922" stroke="rgba(255,255,255,.42)" strokeWidth="1.2"/>
@@ -118,10 +120,10 @@ export function SpsPhonePreview({model,skin,finish}:{model:string;skin:string;fi
           </linearGradient>
         </defs>
         <rect x={vx+2} y={vy+2} width={vw-4} height={vh-4} rx={Math.min(vw*.18,38)} fill={`url(#${frameId})`}/>
-        <path d={exact.body} fill={`url(#${patternId})`} fillRule="evenodd" stroke="rgba(255,255,255,.48)" strokeWidth="2.2"/>
-        <path d={exact.body} fill={`url(#${shineId})`} fillRule="evenodd" opacity=".38"/>
-        <path d={exact.camera} fill={`url(#${patternId})`} fillRule="evenodd" stroke="rgba(255,255,255,.40)" strokeWidth="1.4"/>
-        <path d={exact.camera} fill="#05070b" fillRule="evenodd" opacity=".08"/>
+        <path d={outerBody} fill={`url(#${patternId})`} stroke="rgba(255,255,255,.48)" strokeWidth="2.2"/>
+        <path d={outerBody} fill={`url(#${shineId})`} opacity=".26"/>
+        <path d={outerCamera} fill={`url(#${patternId})`} stroke="rgba(255,255,255,.34)" strokeWidth="1.4"/>
+        <path d={outerCamera} fill={`url(#${shineId})`} opacity=".16"/>
         {exact.lenses.map((l,i)=><g key={i}>{exactLens(l.cx,l.cy,l.r)}</g>)}
         {exact.sensors.map((s,i)=>s.kind==="flash"
           ? <g key={i}><circle cx={s.cx} cy={s.cy} r={s.r+1.8} fill="#d9c98f"/><circle cx={s.cx} cy={s.cy} r={s.r} fill="#fff0bd"/></g>
