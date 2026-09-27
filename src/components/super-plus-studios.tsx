@@ -100,6 +100,9 @@ export function SpsPhonePreview({model,skin,finish}:{model:string;skin:string;fi
 
   if(exact){
     const [vx,vy,vw,vh]=exact.viewBox.split(" ").map(Number);
+    const clipId=`spsBack${rawId}`;
+    // The first contour is the purchased back outline. The remaining contours
+    // include the camera recess and optional logo, not gaps in the artwork.
     const outerBody=(exact.body.match(/^.*?z/i)?.[0] || exact.body).trim();
     const outerCamera=(exact.camera.match(/^.*?z/i)?.[0] || exact.camera).trim();
     const exactLens=(cx:number,cy:number,r:number)=>(
@@ -114,16 +117,9 @@ export function SpsPhonePreview({model,skin,finish}:{model:string;skin:string;fi
     return <div className={`sps-phone-stage exact-template finish-${(finish||"Matte").toLowerCase()}`}>
       <svg className="sps-phone-render sps-exact-phone-render" viewBox={exact.viewBox} role="img" aria-label={model+" exact skin template preview"}>
         <defs>
-          <pattern id={patternId} patternUnits="userSpaceOnUse" x={vx} y={vy} width={vw} height={vh}>
-            <image href={skin} x={vx} y={vy} width={vw} height={vh} preserveAspectRatio="xMidYMid slice"/>
-          </pattern>
-          <linearGradient id={frameId} x1="0" x2="1" y1="0" y2="1">
-            <stop offset="0" stopColor="#f4f5f7"/>
-            <stop offset=".2" stopColor="#8f959e"/>
-            <stop offset=".52" stopColor="#30343b"/>
-            <stop offset=".82" stopColor="#aeb3ba"/>
-            <stop offset="1" stopColor="#f0f1f3"/>
-          </linearGradient>
+          <clipPath id={clipId} clipPathUnits="userSpaceOnUse">
+            <path d={outerBody}/>
+          </clipPath>
           <linearGradient id={shineId} x1="0" x2="1">
             <stop offset="0" stopColor="#fff" stopOpacity=".22"/>
             <stop offset=".28" stopColor="#fff" stopOpacity=".02"/>
@@ -131,11 +127,13 @@ export function SpsPhonePreview({model,skin,finish}:{model:string;skin:string;fi
             <stop offset="1" stopColor="#fff" stopOpacity=".16"/>
           </linearGradient>
         </defs>
-        <rect x={vx+2} y={vy+2} width={vw-4} height={vh-4} rx={Math.min(vw*.18,38)} fill={`url(#${frameId})`}/>
-        <path d={outerBody} fill={`url(#${patternId})`} stroke="rgba(255,255,255,.48)" strokeWidth="2.2"/>
-        <path d={outerBody} fill={`url(#${shineId})`} opacity=".26"/>
-        <path d={outerCamera} fill={`url(#${patternId})`} stroke="rgba(255,255,255,.34)" strokeWidth="1.4"/>
-        <path d={outerCamera} fill={`url(#${shineId})`} opacity=".16"/>
+        {/* Apply the artwork once in the template's coordinate system. A pattern
+            tile with the same non-zero origin as its image offsets it twice. */}
+        <g clipPath={`url(#${clipId})`}>
+          <image className="sps-exact-artwork" href={skin} x={vx} y={vy} width={vw} height={vh} preserveAspectRatio="xMidYMid slice"/>
+          <path d={outerBody} fill={`url(#${shineId})`} opacity=".26"/>
+          <path d={outerCamera} fill="none" stroke="rgba(255,255,255,.34)" strokeWidth="1.4"/>
+        </g>
         {exact.lenses.map((l,i)=><g key={i}>{exactLens(l.cx,l.cy,l.r)}</g>)}
         {exact.sensors.map((s,i)=>s.kind==="flash"
           ? <g key={i}><circle cx={s.cx} cy={s.cy} r={s.r+1.8} fill="#d9c98f"/><circle cx={s.cx} cy={s.cy} r={s.r} fill="#fff0bd"/></g>
