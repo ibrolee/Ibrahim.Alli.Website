@@ -13,7 +13,10 @@ import {
 } from "@/components/super-plus-studios";
 
 export const Route=createFileRoute("/super-plus-studios/customise")({
-  head:()=>({meta:[{title:"Device Studio — Super Plus Studios"},{name:"robots",content:"noindex, nofollow"}]}),
+  head:()=>({
+    meta:[{title:"Device Studio — Super Plus Studios"},{name:"robots",content:"noindex, nofollow"}],
+    links:[{rel:"preload",as:"image",href:"/sps-preview/stealth-black.svg"}],
+  }),
   component:DeviceStudio,
 });
 
@@ -48,7 +51,7 @@ function DeviceStudio(){
             className={productId===skin.id?"active":""}
             onClick={()=>setProductId(skin.id)}
             aria-label={"Preview "+skin.name}
-          ><img src={skin.art} alt=""/></button>)}
+          ><img src={skin.art} alt="" decoding="async" loading={skin.id===productId?"eager":"lazy"}/></button>)}
         </div>
         <div className="sps-preview-summary">
           <div><span>DEVICE</span><strong>{model}</strong></div>
@@ -92,7 +95,7 @@ function DeviceStudio(){
             <div className="sps-build-section-label"><span>Choose skin</span><b>{product.name}</b></div>
             <div className="sps-design-carousel">
               {spsProducts.map(p=><button type="button" className={productId===p.id?"active":""} onClick={()=>setProductId(p.id)} key={p.id}>
-                <img src={p.art} alt={p.name}/>
+                <img src={p.art} alt={p.name} decoding="async" loading={p.id===productId?"eager":"lazy"}/>
                 <span><strong>{p.name}</strong><small>{p.collection} · {naira(p.price)}</small></span>
                 {productId===p.id&&<Check size={15}/>}
               </button>)}
