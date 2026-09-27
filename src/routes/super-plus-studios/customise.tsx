@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowLeft, ArrowRight, Check, Clock3, Smartphone, Sparkles } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, Clock3, Smartphone } from "lucide-react";
 import { FormEvent, useMemo, useState } from "react";
 import {
   SpsHeader,
@@ -18,19 +18,18 @@ export const Route=createFileRoute("/super-plus-studios/customise")({
 });
 
 function DeviceStudio(){
-  const [step,setStep]=useState<"build"|"details"|"service"|"done">("build");
+  const [step,setStep]=useState<"build"|"finish"|"service"|"done">("build");
   const [model,setModel]=useState<string>(spsIphoneModels[0]);
   const [productId,setProductId]=useState(spsProducts[0].id);
   const [finish,setFinish]=useState("Matte");
-  const [personal,setPersonal]=useState("");
-  const [serviceId,setServiceId]=useState("diy");
+   const [serviceId,setServiceId]=useState("diy");
   const [name,setName]=useState("");
   const [phone,setPhone]=useState("");
   const [email,setEmail]=useState("");
 
   const product=spsProducts.find(p=>p.id===productId)!;
   const service=spsInstallOptions.find(s=>s.id===serviceId)!;
-  const total=useMemo(()=>product.price+service.fee+(personal?2500:0),[product,service,personal]);
+  const total=useMemo(()=>product.price+service.fee,[product,service]);
 
   function submit(e:FormEvent){e.preventDefault();if(name&&phone&&email)setStep("done")}
 
@@ -41,7 +40,7 @@ function DeviceStudio(){
     <section className="sps-studio-shell">
       <aside className="sps-studio-preview">
         <div className="sps-preview-topline"><span>YOUR DEVICE</span><b>LIVE PREVIEW</b></div>
-        <SpsPhonePreview model={model} skin={product.art} personal={personal} finish={finish}/>
+        <SpsPhonePreview model={model} skin={product.art} finish={finish}/>
         <div className="sps-preview-swatch-row">
           {spsProducts.map((skin)=><button
             type="button"
@@ -63,7 +62,7 @@ function DeviceStudio(){
       <div className="sps-studio-builder">
         <div className="sps-progress">
           <span className={step==="build"?"active":""}>01 Build</span><i/>
-          <span className={step==="details"?"active":""}>02 Personalise</span><i/>
+          <span className={step==="finish"?"active":""}>02 Finish</span><i/>
           <span className={step==="service"?"active":""}>03 Service</span>
         </div>
 
@@ -100,22 +99,21 @@ function DeviceStudio(){
             </div>
           </div>
 
-          <button className="sps-next" onClick={()=>setStep("details")}>Personalise it <ArrowRight size={16}/></button>
+          <button className="sps-next" onClick={()=>setStep("finish")}>Choose finish <ArrowRight size={16}/></button>
           <p className="sps-note">The phone preview and camera layout update with the selected model. Printable skin artwork is applied directly to the device preview — not another phone mockup.</p>
         </div>}
 
-        {step==="details"&&<div className="sps-builder-panel">
+        {step==="finish"&&<div className="sps-builder-panel">
           <button className="sps-back" onClick={()=>setStep("build")} type="button"><ArrowLeft size={14}/> Device & design</button>
-          <span className="sps-panel-label">FINISH & PERSONALISATION</span>
-          <h1>Give it the<br/><em>final touch.</em></h1>
-          <div className="sps-choice"><span>Finish</span><div>{["Matte","Gloss","Satin"].map(x=><button type="button" className={finish===x?"active":""} onClick={()=>setFinish(x)} key={x}>{x}</button>)}</div></div>
-          <label className="sps-field"><span>Optional name / initials <small>+₦2,500</small></span><input value={personal} maxLength={18} onChange={(e)=>setPersonal(e.target.value)} placeholder="e.g. IBROLEE"/></label>
-          <div className="sps-personal-preview"><Sparkles size={18}/><span>{personal||"Type a name or initials and watch it appear on the device"}</span></div>
+          <span className="sps-panel-label">CHOOSE YOUR FINISH</span>
+          <h1>Pick how it<br/><em>should feel.</em></h1>
+          <div className="sps-choice sps-finish-choice"><span>Skin finish</span><div>{["Matte","Gloss","Satin"].map(x=><button type="button" className={finish===x?"active":""} onClick={()=>setFinish(x)} key={x}>{x}</button>)}</div></div>
+          <p className="sps-finish-copy">Matte keeps reflections low, Gloss gives the artwork more shine, and Satin sits between both.</p>
           <button className="sps-next" onClick={()=>setStep("service")}>Choose installation <ArrowRight size={16}/></button>
         </div>}
 
         {step==="service"&&<form className="sps-builder-panel" onSubmit={submit}>
-          <button className="sps-back" onClick={()=>setStep("details")} type="button"><ArrowLeft size={14}/> Personalisation</button>
+          <button className="sps-back" onClick={()=>setStep("finish")} type="button"><ArrowLeft size={14}/> Finish</button>
           <span className="sps-panel-label">HOW SHOULD WE FINISH THE JOB?</span>
           <h1>Delivery or<br/><em>professional install.</em></h1>
           <div className="sps-service-options">{spsInstallOptions.map(s=><button type="button" className={serviceId===s.id?"active":""} key={s.id} onClick={()=>setServiceId(s.id)}>
