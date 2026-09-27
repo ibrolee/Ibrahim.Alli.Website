@@ -19,6 +19,7 @@ import safiyyrCss from "../safiyyr.css?url";
 import sallysCss from "../sallys-apparel.css?url";
 import premiumCss from "../premium.css?url";
 import solaireCss from "../solaire-house.css?url";
+import novaAutohausCss from "../nova-autohaus.css?url";
 
 function NotFoundComponent() {
   return (
@@ -206,6 +207,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       },
       { rel: "stylesheet", href: premiumCss },
       { rel: "stylesheet", href: solaireCss },
+      { rel: "stylesheet", href: novaAutohausCss },
       {
         rel: "icon",
         href: "/favicon.svg",
@@ -256,8 +258,13 @@ function RootComponent() {
   const isSafiyyrConcept = pathname.startsWith("/safiyyr");
   const isSallysConcept = pathname.startsWith("/sallys-apparel");
   const isSolaireConcept = pathname.startsWith("/solaire-house");
+  const isNovaAutohausConcept = pathname.startsWith("/nova-autohaus");
   const isStandaloneConcept =
-    isDayyahConcept || isSafiyyrConcept || isSallysConcept || isSolaireConcept;
+    isDayyahConcept ||
+    isSafiyyrConcept ||
+    isSallysConcept ||
+    isSolaireConcept ||
+    isNovaAutohausConcept;
 
   return (
     <QueryClientProvider client={queryClient}>
