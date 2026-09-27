@@ -10,13 +10,17 @@ export const SPS_ASSETS = {
   neon: "https://solaire-house-lagos.floot.app/_cdn/static/3c9794e5-97c1-44fb-a51a-cfbe57293805.png",
   custom: "https://solaire-house-lagos.floot.app/_cdn/static/deac7814-238e-4a98-9d3c-aa2963528ebf.png",
   install: "https://solaire-house-lagos.floot.app/_cdn/static/e0373c5e-3e68-4f4b-8175-b4341bd657dc.png",
+  cosmicArt: "https://solaire-house-lagos.floot.app/_cdn/static/7f345be4-17b5-44ba-a7fe-7a208f9de86e.png",
+  stealthArt: "https://solaire-house-lagos.floot.app/_cdn/static/b2238e79-9ec0-4b38-8630-a767738c623d.png",
+  neonArt: "https://solaire-house-lagos.floot.app/_cdn/static/79672aa3-cdd2-489c-9c56-7d8eaceea197.png",
+  customArt: "https://solaire-house-lagos.floot.app/_cdn/static/e7e0ee45-bfc9-48cf-beb7-a83cf437305e.png",
 };
 
 export const spsProducts = [
-  { id:"cosmic-drift", name:"Cosmic Drift", collection:"Space", price:14500, image:SPS_ASSETS.cosmic, badge:"Best seller" },
-  { id:"forged-stealth", name:"Forged Stealth", collection:"Stealth", price:15500, image:SPS_ASSETS.stealth, badge:"Textured look" },
-  { id:"neon-wave", name:"Neon Wave", collection:"Neon", price:14500, image:SPS_ASSETS.neon, badge:"New" },
-  { id:"monogram-studio", name:"Monogram Studio", collection:"Custom", price:17500, image:SPS_ASSETS.custom, badge:"Personalise it" },
+  { id:"cosmic-drift", name:"Cosmic Drift", collection:"Space", price:14500, image:SPS_ASSETS.cosmic, art:SPS_ASSETS.cosmicArt, badge:"Best seller" },
+  { id:"forged-stealth", name:"Forged Stealth", collection:"Stealth", price:15500, image:SPS_ASSETS.stealth, art:SPS_ASSETS.stealthArt, badge:"Textured look" },
+  { id:"neon-wave", name:"Neon Wave", collection:"Neon", price:14500, image:SPS_ASSETS.neon, art:SPS_ASSETS.neonArt, badge:"New" },
+  { id:"monogram-studio", name:"Monogram Studio", collection:"Custom", price:17500, image:SPS_ASSETS.custom, art:SPS_ASSETS.customArt, badge:"Personalise it" },
 ] as const;
 
 export const spsIphoneGroups = [
