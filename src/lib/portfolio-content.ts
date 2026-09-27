@@ -135,7 +135,7 @@ export const projects: Project[] = [
       "Vercel",
       "Supabase",
     ],
-  },,
+  },
   {
     slug: "solaire-house",
     number: "C01",
