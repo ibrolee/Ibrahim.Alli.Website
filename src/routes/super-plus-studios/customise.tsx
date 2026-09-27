@@ -40,7 +40,7 @@ function DeviceStudio(){
     <section className="sps-studio-shell">
       <div className="sps-studio-preview">
         <div className="sps-preview-topline"><span>YOUR DEVICE</span><b>LIVE PREVIEW</b></div>
-        <SpsPhonePreview model={model} skin={product.image} personal={personal} finish={finish}/>
+        <SpsPhonePreview model={model} skin={product.art} personal={personal} finish={finish}/>
         <div className="sps-preview-swatch-row">
           {spsProducts.map((skin)=><button
             type="button"
@@ -48,7 +48,7 @@ function DeviceStudio(){
             className={productId===skin.id?"active":""}
             onClick={()=>setProductId(skin.id)}
             aria-label={"Preview "+skin.name}
-          ><img src={skin.image} alt=""/></button>)}
+          ><img src={skin.art} alt=""/></button>)}
         </div>
         <div className="sps-preview-summary">
           <div><span>DEVICE</span><strong>{model}</strong></div>
@@ -100,7 +100,7 @@ function DeviceStudio(){
           <h1>Pick the design.<br/><em>Watch the phone change.</em></h1>
           <p className="sps-builder-copy">Every option below updates the phone preview immediately so the customer sees the design on their selected model, not just as a flat thumbnail.</p>
           <div className="sps-design-options">{spsProducts.map(p=><button type="button" className={productId===p.id?"active":""} onClick={()=>setProductId(p.id)} key={p.id}>
-            <img src={p.image} alt={p.name}/>
+            <img src={p.art} alt={p.name}/>
             <span><strong>{p.name}</strong><small>{p.collection} · {naira(p.price)}</small></span>
             {productId===p.id&&<Check size={17}/>}
           </button>)}</div>
