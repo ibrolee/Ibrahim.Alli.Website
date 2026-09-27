@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { Gamepad2, Headphones, Laptop, Menu, Smartphone, Tablet, Watch, X } from "lucide-react";
 import { useId, useState } from "react";
+import type { ReactNode } from "react";
 
 export const SPS_ASSETS = {
   logo: "https://solaire-house-lagos.floot.app/_cdn/static/40a35046-e03f-4fd1-82ca-bf0bd3040825-super-plus-studios-logo.png",
@@ -100,7 +101,7 @@ export function SpsPhonePreview({model,skin,finish}:{model:string;skin:string;fi
     </g>
   );
 
-  const cameraBump=(x:number,y:number,w:number,h:number,rx:number,children:React.ReactNode)=>(
+  const cameraBump=(x:number,y:number,w:number,h:number,rx:number,children:ReactNode)=>(
     <g>
       <rect x={x} y={y+4} width={w} height={h} rx={rx} fill="#000" opacity=".22"/>
       <rect x={x} y={y} width={w} height={h} rx={rx} fill={`url(#${patternId})`} stroke="rgba(255,255,255,.34)" strokeWidth="1.5"/>
@@ -109,7 +110,7 @@ export function SpsPhonePreview({model,skin,finish}:{model:string;skin:string;fi
     </g>
   );
 
-  let cameras:React.ReactNode;
+  let cameras:ReactNode;
   switch(visual.camera){
     case "dual-horizontal":
       cameras=cameraBump(22,30,132,62,28,<>{lens(57,61,18)}{lens(112,61,18)}{flash(143,50,5)}</>);
