@@ -11,7 +11,7 @@ export const Route=createFileRoute("/super-plus-studios/shop")({
 function SpsShop(){
   const [query,setQuery]=useState("");
   const [collection,setCollection]=useState("All");
-  const collections=["All","Space","Stealth","Neon","Custom"];
+  const collections=["All","Stealth","Signature"];
   const filtered=useMemo(()=>spsProducts.filter(p=>(collection==="All"||p.collection===collection)&&p.name.toLowerCase().includes(query.toLowerCase())),[query,collection]);
   return <main className="sps-page">
     <div className="sps-topbar"><span>ONLINE STUDIO · NATIONWIDE DELIVERY</span><span>PRO INSTALLATION · LAGOS & IBADAN</span></div><SpsHeader/>
@@ -21,7 +21,7 @@ function SpsShop(){
         <label><Search size={17}/><input value={query} onChange={(e)=>setQuery(e.target.value)} placeholder="Search designs"/></label>
         <div>{collections.map(c=><button type="button" className={collection===c?"active":""} onClick={()=>setCollection(c)} key={c}>{c}</button>)}</div>
       </div>
-      <div className="sps-shop-count">{filtered.length} designs available in this launch collection</div>
+      <div className="sps-shop-count">{filtered.length} starter designs available now · more can be added later</div>
       <div className="sps-product-grid sps-shop-grid">
         {filtered.map(product=><article key={product.id} className="sps-product-card">
           <Link to="/super-plus-studios/customise" className="sps-product-image"><img src={product.image} alt={product.name}/><span>{product.badge}</span></Link>
