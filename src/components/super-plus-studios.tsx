@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { Gamepad2, Headphones, Laptop, Menu, Smartphone, Tablet, Watch, X } from "lucide-react";
-import { CSSProperties, useState } from "react";
+import { useId, useState } from "react";
 
 export const SPS_ASSETS = {
   logo: "https://solaire-house-lagos.floot.app/_cdn/static/40a35046-e03f-4fd1-82ca-bf0bd3040825-super-plus-studios-logo.png",
@@ -20,7 +20,7 @@ export const spsProducts = [
   { id:"cosmic-drift", name:"Cosmic Drift", collection:"Space", price:14500, image:SPS_ASSETS.cosmic, art:SPS_ASSETS.cosmicArt, badge:"Best seller" },
   { id:"forged-stealth", name:"Forged Stealth", collection:"Stealth", price:15500, image:SPS_ASSETS.stealth, art:SPS_ASSETS.stealthArt, badge:"Textured look" },
   { id:"neon-wave", name:"Neon Wave", collection:"Neon", price:14500, image:SPS_ASSETS.neon, art:SPS_ASSETS.neonArt, badge:"New" },
-  { id:"monogram-studio", name:"Monogram Studio", collection:"Custom", price:17500, image:SPS_ASSETS.custom, art:SPS_ASSETS.customArt, badge:"Personalise it" },
+  { id:"studio-grid", name:"Studio Grid", collection:"Abstract", price:17500, image:SPS_ASSETS.custom, art:SPS_ASSETS.customArt, badge:"Graphic series" },
 ] as const;
 
 export const spsIphoneGroups = [
@@ -76,18 +76,106 @@ function phoneVisual(model:string){
   return { size: air?"air":plus?"plus":mini?"mini":"standard", camera };
 }
 
-export function SpsPhonePreview({model,skin,personal,finish}:{model:string;skin:string;personal?:string;finish?:string}){
+export function SpsPhonePreview({model,skin,finish}:{model:string;skin:string;finish?:string}){
   const visual=phoneVisual(model);
-  const style={"--skin-image":`url("${skin}")`} as CSSProperties;
-  return <div className={"sps-phone-stage "+visual.size}>
-    <div className={"sps-phone-device camera-"+visual.camera+" finish-"+(finish||"Matte").toLowerCase()} style={style}>
-      <div className="sps-phone-skin"/>
-      <div className="sps-camera-block">
-        <i className="lens l1"/><i className="lens l2"/><i className="lens l3"/><i className="flash"/>
-      </div>
-      <div className="sps-phone-branding">SUPER PLUS</div>
-      {personal&&<div className="sps-phone-personal">{personal}</div>}
-    </div>
+  const rawId=useId().replace(/:/g,"");
+  const patternId=`spsSkin${rawId}`;
+  const frameId=`spsFrame${rawId}`;
+  const shineId=`spsShine${rawId}`;
+
+  const lens=(cx:number,cy:number,r=20)=>(
+    <g>
+      <circle cx={cx} cy={cy} r={r+5} fill="#20242d" stroke="rgba(255,255,255,.28)" strokeWidth="1.5"/>
+      <circle cx={cx} cy={cy} r={r} fill="#05070b"/>
+      <circle cx={cx} cy={cy} r={r-5} fill="#0b1422"/>
+      <circle cx={cx-5} cy={cy-6} r={Math.max(2,r*.15)} fill="#88b5db" opacity=".75"/>
+      <circle cx={cx+4} cy={cy+6} r={Math.max(3,r*.22)} fill="#07101b"/>
+    </g>
+  );
+
+  const flash=(cx:number,cy:number,r=7)=>(
+    <g>
+      <circle cx={cx} cy={cy} r={r+2} fill="#d7c995" opacity=".75"/>
+      <circle cx={cx} cy={cy} r={r} fill="#fff4c9"/>
+    </g>
+  );
+
+  const cameraBump=(x:number,y:number,w:number,h:number,rx:number,children:React.ReactNode)=>(
+    <g>
+      <rect x={x} y={y+4} width={w} height={h} rx={rx} fill="#000" opacity=".22"/>
+      <rect x={x} y={y} width={w} height={h} rx={rx} fill={`url(#${patternId})`} stroke="rgba(255,255,255,.34)" strokeWidth="1.5"/>
+      <rect x={x} y={y} width={w} height={h} rx={rx} fill="#141922" opacity=".16"/>
+      {children}
+    </g>
+  );
+
+  let cameras:React.ReactNode;
+  switch(visual.camera){
+    case "dual-horizontal":
+      cameras=cameraBump(22,30,132,62,28,<>{lens(57,61,18)}{lens(112,61,18)}{flash(143,50,5)}</>);
+      break;
+    case "dual-vertical":
+      cameras=cameraBump(22,28,68,132,28,<>{lens(56,67,18)}{lens(56,121,18)}{flash(82,145,5)}</>);
+      break;
+    case "single-square":
+      cameras=cameraBump(22,28,92,92,27,<>{lens(57,65,20)}{flash(96,91,6)}</>);
+      break;
+    case "dual-square":
+      cameras=cameraBump(22,28,116,116,30,<>{lens(58,65,19)}{lens(58,119,19)}{flash(112,64,6)}</>);
+      break;
+    case "dual-diagonal":
+      cameras=cameraBump(22,28,116,116,30,<>{lens(58,65,19)}{lens(106,116,19)}{flash(108,59,6)}</>);
+      break;
+    case "dual-vertical-modern":
+      cameras=cameraBump(25,28,66,138,33,<>{lens(58,67,19)}{lens(58,124,19)}{flash(83,151,5)}</>);
+      break;
+    case "triple-square":
+      cameras=cameraBump(22,28,132,132,34,<>{lens(60,67,20)}{lens(60,124,20)}{lens(119,96,20)}{flash(128,52,6)}<circle cx="126" cy="139" r="5" fill="#171b24" stroke="#5e6774" strokeWidth="1"/></>);
+      break;
+    case "triple-plateau":
+      cameras=cameraBump(18,24,264,124,35,<>{lens(58,58,19)}{lens(58,112,19)}{lens(113,85,19)}{flash(239,55,7)}<circle cx="239" cy="99" r="8" fill="#151a23" stroke="#697485" strokeWidth="1.2"/></>);
+      break;
+    case "single-plateau":
+      cameras=cameraBump(18,24,264,82,34,<>{lens(58,65,19)}{flash(242,65,7)}</>);
+      break;
+    case "single-modern":
+      cameras=cameraBump(22,28,92,92,27,<>{lens(58,66,20)}{flash(95,91,6)}</>);
+      break;
+    default:
+      cameras=<g>{lens(54,61,19)}{flash(92,59,6)}</g>;
+  }
+
+  const bodyClass=`sps-phone-stage ${visual.size} finish-${(finish||"Matte").toLowerCase()}`;
+  return <div className={bodyClass}>
+    <svg className="sps-phone-render" viewBox="0 0 300 610" role="img" aria-label={model+" with "+finish+" skin preview"}>
+      <defs>
+        <pattern id={patternId} patternUnits="objectBoundingBox" width="1" height="1">
+          <image href={skin} x="0" y="0" width="300" height="610" preserveAspectRatio="xMidYMid slice"/>
+        </pattern>
+        <linearGradient id={frameId} x1="0" x2="1" y1="0" y2="1">
+          <stop offset="0" stopColor="#f0f1f4"/>
+          <stop offset=".18" stopColor="#7d838d"/>
+          <stop offset=".5" stopColor="#272b31"/>
+          <stop offset=".78" stopColor="#9ba1aa"/>
+          <stop offset="1" stopColor="#e7e9ed"/>
+        </linearGradient>
+        <linearGradient id={shineId} x1="0" x2="1">
+          <stop offset="0" stopColor="#fff" stopOpacity=".30"/>
+          <stop offset=".22" stopColor="#fff" stopOpacity=".04"/>
+          <stop offset=".7" stopColor="#000" stopOpacity=".12"/>
+          <stop offset="1" stopColor="#fff" stopOpacity=".16"/>
+        </linearGradient>
+      </defs>
+
+      <rect x="3" y="3" width="294" height="604" rx="54" fill={`url(#${frameId})`}/>
+      <rect x="10" y="10" width="280" height="590" rx="48" fill="#14171d"/>
+      <rect className="sps-svg-skin" x="15" y="15" width="270" height="580" rx="44" fill={`url(#${patternId})`}/>
+      <rect x="15" y="15" width="270" height="580" rx="44" fill={`url(#${shineId})`} opacity=".48"/>
+      {cameras}
+      <path d="M286 190h7v72h-7z" fill="#7d838c" opacity=".9"/>
+      <path d="M7 170h7v45H7zM7 229h7v72H7z" fill="#6f7580" opacity=".9"/>
+      <rect x="118" y="585" width="64" height="2" rx="1" fill="#fff" opacity=".12"/>
+    </svg>
     <div className="sps-phone-shadow"/>
     <span className="sps-phone-model">{model}</span>
   </div>;
