@@ -75,6 +75,7 @@ export type Project = {
   result: string;
   tools: string[];
   url?: string;
+  concept?: boolean;
 };
 
 // ACTIVE PROJECTS — displayed on the website.
@@ -135,6 +136,33 @@ export const projects: Project[] = [
       "Supabase",
     ],
   },
+  {
+    slug: "solaire-house",
+    number: "C01",
+    name: "Solaire House",
+    type: "Hospitality Website Concept",
+    image: "https://solaire-house-lagos.floot.app/_cdn/static/cee59675-9fc7-42ff-80a8-55e402f6b1a1-solaire-ng-hero.png",
+    summary:
+      "A bright boutique beach-hotel concept for the Lagos coast, exploring how rooms, experiences and booking can come together in a polished hospitality website.",
+    tags: ["Hospitality", "Booking flow", "Responsive design"],
+    url: "https://solaire-house-lagos.floot.app",
+    concept: true,
+    challenge:
+      "Create a hotel experience that feels premium and aspirational without drifting into a generic international-resort aesthetic.",
+    approach:
+      "Build the concept around a colourful, believable Nigerian coastal identity, with clear room discovery, strong lifestyle imagery and a simple path from browsing to booking.",
+    build:
+      "A responsive hotel website concept with room and suite discovery, individual room pages, Nigerian-focused hospitality imagery, experiences, dining, wellness and a multi-step booking flow.",
+    result:
+      "A portfolio-ready hospitality concept that demonstrates brand direction, responsive UX, room merchandising and an end-to-end reservation journey.",
+    tools: [
+      "Website design",
+      "Responsive design",
+      "React",
+      "Booking UX",
+      "AI-assisted development",
+    ],
+  }
 ];
 
 // ARCHIVED PROJECT — retained for future use.
