@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowRight, Box, CheckCircle2, MapPin, PackageCheck, Palette, ShieldCheck, Sparkles, Truck } from "lucide-react";
-import { SpsHeader, SPS_ASSETS, spsProducts, naira } from "@/components/super-plus-studios";
+import { ArrowRight, Box, CheckCircle2, MapPin, PackageCheck, Palette, ShieldCheck, Smartphone, Sparkles, Truck } from "lucide-react";
+import { SpsHeader, SPS_ASSETS, comingSoonDevices, spsIphoneModels, spsProducts, naira } from "@/components/super-plus-studios";
 
 export const Route = createFileRoute("/super-plus-studios/")({
   head:()=>({meta:[
@@ -18,7 +18,7 @@ function SpsHome(){
 
     <section className="sps-hero">
       <div className="sps-hero-copy">
-        <span className="sps-kicker">YOUR STYLE · YOUR DEVICE · YOUR WAY</span>
+        <span className="sps-kicker">CREATE · CUSTOMIZE · STAND OUT</span>
         <h1>Make your tech<br/><em>look like yours.</em></h1>
         <p>Premium device skins built around your phone, your taste and how you want it installed.</p>
         <div className="sps-hero-actions">
@@ -45,6 +45,29 @@ function SpsHome(){
       <div><span>01</span><strong>Choose your device</strong><p>Start with the exact model so every cut is built around the right fit.</p></div>
       <div><span>02</span><strong>Choose your skin</strong><p>Pick a ready-made collection or customise one to feel more personal.</p></div>
       <div><span>03</span><strong>Choose installation</strong><p>DIY nationwide, or professional pickup-install-return in Lagos or Ibadan.</p></div>
+    </section>
+
+    <section className="sps-device-roadmap">
+      <div className="sps-section-head">
+        <div><span>SUPPORTED DEVICES</span><h2>iPhone first.<br/><em>Everything else next.</em></h2></div>
+        <p className="sps-roadmap-copy">We’ll launch with a deep iPhone catalogue while production templates for Samsung, gaming hardware and other gadgets are tested.</p>
+      </div>
+      <div className="sps-device-roadmap-grid">
+        <Link to="/super-plus-studios/customise" className="sps-device-roadmap-card available">
+          <div className="sps-device-icon"><Smartphone size={25}/></div>
+          <span>AVAILABLE IN THE STUDIO</span>
+          <strong>iPhone</strong>
+          <p>{spsIphoneModels.length} selectable models from iPhone 6 through the iPhone 17 family.</p>
+          <b>Choose your model <ArrowRight size={15}/></b>
+        </Link>
+        {comingSoonDevices.map(({name,icon:Icon,note})=><article className="sps-device-roadmap-card coming" key={name}>
+          <div className="sps-device-icon"><Icon size={24}/></div>
+          <span>COMING SOON</span>
+          <strong>{name}</strong>
+          <p>{note}</p>
+          <b>Templates in development</b>
+        </article>)}
+      </div>
     </section>
 
     <section className="sps-featured">
@@ -105,6 +128,6 @@ function SpsHome(){
       <div><Link to="/super-plus-studios/customise">Build your skin <ArrowRight size={17}/></Link><Link to="/super-plus-studios/custom-request">Request something custom</Link></div>
     </section>
 
-    <footer className="sps-footer"><div><strong>SUPER PLUS STUDIOS</strong><span>Your Style · Your Device · Your Way</span></div><span>ONLINE STUDIO · NIGERIA · PRE-LAUNCH DEMO</span></footer>
+    <footer className="sps-footer"><div><strong>SUPER PLUS STUDIOS</strong><span>Create. Customize. Stand Out.</span></div><span>ONLINE STUDIO · NIGERIA · PRE-LAUNCH DEMO</span></footer>
   </main>
 }
