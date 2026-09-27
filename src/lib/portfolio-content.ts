@@ -145,7 +145,7 @@ export const projects: Project[] = [
     summary:
       "A bright boutique beach-hotel concept for the Lagos coast, exploring how rooms, experiences and booking can come together in a polished hospitality website.",
     tags: ["Hospitality", "Booking flow", "Responsive design"],
-    url: "https://solaire-house-lagos.floot.app",
+    url: "/solaire-house/",
     concept: true,
     challenge:
       "Create a hotel experience that feels premium and aspirational without drifting into a generic international-resort aesthetic.",
