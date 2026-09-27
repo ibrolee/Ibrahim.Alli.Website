@@ -36,6 +36,7 @@ const fitnessFeatures = [
 function ProjectPage() {
   const project = Route.useLoaderData();
   const isFitness = project.slug === "super-plus-fitness";
+  const isConcept = Boolean(project.concept);
 
   return (
     <main id="main-content" className="pt-18 premium-project-page">
@@ -46,14 +47,14 @@ function ProjectPage() {
           </Link>
           <div className="mt-12 grid min-w-0 gap-9 lg:mt-16 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] lg:items-end">
             <div className="min-w-0">
-              <p className="eyebrow">Case study / {project.number}</p>
+              <p className="eyebrow">{isConcept ? "Concept project" : "Case study"} / {project.number}</p>
               <h1 className="mt-5 max-w-5xl break-words font-display text-[clamp(3.2rem,8vw,8.5rem)] leading-[0.94] tracking-[-0.035em]">{project.name}</h1>
             </div>
             <div className="min-w-0 lg:pb-2">
               <p className="text-xs font-semibold uppercase tracking-[0.14em] text-accent-mark">{project.type}</p>
               <p className="mt-5 max-w-2xl text-base leading-7 text-muted-foreground md:text-lg md:leading-8">{project.summary}</p>
               {project.url && (
-                <Button asChild className="mt-7"><a href={project.url} target="_blank" rel="noopener noreferrer">Visit Website <ExternalLink aria-hidden="true" /></a></Button>
+                <Button asChild className="mt-7"><a href={project.url} target="_blank" rel="noopener noreferrer">{isConcept ? "View Live Concept" : "Visit Website"} <ExternalLink aria-hidden="true" /></a></Button>
               )}
             </div>
           </div>
@@ -70,6 +71,26 @@ function ProjectPage() {
           {isFitness && <figcaption className="border-b border-border py-4 text-xs leading-5 text-muted-foreground">Project presentation · Explore the live website for the current customer experience.</figcaption>}
         </figure>
       </div>
+
+      {isConcept && (
+        <section className="px-5 py-12 md:px-10 md:py-18">
+          <div className="mx-auto grid max-w-[1480px] gap-8 border-y border-border py-10 md:grid-cols-[minmax(0,0.7fr)_minmax(0,1.3fr)] md:gap-16">
+            <div>
+              <p className="eyebrow">Independent concept</p>
+              <h2 className="mt-4 font-display text-[clamp(2.7rem,5.5vw,5rem)] leading-[0.98] tracking-[-0.035em]">
+                Built to explore <em>what could be.</em>
+              </h2>
+            </div>
+            <div className="md:pt-8">
+              <p className="max-w-2xl text-base leading-8 text-muted-foreground md:text-lg">
+                This is a self-initiated portfolio concept, not commissioned client work. The brand,
+                property details and booking experience are fictional and were created to demonstrate
+                hospitality website design, user experience and responsive development.
+              </p>
+            </div>
+          </div>
+        </section>
+      )}
 
       {isFitness && (
         <>
