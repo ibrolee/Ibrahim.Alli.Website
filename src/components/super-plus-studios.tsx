@@ -22,8 +22,9 @@ export const spsProducts = [
     name:"Stealth Black",
     collection:"Stealth",
     price:14500,
-    image:SPS_ASSETS.stealthBlackArt,
-    art:SPS_ASSETS.stealthBlackArt,
+    image:"/sps-preview/stealth-black.svg",
+    art:"/sps-preview/stealth-black.svg",
+    printArt:SPS_ASSETS.stealthBlackArt,
     badge:"Launch design",
   },
   {
@@ -31,8 +32,9 @@ export const spsProducts = [
     name:"Signature Red",
     collection:"Signature",
     price:14500,
-    image:SPS_ASSETS.signatureRedArt,
-    art:SPS_ASSETS.signatureRedArt,
+    image:"/sps-preview/signature-red.svg",
+    art:"/sps-preview/signature-red.svg",
+    printArt:SPS_ASSETS.signatureRedArt,
     badge:"Launch design",
   },
 ] as const;
