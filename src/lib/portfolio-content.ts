@@ -162,6 +162,34 @@ export const projects: Project[] = [
       "Booking UX",
       "AI-assisted development",
     ],
+  },
+  {
+    slug: "nova-autohaus",
+    number: "C02",
+    name: "NOVA Autohaus",
+    type: "Automotive Dealership Concept",
+    image: "https://solaire-house-lagos.floot.app/_cdn/static/de9e69b9-473b-4c24-b87e-b48e1beaf222.png",
+    summary:
+      "A premium Lagos dealership concept that turns inventory, vehicle research, finance, trade-ins and test drives into one clear digital journey.",
+    tags: ["Automotive", "Inventory UX", "Interactive tools"],
+    url: "/nova-autohaus/",
+    concept: true,
+    challenge:
+      "Design a dealership website that feels premium and aspirational while still making practical buying information easy to find and act on.",
+    approach:
+      "Use a bright, commercial visual system with strong vehicle imagery, structured inventory data and interactive tools that reduce the usual back-and-forth around premium car buying.",
+    build:
+      "A responsive automotive concept with searchable inventory, individual vehicle pages, side-by-side comparison, an illustrative finance calculator, test-drive booking, and a sell/trade-in valuation flow.",
+    result:
+      "A complete automotive website concept demonstrating product discovery, high-value purchase UX, lead capture and interactive dealership workflows across desktop and mobile.",
+    tools: [
+      "Website design",
+      "Responsive design",
+      "React",
+      "Automotive UX",
+      "Interactive forms",
+      "AI-assisted development",
+    ],
   }
 ];
 
