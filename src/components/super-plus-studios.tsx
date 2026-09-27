@@ -150,7 +150,7 @@ export function SpsPhonePreview({model,skin,finish}:{model:string;skin:string;fi
   return <div className={bodyClass}>
     <svg className="sps-phone-render" viewBox="0 0 300 610" role="img" aria-label={model+" with "+finish+" skin preview"}>
       <defs>
-        <pattern id={patternId} patternUnits="objectBoundingBox" width="1" height="1">
+        <pattern id={patternId} patternUnits="userSpaceOnUse" width="300" height="610">
           <image href={skin} x="0" y="0" width="300" height="610" preserveAspectRatio="xMidYMid slice"/>
         </pattern>
         <linearGradient id={frameId} x1="0" x2="1" y1="0" y2="1">
