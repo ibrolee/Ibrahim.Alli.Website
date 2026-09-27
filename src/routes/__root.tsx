@@ -18,6 +18,7 @@ import dayyahCss from "../dayyah-couture.css?url";
 import safiyyrCss from "../safiyyr.css?url";
 import sallysCss from "../sallys-apparel.css?url";
 import premiumCss from "../premium.css?url";
+import solaireCss from "../solaire-house.css?url";
 
 function NotFoundComponent() {
   return (
@@ -204,6 +205,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         href: sallysCss,
       },
       { rel: "stylesheet", href: premiumCss },
+      { rel: "stylesheet", href: solaireCss },
       {
         rel: "icon",
         href: "/favicon.svg",
@@ -253,7 +255,9 @@ function RootComponent() {
   const isDayyahConcept = pathname.startsWith("/dayyah-couture");
   const isSafiyyrConcept = pathname.startsWith("/safiyyr");
   const isSallysConcept = pathname.startsWith("/sallys-apparel");
-  const isStandaloneConcept = isDayyahConcept || isSafiyyrConcept || isSallysConcept;
+  const isSolaireConcept = pathname.startsWith("/solaire-house");
+  const isStandaloneConcept =
+    isDayyahConcept || isSafiyyrConcept || isSallysConcept || isSolaireConcept;
 
   return (
     <QueryClientProvider client={queryClient}>
