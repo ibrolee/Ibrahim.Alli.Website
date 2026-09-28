@@ -69,8 +69,6 @@ export const Route = createFileRoute("/")({
 
 function Home() {
   const featured = projects.find((project) => project.slug === "jis-beauty-fashion");
-  const liveProjects = projects.filter((project) => !project.concept);
-  const conceptProjects = projects.filter((project) => project.concept);
   return (
     <main id="main-content" className="premium-home">
       <section className="p-hero" aria-labelledby="hero-heading">
@@ -174,7 +172,7 @@ function Home() {
             </p>
           </div>
           <div className="p-projects">
-            {liveProjects.map((project) => (
+            {projects.map((project) => (
               <article className="p-project p-reveal" key={project.slug}>
                 <Link
                   to="/projects/$slug"
@@ -223,72 +221,10 @@ function Home() {
           </div>
         </div>
       </section>
-      <section className="p-section p-work" aria-labelledby="concept-lab-heading">
-        <div className="p-container">
-          <div className="p-section-heading p-reveal">
-            <div>
-              <p className="p-label">02 / Concept Lab</p>
-              <h2 id="concept-lab-heading">
-                Ideas beyond the brief.
-                <br />
-                <em>Built like they’re real.</em>
-              </h2>
-            </div>
-            <p>
-              Independent concepts across different industries, created to explore branding,
-              functionality and better digital experiences.
-            </p>
-          </div>
-          <div className="p-projects">
-            {conceptProjects.map((project) => (
-              <article className="p-project p-reveal" key={project.slug}>
-                <Link
-                  to="/projects/$slug"
-                  params={{ slug: project.slug }}
-                  className="p-project-image"
-                  aria-label={`View ${project.name} concept case study`}
-                >
-                  <img
-                    src={project.image}
-                    alt={`${project.name} hospitality concept presentation`}
-                    loading="lazy"
-                    decoding="async"
-                    width={1600}
-                    height={1000}
-                  />
-                  <span className="p-project-view">
-                    View concept <MoveUpRight size={17} />
-                  </span>
-                </Link>
-                <div className="p-project-body">
-                  <div className="p-project-index">
-                    <span>/{project.number}</span>
-                    <span>{project.type}</span>
-                  </div>
-                  <Link
-                    to="/projects/$slug"
-                    params={{ slug: project.slug }}
-                    className="p-project-title"
-                  >
-                    {project.name}
-                    <MoveUpRight aria-hidden="true" />
-                  </Link>
-                  <p>{project.summary}</p>
-                  <div className="p-tags">
-                    {project.tags.map((tag) => (
-                      <span key={tag}>{tag}</span>
-                    ))}
-                  </div>
-                </div>
-              </article>
-            ))}
-          </div>
-        </div>
-      </section>
       <section className="p-about p-section">
         <div className="p-container p-about-grid">
           <div className="p-reveal">
-            <p className="p-label">03 / Behind the work</p>
+            <p className="p-label">02 / Behind the work</p>
             <div className="p-about-mark" aria-hidden="true">
               ia<span>✳</span>
             </div>
@@ -323,7 +259,7 @@ function Home() {
         <div className="p-container">
           <div className="p-section-heading p-reveal">
             <div>
-              <p className="p-label">04 / What I do</p>
+              <p className="p-label">03 / What I do</p>
               <h2 id="services-heading">
                 Your next idea.
                 <br />
@@ -362,7 +298,7 @@ function Home() {
       <section id="contact" className="p-section p-contact" aria-labelledby="contact-heading">
         <div className="p-container">
           <div className="p-contact-top p-reveal">
-            <p className="p-label">05 / Start a conversation</p>
+            <p className="p-label">04 / Start a conversation</p>
             <span className="p-label">Something in mind?</span>
           </div>
           <div className="p-contact-grid p-reveal">

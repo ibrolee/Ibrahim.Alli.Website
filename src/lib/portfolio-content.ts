@@ -75,7 +75,6 @@ export type Project = {
   result: string;
   tools: string[];
   url?: string;
-  concept?: boolean;
 };
 
 // ACTIVE PROJECTS — displayed on the website.
@@ -136,61 +135,7 @@ export const projects: Project[] = [
       "Supabase",
     ],
   },
-  {
-    slug: "solaire-house",
-    number: "C01",
-    name: "Solaire House",
-    type: "Hospitality Website Concept",
-    image: "https://solaire-house-lagos.floot.app/_cdn/static/cee59675-9fc7-42ff-80a8-55e402f6b1a1-solaire-ng-hero.png",
-    summary:
-      "A bright boutique beach-hotel concept for the Lagos coast, exploring how rooms, experiences and booking can come together in a polished hospitality website.",
-    tags: ["Hospitality", "Booking flow", "Responsive design"],
-    url: "/solaire-house/",
-    concept: true,
-    challenge:
-      "Create a hotel experience that feels premium and aspirational without drifting into a generic international-resort aesthetic.",
-    approach:
-      "Build the concept around a colourful, believable Nigerian coastal identity, with clear room discovery, strong lifestyle imagery and a simple path from browsing to booking.",
-    build:
-      "A responsive hotel website concept with room and suite discovery, individual room pages, Nigerian-focused hospitality imagery, experiences, dining, wellness and a multi-step booking flow.",
-    result:
-      "A portfolio-ready hospitality concept that demonstrates brand direction, responsive UX, room merchandising and an end-to-end reservation journey.",
-    tools: [
-      "Website design",
-      "Responsive design",
-      "React",
-      "Booking UX",
-      "AI-assisted development",
-    ],
-  },
-  {
-    slug: "nova-autohaus",
-    number: "C02",
-    name: "NOVA Autohaus",
-    type: "Automotive Dealership Concept",
-    image: "https://solaire-house-lagos.floot.app/_cdn/static/de9e69b9-473b-4c24-b87e-b48e1beaf222.png",
-    summary:
-      "A premium Lagos dealership concept that turns inventory, vehicle research, finance, trade-ins and test drives into one clear digital journey.",
-    tags: ["Automotive", "Inventory UX", "Interactive tools"],
-    url: "/nova-autohaus/",
-    concept: true,
-    challenge:
-      "Design a dealership website that feels premium and aspirational while still making practical buying information easy to find and act on.",
-    approach:
-      "Use a bright, commercial visual system with strong vehicle imagery, structured inventory data and interactive tools that reduce the usual back-and-forth around premium car buying.",
-    build:
-      "A responsive automotive concept with searchable inventory, individual vehicle pages, side-by-side comparison, an illustrative finance calculator, test-drive booking, and a sell/trade-in valuation flow.",
-    result:
-      "A complete automotive website concept demonstrating product discovery, high-value purchase UX, lead capture and interactive dealership workflows across desktop and mobile.",
-    tools: [
-      "Website design",
-      "Responsive design",
-      "React",
-      "Automotive UX",
-      "Interactive forms",
-      "AI-assisted development",
-    ],
-  }
+
 ];
 
 // ARCHIVED PROJECT — retained for future use.
