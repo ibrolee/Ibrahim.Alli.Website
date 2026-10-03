@@ -183,7 +183,7 @@ function PhotographyPage() {
       <section className="photo-hero" aria-labelledby="photography-heading">
         <div className="p-container photo-hero-grid">
           <div>
-            <p className="p-label">04 / Photography</p>
+            <p className="p-label">Photography / Selected work</p>
             <h1 id="photography-heading">
               Through my
               <br />
@@ -195,8 +195,7 @@ function PhotographyPage() {
               I build digital experiences and document the world around me through photography.
             </p>
             <p>
-              People, places and the details that catch my attention — photographed as I found
-              them.
+              People, places and the details that catch my attention.
             </p>
             <div className="photo-jump-links" aria-label="Photography categories">
               <a href="#people">People</a>
