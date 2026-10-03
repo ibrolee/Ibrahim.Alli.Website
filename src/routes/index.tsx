@@ -47,12 +47,12 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "The personal website of Ibrahim Alli. Explore my web development, digital projects, creative work and selected business ventures.",
+          "The personal website of Ibrahim Alli. Explore my web development, digital projects, photography, creative work and selected business ventures.",
       },
       { property: "og:title", content: "Ibrahim Alli — Builder, Creator & Entrepreneur" },
       {
         property: "og:description",
-        content: "Web development, digital projects and creative work by Ibrahim Alli.",
+        content: "Web development, digital projects and photography by Ibrahim Alli.",
       },
       { property: "og:type", content: "website" },
       { property: "og:url", content: SITE_URL },
@@ -64,7 +64,7 @@ export const Route = createFileRoute("/")({
       { name: "twitter:title", content: "Ibrahim Alli — Builder, Creator & Entrepreneur" },
       {
         name: "twitter:description",
-        content: "Web development, digital projects and creative work by Ibrahim Alli.",
+        content: "Web development, digital projects and photography by Ibrahim Alli.",
       },
       { name: "twitter:image", content: OG_IMAGE },
     ],
@@ -93,8 +93,7 @@ function Home() {
                 <em>Made digital.</em>
               </h1>
               <p className="p-hero-description">
-                I design and build websites, mobile apps, online stores and practical systems that bring
-                businesses to life.
+                I build digital experiences and document the world around me through photography.
               </p>
               <div className="p-actions">
                 <a className="p-button" href="#work">
@@ -157,8 +156,8 @@ function Home() {
         <div aria-hidden="true">
           {[0, 1].map((i) => (
             <span className="p-ticker-group" key={i}>
-              Web design <i>✳</i> E-commerce <i>✳</i> Digital systems <i>✳</i> Creative thinking{" "}
-              <i>✳</i>
+              Web design <i>✳</i> E-commerce <i>✳</i> Digital systems <i>✳</i> Photography{" "}
+              <i>✳</i> Creative thinking <i>✳</i>
             </span>
           ))}
         </div>
