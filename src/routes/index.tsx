@@ -22,12 +22,18 @@ const webServices = [
   },
   {
     number: "03",
+    title: "Mobile apps",
+    description:
+      "Custom Android and iOS apps that bring your business closer to customers, with intuitive design and features built around their needs. From development and testing to submission support for Google Play and the Apple App Store.",
+  },
+  {
+    number: "04",
     title: "Business systems",
     description:
       "Practical digital tools for everyday operations, including membership management, staff portals and QR-based check-in systems.",
   },
   {
-    number: "04",
+    number: "05",
     title: "Website improvements",
     description:
       "Updates and redesigns that improve an existing website’s appearance, mobile experience, content structure and ease of use.",
