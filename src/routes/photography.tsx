@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 const SITE_URL = "https://ibrahimalli.com";
 
@@ -250,6 +250,18 @@ function PhotographyPage() {
           aria-label={activePhoto.title}
           onMouseDown={(event) => {
             if (event.target === event.currentTarget) closeLightbox();
+          }}
+          onTouchStart={(event) => {
+            touchStartX.current = event.touches[0]?.clientX ?? null;
+          }}
+          onTouchEnd={(event) => {
+            if (touchStartX.current === null) return;
+            const endX = event.changedTouches[0]?.clientX ?? touchStartX.current;
+            const distance = endX - touchStartX.current;
+            touchStartX.current = null;
+            if (Math.abs(distance) < 45) return;
+            if (distance > 0) showPrevious();
+            else showNext();
           }}
         >
           <button
