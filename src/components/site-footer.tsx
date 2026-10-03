@@ -79,6 +79,7 @@ export function SiteFooter() {
             <Link to="/" hash="work">
               Work
             </Link>
+            <Link to="/photography">Photography</Link>
             <Link to="/" hash="web-development">
               Services
             </Link>
