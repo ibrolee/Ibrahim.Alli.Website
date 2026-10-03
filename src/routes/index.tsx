@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowDown, ArrowRight, MoveUpRight, Mail, MessageCircle } from "lucide-react";
+import { ArrowDown, ArrowRight, MoveUpRight, Mail, MessageCircle, Monitor, Smartphone } from "lucide-react";
 
 import { projects } from "@/lib/portfolio-content";
 import { JisProjectVisual } from "@/components/jis-project-visual";
@@ -74,7 +74,6 @@ export const Route = createFileRoute("/")({
 });
 
 function Home() {
-  const featured = projects.find((project) => project.slug === "jis-beauty-fashion");
   return (
     <main id="main-content" className="premium-home">
       <section className="p-hero" aria-labelledby="hero-heading">
@@ -94,7 +93,7 @@ function Home() {
                 <em>Made digital.</em>
               </h1>
               <p className="p-hero-description">
-                I design and build websites, online stores and practical systems that bring
+                I design and build websites, mobile apps, online stores and practical systems that bring
                 businesses to life.
               </p>
               <div className="p-actions">
@@ -107,26 +106,29 @@ function Home() {
               </div>
             </div>
             <div className="p-hero-visual">
-              {featured && (
-                <Link
-                  to="/projects/$slug"
-                  params={{ slug: featured.slug }}
-                  className="p-featured"
-                  aria-label="Explore JIS Beauty & Fashion"
-                >
-                  <div className="p-featured-image">
-                    <JisProjectVisual className="jis-portfolio-fill" />
+              <a className="p-service-showcase" href="#web-development" aria-label="Explore website and mobile app services">
+                <div className="p-showcase-top">
+                  <span>Web & app development</span>
+                  <span className="p-showcase-mark" aria-hidden="true">ia.</span>
+                </div>
+                <h2>Your business.<br /><em>On every screen.</em></h2>
+                <div className="p-showcase-platforms">
+                  <div className="p-showcase-web">
+                    <Monitor aria-hidden="true" strokeWidth={1} />
+                    <strong>Websites</strong>
+                    <span>Business & e-commerce</span>
                   </div>
-                  <div className="p-featured-caption">
-                    <span>
-                      <small>Selected project / 02</small>JIS Beauty & Fashion
-                    </span>
-                    <span className="p-circle">
-                      <MoveUpRight size={21} />
-                    </span>
+                  <div className="p-showcase-app">
+                    <Smartphone aria-hidden="true" strokeWidth={1} />
+                    <strong>Mobile apps</strong>
+                    <span>Android & iOS</span>
                   </div>
-                </Link>
-              )}
+                </div>
+                <div className="p-showcase-bottom">
+                  <span>From idea to launch</span>
+                  <span className="p-showcase-link">Explore services <MoveUpRight size={18} aria-hidden="true" /></span>
+                </div>
+              </a>
               <div className="p-visual-note">
                 <span className="p-spark" aria-hidden="true">
                   ✳
