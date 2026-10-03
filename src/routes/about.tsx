@@ -206,18 +206,6 @@ function About() {
                       another way to look at the world and express creativity.
                     </p>
                     <p>
-                      I also had an experience that became particularly
-                      meaningful to me. My mother sponsored me to perform{" "}
-                      <strong>Umrah in Saudi Arabia</strong>, which was not
-                      only my first international experience but also an
-                      important moment in my spiritual journey. The experience
-                      uplifted my spirituality and gave me a deeper
-                      appreciation for faith, travel and experiencing the
-                      world beyond what I had always known. It is an
-                      experience I hope to have again someday — this time
-                      alongside my wife.
-                    </p>
-                    <p>
                       I also invested in developing practical skills outside
                       my university degree. I attended an LSETF-sponsored
                       digital marketing training at Poise Nigeria Limited in
