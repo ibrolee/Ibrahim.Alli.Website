@@ -19,6 +19,7 @@ import dayyahCss from "../dayyah-couture.css?url";
 import safiyyrCss from "../safiyyr.css?url";
 import sallysCss from "../sallys-apparel.css?url";
 import premiumCss from "../premium.css?url";
+import photographyCss from "../photography.css?url";
 import superPlusStudiosCss from "../super-plus-studios.css?url";
 
 function NotFoundComponent() {
@@ -206,6 +207,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         href: sallysCss,
       },
       { rel: "stylesheet", href: premiumCss },
+      { rel: "stylesheet", href: photographyCss },
       { rel: "stylesheet", href: superPlusStudiosCss },
       {
         rel: "icon",
