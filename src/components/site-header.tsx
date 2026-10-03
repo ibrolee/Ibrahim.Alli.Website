@@ -21,6 +21,9 @@ export function SiteHeader() {
           <Link to="/" hash="work">
             Selected work
           </Link>
+          <Link to="/photography" activeProps={{ className: "p-active" }}>
+            Photography
+          </Link>
           <Link to="/about" activeProps={{ className: "p-active" }}>
             About me
           </Link>
@@ -40,13 +43,16 @@ export function SiteHeader() {
           </SheetTrigger>
           <SheetContent className="p-mobile-sheet" side="right">
             <SheetTitle>Explore</SheetTitle>
-            <SheetDescription>Work, background and ways to get in touch.</SheetDescription>
+            <SheetDescription>Work, photography, background and ways to get in touch.</SheetDescription>
             <nav aria-label="Mobile navigation">
               <Link to="/" onClick={() => setOpen(false)}>
                 Home
               </Link>
               <Link to="/" hash="work" onClick={() => setOpen(false)}>
                 Selected work
+              </Link>
+              <Link to="/photography" onClick={() => setOpen(false)}>
+                Photography
               </Link>
               <Link to="/about" onClick={() => setOpen(false)}>
                 About me
