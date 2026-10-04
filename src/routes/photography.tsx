@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { ChevronLeft, ChevronRight, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, MoveUpRight, X } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 const SITE_URL = "https://ibrahimalli.com";
@@ -208,7 +208,8 @@ function PhotographyPage() {
               target="_blank"
               rel="noreferrer"
             >
-              View my work on Pexels <span aria-hidden="true">↗</span>
+              <span>View my work on Pexels</span>
+              <MoveUpRight size={16} aria-hidden="true" />
             </a>
           </div>
         </div>
@@ -255,7 +256,8 @@ function PhotographyPage() {
               target="_blank"
               rel="noreferrer"
             >
-              More photography on Pexels <span aria-hidden="true">↗</span>
+              <span>More photography on Pexels</span>
+              <MoveUpRight size={15} aria-hidden="true" />
             </a>
           </div>
         </div>
