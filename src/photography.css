@@ -85,15 +85,18 @@
 .photo-pexels-cta {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
+  justify-content: space-between;
+  gap: 12px;
   min-height: 48px;
   margin-top: 18px;
   padding: 12px 18px;
   border-radius: 30px;
   background: #f0efeb;
-  color: #151619;
+  color: #111214 !important;
+  -webkit-text-fill-color: #111214;
   font-size: 13px;
   font-weight: 600;
+  text-decoration: none;
   transition:
     transform 0.2s ease,
     background 0.2s ease;
@@ -104,9 +107,14 @@
   background: #fff;
 }
 
-.photo-pexels-cta span,
-.photo-note-link span {
-  font-size: 15px;
+.photo-pexels-cta span {
+  color: #111214 !important;
+  -webkit-text-fill-color: #111214;
+}
+
+.photo-pexels-cta svg {
+  flex-shrink: 0;
+  color: #111214;
 }
 
 .photo-section {
@@ -250,9 +258,18 @@
   font-size: 13px;
   border-bottom: 1px solid #55575d;
   padding-bottom: 3px;
+  text-decoration: none;
   transition:
     color 0.2s ease,
     border-color 0.2s ease;
+}
+
+.photo-note-link span {
+  color: inherit;
+}
+
+.photo-note-link svg {
+  flex-shrink: 0;
 }
 
 .photo-note-link:hover {
