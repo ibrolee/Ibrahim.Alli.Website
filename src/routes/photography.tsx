@@ -3,6 +3,7 @@ import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 const SITE_URL = "https://ibrahimalli.com";
+const PEXELS_URL = "https://www.pexels.com/@ibrolee/";
 
 type PhotoCategory = "people" | "places";
 
@@ -201,6 +202,14 @@ function PhotographyPage() {
               <a href="#people">People</a>
               <a href="#places">Places &amp; Details</a>
             </div>
+            <a
+              className="photo-pexels-cta"
+              href={PEXELS_URL}
+              target="_blank"
+              rel="noreferrer"
+            >
+              View my work on Pexels <span aria-hidden="true">↗</span>
+            </a>
           </div>
         </div>
       </section>
@@ -238,7 +247,17 @@ function PhotographyPage() {
       <section className="photo-note">
         <div className="p-container">
           <p className="p-label">Photography by Ibrahim Alli</p>
-          <p>Selected work from different places, people and moments along the way.</p>
+          <div className="photo-note-copy">
+            <p>Selected work from different places, people and moments along the way.</p>
+            <a
+              className="photo-note-link"
+              href={PEXELS_URL}
+              target="_blank"
+              rel="noreferrer"
+            >
+              More photography on Pexels <span aria-hidden="true">↗</span>
+            </a>
+          </div>
         </div>
       </section>
 
