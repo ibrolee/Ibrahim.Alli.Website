@@ -82,6 +82,33 @@
   background: #ffffff08;
 }
 
+.photo-pexels-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 48px;
+  margin-top: 18px;
+  padding: 12px 18px;
+  border-radius: 30px;
+  background: #f0efeb;
+  color: #151619;
+  font-size: 13px;
+  font-weight: 600;
+  transition:
+    transform 0.2s ease,
+    background 0.2s ease;
+}
+
+.photo-pexels-cta:hover {
+  transform: translateY(-1px);
+  background: #fff;
+}
+
+.photo-pexels-cta span,
+.photo-note-link span {
+  font-size: 15px;
+}
+
 .photo-section {
   padding: 96px 0 112px;
   scroll-margin-top: 28px;
@@ -202,12 +229,35 @@
   gap: 32px;
 }
 
-.photo-note > .p-container > p:last-child {
+.photo-note-copy {
   max-width: 520px;
+  text-align: right;
+}
+
+.photo-note-copy > p {
+  margin: 0;
   color: #8f9197;
   font-size: 14px;
   line-height: 1.8;
-  text-align: right;
+}
+
+.photo-note-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 14px;
+  color: #d9d9d6;
+  font-size: 13px;
+  border-bottom: 1px solid #55575d;
+  padding-bottom: 3px;
+  transition:
+    color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.photo-note-link:hover {
+  color: #fff;
+  border-color: #fff;
 }
 
 .photo-lightbox {
@@ -373,7 +423,7 @@
     display: block;
   }
 
-  .photo-note > .p-container > p:last-child {
+  .photo-note-copy {
     margin-top: 12px;
     text-align: left;
   }
