@@ -17,6 +17,11 @@ const socialLinks = [
     href: "https://www.tiktok.com/@ibrolee_?_r=1&_t=ZS-99o0pp1Iml6",
     icon: "tiktok",
   },
+  {
+    label: "Pexels",
+    href: "https://www.pexels.com/@ibrolee/",
+    icon: "pexels",
+  },
 ] as const;
 
 function SocialIcon({ type }: { type: (typeof socialLinks)[number]["icon"] }) {
@@ -43,6 +48,16 @@ function SocialIcon({ type }: { type: (typeof socialLinks)[number]["icon"] }) {
       <svg viewBox="0 0 24 24" aria-hidden="true">
         <path
           d="M14.3 3h3.05c.3 1.55 1.2 2.72 2.65 3.4v3.02c-1.1-.04-2.08-.32-2.95-.84v6.3c0 3.65-2.43 6.12-5.77 6.12A5.73 5.73 0 0 1 5.5 15.3c0-3.36 2.48-5.85 5.85-5.85.36 0 .72.04 1.06.1v3.13a2.86 2.86 0 0 0-1.06-.2c-1.55 0-2.72 1.1-2.72 2.77 0 1.5 1.08 2.7 2.65 2.7 1.64 0 3.02-1.12 3.02-3.5V3Z"
+          fill="currentColor"
+          stroke="none"
+        />
+      </svg>
+    );
+  if (type === "pexels")
+    return (
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path
+          d="M8 5h5a4 4 0 0 1 0 8h-3v6H8V5Zm2 2v4h3a2 2 0 1 0 0-4h-3Z"
           fill="currentColor"
           stroke="none"
         />
