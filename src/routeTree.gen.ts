@@ -11,8 +11,11 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AboutRouteImport } from './routes/about'
+import { Route as PhotographyRouteImport } from './routes/photography'
 import { Route as DayyahCoutureIndexRouteImport } from './routes/dayyah-couture/index'
 import { Route as DayyahCouturePageRouteImport } from './routes/dayyah-couture/$page'
+import { Route as MimsIndexRouteImport } from './routes/mims/index'
+import { Route as MimsSplatRouteImport } from './routes/mims/$'
 import { Route as ProjectsSlugRouteImport } from './routes/projects/$slug'
 import { Route as SafiyyrIndexRouteImport } from './routes/safiyyr/index'
 import { Route as SafiyyrShopRouteImport } from './routes/safiyyr/shop'
@@ -36,6 +39,11 @@ const AboutRoute = AboutRouteImport.update({
   path: '/about',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PhotographyRoute = PhotographyRouteImport.update({
+  id: '/photography',
+  path: '/photography',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DayyahCoutureIndexRoute = DayyahCoutureIndexRouteImport.update({
   id: '/dayyah-couture/',
   path: '/dayyah-couture/',
@@ -44,6 +52,16 @@ const DayyahCoutureIndexRoute = DayyahCoutureIndexRouteImport.update({
 const DayyahCouturePageRoute = DayyahCouturePageRouteImport.update({
   id: '/dayyah-couture/$page',
   path: '/dayyah-couture/$page',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MimsIndexRoute = MimsIndexRouteImport.update({
+  id: '/mims/',
+  path: '/mims/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MimsSplatRoute = MimsSplatRouteImport.update({
+  id: '/mims/$',
+  path: '/mims/$',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProjectsSlugRoute = ProjectsSlugRouteImport.update({
@@ -113,7 +131,9 @@ const SallysApparelProductSlugRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/photography': typeof PhotographyRoute
   '/dayyah-couture/$page': typeof DayyahCouturePageRoute
+  '/mims/$': typeof MimsSplatRoute
   '/projects/$slug': typeof ProjectsSlugRoute
   '/safiyyr/shop': typeof SafiyyrShopRoute
   '/sallys-apparel/shop': typeof SallysApparelShopRoute
@@ -122,6 +142,7 @@ export interface FileRoutesByFullPath {
   '/super-plus-studios/shop': typeof SuperPlusStudiosShopRoute
   '/super-plus-studios/track': typeof SuperPlusStudiosTrackRoute
   '/dayyah-couture/': typeof DayyahCoutureIndexRoute
+  '/mims/': typeof MimsIndexRoute
   '/safiyyr/': typeof SafiyyrIndexRoute
   '/sallys-apparel/': typeof SallysApparelIndexRoute
   '/super-plus-studios/': typeof SuperPlusStudiosIndexRoute
@@ -131,7 +152,9 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/photography': typeof PhotographyRoute
   '/dayyah-couture/$page': typeof DayyahCouturePageRoute
+  '/mims/$': typeof MimsSplatRoute
   '/projects/$slug': typeof ProjectsSlugRoute
   '/safiyyr/shop': typeof SafiyyrShopRoute
   '/sallys-apparel/shop': typeof SallysApparelShopRoute
@@ -140,6 +163,7 @@ export interface FileRoutesByTo {
   '/super-plus-studios/shop': typeof SuperPlusStudiosShopRoute
   '/super-plus-studios/track': typeof SuperPlusStudiosTrackRoute
   '/dayyah-couture': typeof DayyahCoutureIndexRoute
+  '/mims': typeof MimsIndexRoute
   '/safiyyr': typeof SafiyyrIndexRoute
   '/sallys-apparel': typeof SallysApparelIndexRoute
   '/super-plus-studios': typeof SuperPlusStudiosIndexRoute
@@ -150,7 +174,9 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/photography': typeof PhotographyRoute
   '/dayyah-couture/$page': typeof DayyahCouturePageRoute
+  '/mims/$': typeof MimsSplatRoute
   '/projects/$slug': typeof ProjectsSlugRoute
   '/safiyyr/shop': typeof SafiyyrShopRoute
   '/sallys-apparel/shop': typeof SallysApparelShopRoute
@@ -159,6 +185,7 @@ export interface FileRoutesById {
   '/super-plus-studios/shop': typeof SuperPlusStudiosShopRoute
   '/super-plus-studios/track': typeof SuperPlusStudiosTrackRoute
   '/dayyah-couture/': typeof DayyahCoutureIndexRoute
+  '/mims/': typeof MimsIndexRoute
   '/safiyyr/': typeof SafiyyrIndexRoute
   '/sallys-apparel/': typeof SallysApparelIndexRoute
   '/super-plus-studios/': typeof SuperPlusStudiosIndexRoute
@@ -170,7 +197,9 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/about'
+    | '/photography'
     | '/dayyah-couture/$page'
+    | '/mims/$'
     | '/projects/$slug'
     | '/safiyyr/shop'
     | '/sallys-apparel/shop'
@@ -179,6 +208,7 @@ export interface FileRouteTypes {
     | '/super-plus-studios/shop'
     | '/super-plus-studios/track'
     | '/dayyah-couture/'
+    | '/mims/'
     | '/safiyyr/'
     | '/sallys-apparel/'
     | '/super-plus-studios/'
@@ -188,7 +218,9 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/about'
+    | '/photography'
     | '/dayyah-couture/$page'
+    | '/mims/$'
     | '/projects/$slug'
     | '/safiyyr/shop'
     | '/sallys-apparel/shop'
@@ -197,6 +229,7 @@ export interface FileRouteTypes {
     | '/super-plus-studios/shop'
     | '/super-plus-studios/track'
     | '/dayyah-couture'
+    | '/mims'
     | '/safiyyr'
     | '/sallys-apparel'
     | '/super-plus-studios'
@@ -206,7 +239,9 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/about'
+    | '/photography'
     | '/dayyah-couture/$page'
+    | '/mims/$'
     | '/projects/$slug'
     | '/safiyyr/shop'
     | '/sallys-apparel/shop'
@@ -215,6 +250,7 @@ export interface FileRouteTypes {
     | '/super-plus-studios/shop'
     | '/super-plus-studios/track'
     | '/dayyah-couture/'
+    | '/mims/'
     | '/safiyyr/'
     | '/sallys-apparel/'
     | '/super-plus-studios/'
@@ -225,7 +261,9 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
+  PhotographyRoute: typeof PhotographyRoute
   DayyahCouturePageRoute: typeof DayyahCouturePageRoute
+  MimsSplatRoute: typeof MimsSplatRoute
   ProjectsSlugRoute: typeof ProjectsSlugRoute
   SafiyyrShopRoute: typeof SafiyyrShopRoute
   SallysApparelShopRoute: typeof SallysApparelShopRoute
@@ -234,6 +272,7 @@ export interface RootRouteChildren {
   SuperPlusStudiosShopRoute: typeof SuperPlusStudiosShopRoute
   SuperPlusStudiosTrackRoute: typeof SuperPlusStudiosTrackRoute
   DayyahCoutureIndexRoute: typeof DayyahCoutureIndexRoute
+  MimsIndexRoute: typeof MimsIndexRoute
   SafiyyrIndexRoute: typeof SafiyyrIndexRoute
   SallysApparelIndexRoute: typeof SallysApparelIndexRoute
   SuperPlusStudiosIndexRoute: typeof SuperPlusStudiosIndexRoute
@@ -257,6 +296,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AboutRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/photography': {
+      id: '/photography'
+      path: '/photography'
+      fullPath: '/photography'
+      preLoaderRoute: typeof PhotographyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/dayyah-couture/': {
       id: '/dayyah-couture/'
       path: '/dayyah-couture'
@@ -269,6 +315,20 @@ declare module '@tanstack/react-router' {
       path: '/dayyah-couture/$page'
       fullPath: '/dayyah-couture/$page'
       preLoaderRoute: typeof DayyahCouturePageRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mims/': {
+      id: '/mims/'
+      path: '/mims'
+      fullPath: '/mims/'
+      preLoaderRoute: typeof MimsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mims/$': {
+      id: '/mims/$'
+      path: '/mims/$'
+      fullPath: '/mims/$'
+      preLoaderRoute: typeof MimsSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/projects/$slug': {
@@ -361,7 +421,9 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
+  PhotographyRoute: PhotographyRoute,
   DayyahCouturePageRoute: DayyahCouturePageRoute,
+  MimsSplatRoute: MimsSplatRoute,
   ProjectsSlugRoute: ProjectsSlugRoute,
   SafiyyrShopRoute: SafiyyrShopRoute,
   SallysApparelShopRoute: SallysApparelShopRoute,
@@ -370,6 +432,7 @@ const rootRouteChildren: RootRouteChildren = {
   SuperPlusStudiosShopRoute: SuperPlusStudiosShopRoute,
   SuperPlusStudiosTrackRoute: SuperPlusStudiosTrackRoute,
   DayyahCoutureIndexRoute: DayyahCoutureIndexRoute,
+  MimsIndexRoute: MimsIndexRoute,
   SafiyyrIndexRoute: SafiyyrIndexRoute,
   SallysApparelIndexRoute: SallysApparelIndexRoute,
   SuperPlusStudiosIndexRoute: SuperPlusStudiosIndexRoute,

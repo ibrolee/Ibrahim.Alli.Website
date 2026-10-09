@@ -21,6 +21,7 @@ import sallysCss from "../sallys-apparel.css?url";
 import premiumCss from "../premium.css?url";
 import photographyCss from "../photography.css?url";
 import superPlusStudiosCss from "../super-plus-studios.css?url";
+import mimsCss from "../mims.css?url";
 
 function NotFoundComponent() {
   return (
@@ -209,6 +210,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "stylesheet", href: premiumCss },
       { rel: "stylesheet", href: photographyCss },
       { rel: "stylesheet", href: superPlusStudiosCss },
+      { rel: "stylesheet", href: mimsCss },
       {
         rel: "icon",
         href: "/favicon.svg",
@@ -261,6 +263,7 @@ function RootComponent() {
   const isSallysConcept = pathname.startsWith("/sallys-apparel");
   const isSuperPlusStudios = pathname.startsWith("/super-plus-studios");
   const isStandaloneConcept =
+    pathname === "/mims" || pathname.startsWith("/mims/") ||
     isDayyahConcept ||
     isSafiyyrConcept ||
     isSallysConcept ||
