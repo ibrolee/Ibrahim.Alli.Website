@@ -8,7 +8,7 @@ export function PortfolioProof() {
     <section id="proof" className="ia-proof-section p-section" aria-labelledby="proof-title">
       <div className="p-container">
         <div className="ia-proof-heading">
-          <div><p className="p-label">02 / Proof of work</p><h2 id="proof-title">Real businesses.<br /><em>Real work to explore.</em></h2></div>
+          <div><p className="p-label">Project evidence / Behind the work</p><h2 id="proof-title">Real businesses.<br /><em>Real work to explore.</em></h2></div>
           <p>These are businesses I'm personally involved with, not invented agency commissions. Explore the actual sites and read how their digital journeys work.</p>
         </div>
         <div className="ia-proof-grid">
