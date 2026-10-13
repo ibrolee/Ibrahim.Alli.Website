@@ -40,9 +40,13 @@ export function SiteHeader() {
         </nav>
         <Sheet open={open} onOpenChange={setOpen}>
           <SheetTrigger asChild>
-            <button className="p-menu-button" aria-label="Open navigation menu">
-              <span>Menu</span>
-              <Menu size={21} />
+            <button
+              type="button"
+              className="p-menu-button"
+              aria-label="Open navigation menu"
+              aria-expanded={open}
+            >
+              <Menu size={23} aria-hidden="true" />
             </button>
           </SheetTrigger>
           <SheetContent className="p-mobile-sheet" side="right">
