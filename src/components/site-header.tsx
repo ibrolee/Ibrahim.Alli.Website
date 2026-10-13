@@ -31,11 +31,11 @@ export function SiteHeader() {
           <Link to="/about" activeProps={{ className: "p-active" }}>
             About me
           </Link>
-          <Link to="/" hash="web-development">
+          <Link to="/services" activeProps={{ className: "p-active" }}>
             Services
           </Link>
-          <Link className="p-nav-contact" to="/" hash="contact">
-            Contact me <MoveUpRight size={15} />
+          <Link className="p-nav-contact" to="/start-project" activeProps={{ className: "p-active" }}>
+            Start a project <MoveUpRight size={15} />
           </Link>
         </nav>
         <Sheet open={open} onOpenChange={setOpen}>
@@ -65,11 +65,11 @@ export function SiteHeader() {
               <Link to="/about" onClick={() => setOpen(false)}>
                 About me
               </Link>
-              <Link to="/" hash="web-development" onClick={() => setOpen(false)}>
+              <Link to="/services" onClick={() => setOpen(false)}>
                 Services
               </Link>
-              <Link to="/" hash="contact" onClick={() => setOpen(false)}>
-                Contact me ↗
+              <Link to="/start-project" onClick={() => setOpen(false)}>
+                Start a project ↗
               </Link>
             </nav>
             <p>Design · Digital · Business</p>
