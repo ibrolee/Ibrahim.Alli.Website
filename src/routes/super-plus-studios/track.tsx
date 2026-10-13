@@ -1,10 +1,12 @@
+import conceptCss from "../../super-plus-studios.css?url";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight, Check, Circle, PackageCheck, Search, Truck } from "lucide-react";
 import { FormEvent, useState } from "react";
 import { SpsHeader } from "@/components/super-plus-studios";
 
 export const Route=createFileRoute("/super-plus-studios/track")({
-  head:()=>({meta:[{title:"Track Order — Super Plus Studios"},{name:"robots",content:"noindex, nofollow"}]}),
+  head:()=>({
+    links:[{ rel: "stylesheet", href: conceptCss }],meta:[{title:"Track Order — Super Plus Studios"},{name:"robots",content:"noindex, nofollow"}]}),
   component:TrackOrder,
 });
 
