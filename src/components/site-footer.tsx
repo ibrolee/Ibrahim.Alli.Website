@@ -102,7 +102,7 @@ export function SiteFooter() {
               Client onboarding
             </Link>
             <Link to="/client-documents">
-              Document tools
+              Document Studio
             </Link>
             <Link to="/free-website-audit">
               Free audit
