@@ -1,3 +1,4 @@
+import conceptCss from "../../dayyah-couture.css?url";
 import { createFileRoute } from "@tanstack/react-router";
 import { DayyahSubpage } from "@/components/dayyah-couture";
 
@@ -13,7 +14,8 @@ const titles: Record<string, string> = {
 };
 
 export const Route = createFileRoute("/dayyah-couture/$page")({
-  head: ({ params }) => ({
+  head: ({
+    links: [{ rel: "stylesheet", href: conceptCss }], params }) => ({
     meta: [
       {
         title: `${titles[params.page] ?? "Dayyah Couture"} — Dayyah Couture Concept`,
