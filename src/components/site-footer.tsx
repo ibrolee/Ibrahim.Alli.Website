@@ -98,6 +98,12 @@ export function SiteFooter() {
             <Link to="/services">
               Services
             </Link>
+            <Link to="/free-website-audit">
+              Free audit
+            </Link>
+            <Link to="/website-maintenance">
+              Maintenance
+            </Link>
             <Link to="/faqs">
               FAQs
             </Link>
