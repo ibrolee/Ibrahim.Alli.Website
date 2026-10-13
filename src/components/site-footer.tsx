@@ -98,6 +98,9 @@ export function SiteFooter() {
             <Link to="/" hash="web-development">
               Services
             </Link>
+            <Link to="/" hash="frequently-asked-questions">
+              FAQs
+            </Link>
             <Link to="/" hash="contact">
               Contact
             </Link>
