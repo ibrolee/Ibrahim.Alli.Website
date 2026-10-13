@@ -14,8 +14,8 @@ const titles: Record<string, string> = {
 };
 
 export const Route = createFileRoute("/dayyah-couture/$page")({
-  head: ({
-    links: [{ rel: "stylesheet", href: conceptCss }], params }) => ({
+  head: ({ params }) => ({
+    links: [{ rel: "stylesheet", href: conceptCss }],
     meta: [
       {
         title: `${titles[params.page] ?? "Dayyah Couture"} — Dayyah Couture Concept`,
