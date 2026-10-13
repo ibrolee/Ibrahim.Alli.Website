@@ -5,6 +5,7 @@ import { projects } from "@/lib/portfolio-content";
 import { JisProjectVisual } from "@/components/jis-project-visual";
 import { projectFaqs, projectProcess } from "@/lib/freelance-services";
 import { PortfolioProof } from "@/components/portfolio-proof";
+import { VerifiedFeedbackSection } from "@/components/verified-feedback";
 
 const SITE_URL = "https://ibrahimalli.com";
 const OG_IMAGE = `${SITE_URL}/og-image.jpg`;
@@ -367,6 +368,7 @@ function Home() {
         </div>
       </section>
       <PortfolioProof />
+      <VerifiedFeedbackSection />
       <section id="process" className="ia-home-process p-section" aria-labelledby="process-heading">
         <div className="p-container">
           <div className="p-section-heading">
