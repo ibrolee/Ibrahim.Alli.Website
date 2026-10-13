@@ -202,3 +202,77 @@
  .portfolio-shell .ia-4b-bridge-inner h2 em{color:#ff9ca5}
  .portfolio-shell .ia-4b-bridge-inner p:not(.p-label){color:#d2d2d2}
 }
+
+
+/* Direct navigation to Document Studio from Services and Client Onboarding. */
+.portfolio-shell .ia-4b-bridge-actions{
+  display:grid;
+  justify-items:stretch;
+  flex-shrink:0;
+  gap:12px;
+  width:min(100%,315px)
+}
+.portfolio-shell .ia-4b-bridge-actions .ia-stage-primary{
+  justify-content:space-between;
+  white-space:normal;
+  width:100%;
+  text-align:left
+}
+.portfolio-shell .ia-4b-studio-link{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  min-height:51px;
+  padding:13px 22px;
+  border:1px solid #d9a3aa;
+  border-radius:99px;
+  color:#b64755;
+  background:#fff;
+  font-size:13px;
+  font-weight:850;
+}
+.portfolio-shell .ia-4b-studio-link:hover{
+  background:#fff4f5;
+  border-color:#cf6b76;
+}
+.portfolio-shell .ia-4b-onboarding-resources{
+  display:grid;
+  gap:19px;
+  justify-items:start;
+  margin-top:23px;
+}
+.portfolio-shell .ia-4b-onboarding-studio{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+  width:100%;
+  border:1px solid #e9c4c9;
+  border-radius:15px;
+  padding:17px 19px;
+  background:linear-gradient(115deg,#fff0f2,#fff 90%);
+  color:#bb4d5b;
+}
+.portfolio-shell .ia-4b-onboarding-studio>span{display:grid;gap:5px}
+.portfolio-shell .ia-4b-onboarding-studio strong{font-size:16px;font-weight:850;letter-spacing:-.03em}
+.portfolio-shell .ia-4b-onboarding-studio small{font-size:12px;line-height:1.55;color:#667285}
+.portfolio-shell .ia-4b-onboarding-studio>svg{flex-shrink:0}
+@media(max-width:760px){
+  .portfolio-shell .ia-4b-bridge-actions{width:100%}
+  .portfolio-shell .ia-4b-studio-link{width:100%}
+}
+@media(prefers-color-scheme:dark){
+  .portfolio-shell .ia-4b-studio-link{
+    background:#352b2d;
+    border-color:#81535b;
+    color:#ffc1c5;
+  }
+  .portfolio-shell .ia-4b-studio-link:hover{background:#413034}
+  .portfolio-shell .ia-4b-onboarding-studio{
+    background:linear-gradient(115deg,#382a2e,#292929 90%);
+    border-color:#68444b;
+    color:#ffb5bc;
+  }
+  .portfolio-shell .ia-4b-onboarding-studio small{color:#d4d4d4}
+}
