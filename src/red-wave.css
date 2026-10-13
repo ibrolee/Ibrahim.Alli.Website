@@ -634,3 +634,25 @@
  .portfolio-shell .p-hero-client-cta strong{font-size:12px}
  .portfolio-shell .p-client-availability{font-size:10px}
 }
+
+
+/* Case studies: evidence-based breakdown of shipped deliverables */
+.portfolio-shell .p-evidence-section{background:#fff;color:#242a35}
+.portfolio-shell .p-evidence-heading{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,.7fr);gap:30px;align-items:end}
+.portfolio-shell .p-evidence-heading h2{margin:15px 0 0;max-width:720px;font-family:Manrope,"DM Sans",sans-serif;font-size:clamp(35px,4.5vw,68px);font-weight:850;letter-spacing:-.06em;line-height:1.07}
+.portfolio-shell .p-evidence-heading h2 em{color:#dd5c64}
+.portfolio-shell .p-evidence-heading>p{max-width:370px;justify-self:end;color:#657083;font-size:15px;line-height:1.8}
+.portfolio-shell .p-evidence-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px;margin-top:36px}
+.portfolio-shell .p-evidence-item{display:flex;gap:17px;align-items:flex-start;min-width:0;padding:25px;border:1px solid #e7e9ef;background:#f5f6f9;border-radius:15px}
+.portfolio-shell .p-evidence-item>span{color:#d5515a;font-size:12px;font-weight:850;letter-spacing:.1em}
+.portfolio-shell .p-evidence-item svg{color:#d5515a;margin-top:1px}
+.portfolio-shell .p-evidence-item p{flex:1;line-height:1.6;font-weight:650;font-size:15px}
+.portfolio-shell .p-evidence-note{border-top:1px solid #e3e6eb;margin-top:25px;padding-top:18px;font-size:12px;line-height:1.8;color:#687182}
+.portfolio-shell .p-evidence-note strong{color:#434956}
+@media(max-width:760px){
+ .portfolio-shell .p-evidence-heading{grid-template-columns:minmax(0,1fr);gap:15px}
+ .portfolio-shell .p-evidence-heading>p{justify-self:start}
+ .portfolio-shell .p-evidence-grid{grid-template-columns:minmax(0,1fr);gap:9px;margin-top:22px}
+ .portfolio-shell .p-evidence-item{padding:19px 15px;gap:12px}
+ .portfolio-shell .p-evidence-item p{font-size:14px}
+}
