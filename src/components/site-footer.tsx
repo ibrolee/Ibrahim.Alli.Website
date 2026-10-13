@@ -101,9 +101,6 @@ export function SiteFooter() {
             <Link to="/client-onboarding">
               Client onboarding
             </Link>
-            <Link to="/client-documents">
-              Document Studio
-            </Link>
             <Link to="/free-website-audit">
               Free audit
             </Link>
