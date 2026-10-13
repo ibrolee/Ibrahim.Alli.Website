@@ -15,13 +15,8 @@ import { SiteFooter } from "@/components/site-footer";
 
 import appCss from "../styles.css?url";
 import aboutCss from "../about-editorial.css?url";
-import dayyahCss from "../dayyah-couture.css?url";
-import safiyyrCss from "../safiyyr.css?url";
-import sallysCss from "../sallys-apparel.css?url";
 import premiumCss from "../premium.css?url";
 import photographyCss from "../photography.css?url";
-import superPlusStudiosCss from "../super-plus-studios.css?url";
-import mimsCss from "../mims.css?url";
 import redWaveCss from "../red-wave.css?url";
 import autoDarkCss from "../auto-dark.css?url";
 import freelanceStage1Css from "../freelance-stage1.css?url";
@@ -200,22 +195,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         rel: "stylesheet",
         href: aboutCss,
       },
-      {
-        rel: "stylesheet",
-        href: dayyahCss,
-      },
-      {
-        rel: "stylesheet",
-        href: safiyyrCss,
-      },
-      {
-        rel: "stylesheet",
-        href: sallysCss,
-      },
       { rel: "stylesheet", href: premiumCss },
       { rel: "stylesheet", href: photographyCss },
-      { rel: "stylesheet", href: superPlusStudiosCss },
-      { rel: "stylesheet", href: mimsCss },
       { rel: "stylesheet", href: redWaveCss },
       { rel: "stylesheet", href: autoDarkCss },
       { rel: "stylesheet", href: freelanceStage1Css },
