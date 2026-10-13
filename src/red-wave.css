@@ -574,3 +574,85 @@
     padding:0;
   }
 }
+
+ 
+
+/* Portfolio conversion improvements — preview branch. No standalone demos affected. */
+.portfolio-shell .p-hero-client-cta {
+  display:flex;flex-direction:column;align-items:flex-start;gap:10px;
+  margin-top:26px;padding-top:18px;border-top:1px solid #cbd4e2;
+  width:fit-content;max-width:100%;color:#454b5b;text-decoration:none
+}
+.portfolio-shell .p-client-availability{display:inline-flex;align-items:center;gap:9px;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.11em;color:#70788b}
+.portfolio-shell .p-client-availability>span{width:8px;height:8px;border-radius:50%;background:#db6365;box-shadow:0 0 0 4px #f6d9dc}
+.portfolio-shell .p-hero-client-cta strong{display:inline-flex;align-items:center;gap:10px;font-size:14px;font-weight:800;color:#c83f4d;border-bottom:1px solid currentColor;padding-bottom:5px}
+.portfolio-shell .p-hero-client-cta:hover strong{gap:16px}
+.portfolio-shell .p-packages {background:#f0f2f8}
+.portfolio-shell .p-package-grid {display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:19px;margin-top:47px}
+.portfolio-shell .p-package-card {
+  display:flex;flex-direction:column;min-width:0;padding:clamp(22px,2.7vw,36px);
+  background:#fff;border:1px solid #dfe3ed;border-radius:22px;
+  box-shadow:0 15px 45px #4b586b0c
+}
+.portfolio-shell .p-package-card.is-featured{border:1.5px solid #e37c80;box-shadow:0 17px 48px #df5d6623;background:linear-gradient(155deg,#fff 0%,#fff6f6 100%)}
+.portfolio-shell .p-package-top{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;min-height:26px}
+.portfolio-shell .p-package-highlight{display:inline-flex;gap:6px;align-items:center;border-radius:99px;padding:7px 11px;background:#fbe5e5;color:#b9364d;font-size:10px;font-weight:800;letter-spacing:.02em}
+.portfolio-shell .p-package-card h3{margin:32px 0 16px;color:#202633;font-family:Manrope,"DM Sans",sans-serif;font-size:clamp(27px,2.75vw,40px);line-height:1.06;font-weight:850;letter-spacing:-.055em}
+.portfolio-shell .p-package-description{color:#555f73;line-height:1.75;font-size:15px;min-height:80px}
+.portfolio-shell .p-package-suitable{color:#b73f4e;font-size:12px;font-weight:750;margin:19px 0 0;line-height:1.5}
+.portfolio-shell .p-package-divider{height:1px;background:#e3e6ed;margin:28px 0 24px}
+.portfolio-shell .p-package-card ul{list-style:none;padding:0;margin:0 0 32px;display:grid;gap:16px}
+.portfolio-shell .p-package-card li{display:flex;gap:12px;align-items:flex-start;line-height:1.55;color:#41495a;font-size:13px}
+.portfolio-shell .p-package-card li svg{color:#dc5660;flex-shrink:0;margin-top:2px}
+.portfolio-shell .p-package-bottom{display:grid;gap:19px;margin-top:auto}
+.portfolio-shell .p-package-bottom>span{display:inline-flex;gap:8px;align-items:center;color:#7a8290;font-size:12px}
+.portfolio-shell .p-package-bottom>a{display:inline-flex;justify-content:space-between;align-items:center;gap:12px;min-height:48px;padding:12px 15px;border-radius:13px;background:#232938;color:#fff!important;font-size:13px;font-weight:750}
+.portfolio-shell .p-package-bottom>a:hover{background:#c94852}
+.portfolio-shell .p-package-card.is-featured .p-package-bottom>a{background:linear-gradient(110deg,#e96862,#c83c52)}
+.portfolio-shell .p-package-card.is-featured .p-package-bottom>a:hover{background:linear-gradient(110deg,#d85357,#a92b46)}
+.portfolio-shell .p-process-line{display:flex;align-items:center;gap:16px;margin-top:30px;padding:21px 26px;border:1px solid #d7dce5;border-radius:15px;color:#566071;line-height:1.65;background:#ffffff82}
+.portfolio-shell .p-process-line svg{color:#d84e5a;flex-shrink:0}
+.portfolio-shell .p-process-line strong{color:#262c39}
+@media (max-width:1080px){
+ .portfolio-shell .p-package-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .portfolio-shell .p-package-card:last-child{grid-column:1/-1}
+ .portfolio-shell .p-package-description{min-height:0}
+}
+@media (max-width:760px){
+ .portfolio-shell .p-hero-client-cta{margin-top:20px;padding-top:14px}
+ .portfolio-shell .p-hero h1{font-size:clamp(42px,9vw,69px);overflow-wrap:normal}
+ .portfolio-shell .p-packages{padding-block:70px}
+ .portfolio-shell .p-package-grid{grid-template-columns:minmax(0,1fr);gap:15px;margin-top:28px}
+ .portfolio-shell .p-package-card:last-child{grid-column:auto}
+ .portfolio-shell .p-package-card{padding:25px 22px}
+ .portfolio-shell .p-package-card h3{margin-top:23px;font-size:34px}
+ .portfolio-shell .p-package-divider{margin:22px 0}
+ .portfolio-shell .p-process-line{align-items:flex-start;padding:18px 17px;font-size:13px}
+}
+@media (max-width:380px){
+ .portfolio-shell .p-hero h1{font-size:clamp(38px,9.4vw,49px)}
+ .portfolio-shell .p-hero-client-cta strong{font-size:12px}
+ .portfolio-shell .p-client-availability{font-size:10px}
+}
+
+
+/* Case studies: evidence-based breakdown of shipped deliverables */
+.portfolio-shell .p-evidence-section{background:#fff;color:#242a35}
+.portfolio-shell .p-evidence-heading{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,.7fr);gap:30px;align-items:end}
+.portfolio-shell .p-evidence-heading h2{margin:15px 0 0;max-width:720px;font-family:Manrope,"DM Sans",sans-serif;font-size:clamp(35px,4.5vw,68px);font-weight:850;letter-spacing:-.06em;line-height:1.07}
+.portfolio-shell .p-evidence-heading h2 em{color:#dd5c64}
+.portfolio-shell .p-evidence-heading>p{max-width:370px;justify-self:end;color:#657083;font-size:15px;line-height:1.8}
+.portfolio-shell .p-evidence-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px;margin-top:36px}
+.portfolio-shell .p-evidence-item{display:flex;gap:17px;align-items:flex-start;min-width:0;padding:25px;border:1px solid #e7e9ef;background:#f5f6f9;border-radius:15px}
+.portfolio-shell .p-evidence-item>span{color:#d5515a;font-size:12px;font-weight:850;letter-spacing:.1em}
+.portfolio-shell .p-evidence-item svg{color:#d5515a;margin-top:1px}
+.portfolio-shell .p-evidence-item p{flex:1;line-height:1.6;font-weight:650;font-size:15px}
+.portfolio-shell .p-evidence-note{border-top:1px solid #e3e6eb;margin-top:25px;padding-top:18px;font-size:12px;line-height:1.8;color:#687182}
+.portfolio-shell .p-evidence-note strong{color:#434956}
+@media(max-width:760px){
+ .portfolio-shell .p-evidence-heading{grid-template-columns:minmax(0,1fr);gap:15px}
+ .portfolio-shell .p-evidence-heading>p{justify-self:start}
+ .portfolio-shell .p-evidence-grid{grid-template-columns:minmax(0,1fr);gap:9px;margin-top:22px}
+ .portfolio-shell .p-evidence-item{padding:19px 15px;gap:12px}
+ .portfolio-shell .p-evidence-item p{font-size:14px}
+}

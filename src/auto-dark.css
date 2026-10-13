@@ -427,3 +427,40 @@
 @media (prefers-color-scheme: dark) {
   .p-mobile-sheet{background:#1a1a1d!important;border-color:#444448!important}
 }
+
+
+/* Conversion elements inherit the approved automatic charcoal / black theme. */
+@media(prefers-color-scheme:dark){
+ .portfolio-shell .p-hero-client-cta{border-color:#565656;color:#dbdbdb}
+ .portfolio-shell .p-client-availability{color:#c4c4c4}
+ .portfolio-shell .p-client-availability>span{background:#ff8b93;box-shadow:0 0 0 4px #ff8b932f}
+ .portfolio-shell .p-hero-client-cta strong{color:#ff9b9e}
+ .portfolio-shell .p-packages{background:#171717}
+ .portfolio-shell .p-package-card{background:#272727;border-color:#4a4a4a;box-shadow:0 15px 45px #0004}
+ .portfolio-shell .p-package-card.is-featured{background:linear-gradient(155deg,#333,#282828);border-color:#e2828a;box-shadow:0 16px 45px #e65a6817}
+ .portfolio-shell .p-package-highlight{background:#4b2b34;color:#ffc3c3}
+ .portfolio-shell .p-package-card h3{color:#f4f4f4}
+ .portfolio-shell .p-package-description{color:#d2d2d2}
+ .portfolio-shell .p-package-suitable{color:#ffa5a8}
+ .portfolio-shell .p-package-divider{background:#515151}
+ .portfolio-shell .p-package-card li{color:#d5d5d5}
+ .portfolio-shell .p-package-card li svg{color:#ff9197}
+ .portfolio-shell .p-package-bottom>span{color:#bcbcbc}
+ .portfolio-shell .p-package-bottom>a{background:#424242;color:#f5f5f5!important}
+ .portfolio-shell .p-package-bottom>a:hover{background:#5c454a}
+ .portfolio-shell .p-process-line{background:#252525;border-color:#4d4d4d;color:#d1d1d1}
+ .portfolio-shell .p-process-line strong{color:#f4f4f4}
+ .portfolio-shell .p-process-line svg{color:#ff929b}
+}
+
+@media(prefers-color-scheme:dark){
+ .portfolio-shell .p-evidence-section{background:#1c1c1c;color:#f3f3f3}
+ .portfolio-shell .p-evidence-heading h2{color:#f4f4f4}
+ .portfolio-shell .p-evidence-heading h2 em{color:#ff9099}
+ .portfolio-shell .p-evidence-heading>p{color:#cecece}
+ .portfolio-shell .p-evidence-item{background:#2a2a2a;border-color:#484848}
+ .portfolio-shell .p-evidence-item>span,.portfolio-shell .p-evidence-item svg{color:#ff959c}
+ .portfolio-shell .p-evidence-item p{color:#ededed}
+ .portfolio-shell .p-evidence-note{border-color:#555;color:#c7c7c7}
+ .portfolio-shell .p-evidence-note strong{color:#ededed}
+}

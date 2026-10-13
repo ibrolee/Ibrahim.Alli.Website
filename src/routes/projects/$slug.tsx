@@ -72,6 +72,30 @@ function ProjectPage() {
         </figure>
       </div>
 
+      {!isConcept && (
+        <section className="p-evidence-section px-5 py-14 md:px-10 md:py-20" aria-labelledby="delivered-heading">
+          <div className="mx-auto max-w-[1480px]">
+            <div className="p-evidence-heading">
+              <div>
+                <p className="eyebrow">Shipped work / what is included</p>
+                <h2 id="delivered-heading">The details <em>behind the design.</em></h2>
+              </div>
+              <p>Specific things I worked on — rather than invented traffic, sales or conversion results.</p>
+            </div>
+            <div className="p-evidence-grid">
+              {project.deliverables.map((deliverable, index) => (
+                <div className="p-evidence-item" key={deliverable}>
+                  <span>0{index + 1}</span>
+                  <Check size={19} aria-hidden="true" />
+                  <p>{deliverable}</p>
+                </div>
+              ))}
+            </div>
+            <p className="p-evidence-note"><strong>Project status:</strong> {project.evidenceNote}</p>
+          </div>
+        </section>
+      )}
+
       {isConcept && (
         <section className="px-5 py-12 md:px-10 md:py-18">
           <div className="mx-auto grid max-w-[1480px] gap-8 border-y border-border py-10 md:grid-cols-[minmax(0,0.7fr)_minmax(0,1.3fr)] md:gap-16">

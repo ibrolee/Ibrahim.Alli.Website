@@ -1,11 +1,41 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowDown, ArrowRight, MoveUpRight, Mail, MessageCircle, Monitor, Smartphone } from "lucide-react";
+import { ArrowDown, ArrowRight, MoveUpRight, Mail, MessageCircle, Monitor, Smartphone, Check, Sparkles, Layers3, BadgeCheck } from "lucide-react";
 
 import { projects } from "@/lib/portfolio-content";
 import { JisProjectVisual } from "@/components/jis-project-visual";
 
 const SITE_URL = "https://ibrahimalli.com";
 const OG_IMAGE = `${SITE_URL}/og-image.jpg`;
+const EMAIL = "alliibrahim3@gmail.com";
+const enquiryMail = (subject: string) => `mailto:${EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent("Hello Ibrahim,\n\nI'd like to discuss a project.\n\nBusiness / brand:\nWhat I need:\nTimeline:\nBudget range (optional):\n\nThank you.")}`;
+
+const packages = [
+  {
+    tag: "01 / Launch",
+    title: "Essential",
+    description: "A confident online home for a business, professional or personal brand.",
+    suitable: "Best for a new business or simple portfolio",
+    items: ["A focused, mobile-first website", "Clear services and contact journey", "Basic search visibility and launch guidance"],
+    enquiry: "Essential website project enquiry",
+  },
+  {
+    tag: "02 / Grow",
+    title: "Business",
+    description: "A more complete experience for a growing business with richer content and customer journeys.",
+    suitable: "Best for established businesses ready to grow",
+    items: ["Custom multi-page design", "Service or product presentation", "Conversion-focused enquiries and responsive refinement"],
+    enquiry: "Business website project enquiry",
+    featured: true,
+  },
+  {
+    tag: "03 / Build",
+    title: "Custom",
+    description: "Digital tools, stores and workflows built around how your business actually operates.",
+    suitable: "Best for e-commerce and tailored digital systems",
+    items: ["Discovery and workflow planning", "Custom features, integrations or member tools", "Testing, handover and support scope"],
+    enquiry: "Custom digital project enquiry",
+  },
+] as const;
 
 const webServices = [
   {
@@ -43,28 +73,28 @@ const webServices = [
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Ibrahim Alli — Builder, Creator & Entrepreneur" },
+      { title: "Ibrahim Alli — Web Designer, Developer & Creative" },
       {
         name: "description",
         content:
-          "The personal website of Ibrahim Alli. Explore my web development, digital projects, photography, creative work and selected business ventures.",
+          "Ibrahim Alli designs mobile-friendly business websites, e-commerce experiences and practical digital systems. Explore real projects and enquire about a website.",
       },
-      { property: "og:title", content: "Ibrahim Alli — Builder, Creator & Entrepreneur" },
+      { property: "og:title", content: "Ibrahim Alli — Web Designer, Developer & Creative" },
       {
         property: "og:description",
-        content: "Web development, digital projects and photography by Ibrahim Alli.",
+        content: "Real business websites, e-commerce and useful digital systems by Ibrahim Alli.",
       },
       { property: "og:type", content: "website" },
       { property: "og:url", content: SITE_URL },
       { property: "og:image", content: OG_IMAGE },
       { property: "og:image:width", content: "1200" },
       { property: "og:image:height", content: "630" },
-      { property: "og:image:alt", content: "Ibrahim Alli — Builder. Creator. Entrepreneur." },
+      { property: "og:image:alt", content: "Ibrahim Alli — Web Design & Digital Projects" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "Ibrahim Alli — Builder, Creator & Entrepreneur" },
+      { name: "twitter:title", content: "Ibrahim Alli — Web Designer, Developer & Creative" },
       {
         name: "twitter:description",
-        content: "Web development, digital projects and photography by Ibrahim Alli.",
+        content: "Websites, digital systems and photography by Ibrahim Alli.",
       },
       { name: "twitter:image", content: OG_IMAGE },
     ],
@@ -84,19 +114,23 @@ function Home() {
           </div>
           <div className="p-hero-grid">
             <div className="p-hero-copy">
-              <p className="p-overline">Web designer · App builder · Creative</p>
+              <p className="p-overline">Independent web designer · Digital builder</p>
               <h1 id="hero-heading">
-                I create digital<br />
-                experiences<br />
-                <em>that work.</em>
+                I build websites<br />
+                for real people.<br />
+                <em>And real businesses.</em>
               </h1>
               <p className="p-hero-description">
-                Thoughtfully designed websites, mobile apps and practical business systems — with photography as another way I see the world.
+                I design considered, mobile-friendly websites, online stores and useful digital systems. Built with the business in mind, not just the screen.
               </p>
               <div className="p-actions">
                 <Link className="p-button" to="/about">About me <MoveUpRight size={18} /></Link>
                 <a className="p-subtle-link" href="#work">Explore my work <ArrowRight size={18} /></a>
               </div>
+              <a className="p-hero-client-cta" href={enquiryMail("New website project enquiry")}>
+                <span className="p-client-availability"><span aria-hidden="true" /> Available for select website projects</span>
+                <strong>Have a project? Tell me about it <MoveUpRight size={16} aria-hidden="true" /></strong>
+              </a>
             </div>
             <div className="p-hero-visual">
               <a
@@ -262,8 +296,8 @@ function Home() {
               </h2>
             </div>
             <p>
-              What started as improving my own businesses has grown into building for others. Clear
-              design, thoughtful details and useful functionality.
+              I focus on what a business needs visitors to understand and do — from the first impression
+              to the final enquiry. Every project starts with a clear brief.
             </p>
           </div>
           <div className="p-service-list">
@@ -273,8 +307,8 @@ function Home() {
                 <h3>{service.title}</h3>
                 <p>{service.description}</p>
                 <a
-                  href="#contact"
-                  aria-label={`Discuss ${service.title.toLowerCase()}`}
+                  href={enquiryMail(`${service.title} enquiry`)}
+                  aria-label={`Enquire about ${service.title.toLowerCase()}`}
                   className="p-circle"
                 >
                   <MoveUpRight size={22} />
@@ -284,16 +318,52 @@ function Home() {
           </div>
           <div className="p-services-bottom">
             <p>From a first website to a better way of working.</p>
-            <a href="#contact" className="p-subtle-link">
-              Discuss your project <ArrowRight size={18} />
+            <a href="#packages" className="p-subtle-link">
+              Explore website packages <ArrowRight size={18} />
             </a>
+          </div>
+        </div>
+      </section>
+      <section id="packages" className="p-section p-packages" aria-labelledby="packages-heading">
+        <div className="p-container">
+          <div className="p-section-heading p-reveal">
+            <div>
+              <p className="p-label">04 / Ways to work together</p>
+              <h2 id="packages-heading">The right starting point.<br /><em>Built around your needs.</em></h2>
+            </div>
+            <p>Three clear starting points. Final scope, price and timeline are agreed after we discuss your project, so you only pay for what you actually need.</p>
+          </div>
+          <div className="p-package-grid">
+            {packages.map((item) => (
+              <article className={`p-package-card${"featured" in item && item.featured ? " is-featured" : ""}`} key={item.title}>
+                <div className="p-package-top">
+                  <span className="p-label">{item.tag}</span>
+                  {"featured" in item && item.featured ? <span className="p-package-highlight"><Sparkles size={13} aria-hidden="true" /> Popular starting point</span> : null}
+                </div>
+                <h3>{item.title}</h3>
+                <p className="p-package-description">{item.description}</p>
+                <p className="p-package-suitable">{item.suitable}</p>
+                <div className="p-package-divider" aria-hidden="true" />
+                <ul>
+                  {item.items.map((feature) => <li key={feature}><Check size={17} aria-hidden="true" /><span>{feature}</span></li>)}
+                </ul>
+                <div className="p-package-bottom">
+                  <span><BadgeCheck size={16} aria-hidden="true" /> Scope-based quote</span>
+                  <a href={enquiryMail(item.enquiry)}>Enquire about this <MoveUpRight size={17} aria-hidden="true" /></a>
+                </div>
+              </article>
+            ))}
+          </div>
+          <div className="p-process-line">
+            <Layers3 size={22} aria-hidden="true" />
+            <p><strong>Simple process.</strong> Brief conversation → clear proposal → design &amp; build → review → launch. No surprise add-ons without approval.</p>
           </div>
         </div>
       </section>
       <section id="contact" className="p-section p-contact" aria-labelledby="contact-heading">
         <div className="p-container">
           <div className="p-contact-top p-reveal">
-            <p className="p-label">04 / Start a conversation</p>
+            <p className="p-label">05 / Start a conversation</p>
             <span className="p-label">Something in mind?</span>
           </div>
           <div className="p-contact-grid p-reveal">
@@ -304,12 +374,12 @@ function Home() {
             </h2>
             <div>
               <p>
-                A business website. An online store. A system that makes the day easier. Tell me
-                what you’re thinking, and let’s explore what it could become.
+                Tell me a little about your business, what you need and when you want to launch.
+                I’ll suggest a practical scope before we discuss the final quote.
               </p>
               <a
                 className="p-contact-link"
-                href="mailto:alliibrahim3@gmail.com?subject=Project%20enquiry"
+                href={enquiryMail("New website project enquiry")}
               >
                 <Mail size={20} />
                 <span>
