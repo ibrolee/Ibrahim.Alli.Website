@@ -20,14 +20,14 @@
 - Updates a rendered, printable draft as you edit.
 - **Copy text**, **download text**, **print/save PDF via browser**, **save editable JSON to device**, and **reopen saved JSON**.
 - Confirmed no database, localStorage, external builder, accounts, automatic email delivery or fees.
-- Route marked `noindex,nofollow`; **not actually access-controlled**. Anyone who has the link can open the blank document builder. The document contents are held only in browser memory until explicitly exported.
+- Route marked `noindex,nofollow` and guarded by a server-verified owner login. Unauthenticated direct requests redirect to `/owner-login`, and client navigation checks the signed server session before rendering the editor. The document contents are held only in browser memory until explicitly exported.
 - Saved JSON files contain any client details users enter; user must keep them securely. No automatic storage or server upload.
 - Draft legal documents explicitly require legal review and signed agreement; do not present as lawyer-reviewed or executed contracts.
 - Blank payment/bank details by default. Invoice is marked **Draft**, not proof of payment.
 
 ### Discovery
 - Added onboarding to Services page, Start Project form, mobile navigation and footer.
-- Added Document Studio to footer for easy access (but not to sitemap or search index).
+- Document Studio is removed from the public footer, Services page, Client Onboarding page and mobile menu. The only owner entry is `/owner-login` (unlisted and `noindex`).
 - Existing homepage remains at Stage 2 compact length.
 - Added `/client-onboarding` to the sitemap.
 
@@ -46,3 +46,9 @@
 
 ## Publishing
 Merge its GitHub PR after explicit user approval; verify Vercel production deploy and key live routes.
+
+## Owner-only access (revision)
+
+The private Document Studio is only accessible after authentication using `STUDIO_ACCESS_PASSWORD` and `STUDIO_SESSION_SECRET`. Both are encrypted environment variables, not committed to the repository. Sessions are signed using server HMAC and use a Secure, SameSite=Strict, HttpOnly eight-hour cookie. Login and logout are server functions, and direct server requests are checked before SSR. Incorrect, missing or expired sessions fail closed. The passphrase has high entropy; the project uses no account database. Optional future improvements include IP-based throttling, second-factor login and an audit log.
+
+The editor still uses browser-only in-memory client drafts, not a remote store. Authorized users must keep exported JSON documents securely. Public site navigation, SEO and client questionnaires do not reference the private tool. Secrets must remain in the deployment environment and never be put in the browser bundle.
