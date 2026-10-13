@@ -22,7 +22,7 @@ export function SiteHeader() {
           </span>
         </Link>
         <nav className="p-desktop-nav" aria-label="Primary navigation">
-          <Link to="/" hash="work">
+          <Link to="/work" activeProps={{ className: "p-active" }}>
             Projects
           </Link>
           <Link to="/photography" activeProps={{ className: "p-active" }}>
@@ -56,7 +56,7 @@ export function SiteHeader() {
               <Link to="/" onClick={() => setOpen(false)}>
                 Home
               </Link>
-              <Link to="/" hash="work" onClick={() => setOpen(false)}>
+              <Link to="/work" onClick={() => setOpen(false)}>
                 Selected work
               </Link>
               <Link to="/photography" onClick={() => setOpen(false)}>
@@ -68,7 +68,7 @@ export function SiteHeader() {
               <Link to="/services" onClick={() => setOpen(false)}>
                 Services
               </Link>
-              <Link to="/" hash="frequently-asked-questions" onClick={() => setOpen(false)}>
+              <Link to="/faqs" onClick={() => setOpen(false)}>
                 FAQs
               </Link>
               <Link to="/start-project" onClick={() => setOpen(false)}>

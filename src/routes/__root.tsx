@@ -25,6 +25,8 @@ import mimsCss from "../mims.css?url";
 import redWaveCss from "../red-wave.css?url";
 import autoDarkCss from "../auto-dark.css?url";
 import freelanceStage1Css from "../freelance-stage1.css?url";
+import portfolioStage2Css from "../portfolio-stage2.css?url";
+import compactHomeCss from "../compact-home.css?url";
 
 function NotFoundComponent() {
   return (
@@ -217,6 +219,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "stylesheet", href: redWaveCss },
       { rel: "stylesheet", href: autoDarkCss },
       { rel: "stylesheet", href: freelanceStage1Css },
+      { rel: "stylesheet", href: portfolioStage2Css },
+      { rel: "stylesheet", href: compactHomeCss },
       {
         rel: "icon",
         href: "/favicon.svg",

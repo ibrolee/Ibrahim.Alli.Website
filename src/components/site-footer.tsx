@@ -91,17 +91,17 @@ export function SiteFooter() {
           <p>© {new Date().getFullYear()} Ibrahim Alli</p>
           <nav aria-label="Footer navigation">
             <Link to="/about">About</Link>
-            <Link to="/" hash="work">
+            <Link to="/work">
               Work
             </Link>
             <Link to="/photography">Photography</Link>
-            <Link to="/" hash="web-development">
+            <Link to="/services">
               Services
             </Link>
-            <Link to="/" hash="frequently-asked-questions">
+            <Link to="/faqs">
               FAQs
             </Link>
-            <Link to="/" hash="contact">
+            <Link to="/start-project">
               Contact
             </Link>
           </nav>

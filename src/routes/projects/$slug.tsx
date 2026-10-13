@@ -3,6 +3,7 @@ import { ArrowLeft, ArrowRight, ExternalLink, Check, Smartphone, Users, QrCode, 
 import { Button } from "@/components/ui/button";
 import { projects } from "@/lib/portfolio-content";
 import { JisProjectVisual } from "@/components/jis-project-visual";
+import { ProjectWalkthrough } from "@/components/project-walkthrough";
 
 export const Route = createFileRoute("/projects/$slug")({
   loader: ({ params }) => {
@@ -71,6 +72,8 @@ function ProjectPage() {
           {isFitness && <figcaption className="border-b border-border py-4 text-xs leading-5 text-muted-foreground">Project presentation · Explore the live website for the current customer experience.</figcaption>}
         </figure>
       </div>
+
+      {!isConcept && <ProjectWalkthrough project={project} />}
 
       {!isConcept && (
         <section className="p-evidence-section px-5 py-14 md:px-10 md:py-20" aria-labelledby="delivered-heading">
@@ -181,7 +184,7 @@ function ProjectPage() {
       <section className="bg-accent px-5 py-16 text-accent-foreground md:px-10 md:py-28">
         <div className="mx-auto flex max-w-[1480px] flex-col justify-between gap-8 md:flex-row md:items-end">
           <div className="min-w-0"><p className="eyebrow text-accent-foreground/60">Next conversation</p><p className="mt-5 font-display text-[clamp(2.8rem,6vw,5rem)] leading-[1.05]">Have a project in mind?</p></div>
-          <Button asChild className="bg-ink text-paper hover:bg-ink/90"><Link to="/" hash="contact">Let’s Work Together <ArrowRight aria-hidden="true" /></Link></Button>
+          <Button asChild className="bg-ink text-paper hover:bg-ink/90"><Link to="/start-project">Let's Talk About Your Project <ArrowRight aria-hidden="true" /></Link></Button>
         </div>
       </section>
     </main>

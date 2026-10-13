@@ -6,6 +6,14 @@ import { services } from "@/lib/freelance-services";
 const DESTINATION_EMAIL = "alliibrahim3@gmail.com";
 const WHATSAPP_NUMBER = "905488534011";
 
+const serviceLabels: Record<(typeof services)[number]["slug"], string> = {
+  "business-websites": "Business website",
+  "e-commerce": "E-commerce store",
+  "mobile-apps": "Mobile app",
+  "business-systems": "Business system",
+  "website-redesign": "Website improvement",
+};
+
 export const Route = createFileRoute("/start-project")({
   validateSearch: (search: Record<string, unknown>) => ({
     service: typeof search.service === "string" ? search.service : "",
@@ -34,7 +42,7 @@ function StartProjectPage() {
     const data = new FormData(form);
     const get = (field: string) => String(data.get(field) ?? "").trim();
     const chosen = services.find((item) => item.slug === get("service"));
-    const serviceName = chosen?.name ?? "Not sure yet";
+    const serviceName = chosen ? serviceLabels[chosen.slug] : "Not sure yet";
     const brief = [
       "Hello Ibrahim,",
       "",
@@ -113,7 +121,7 @@ function StartProjectPage() {
                 <label className="ia-field"><span>What do you need? <strong>*</strong></span>
                   <select name="service" defaultValue={selectedService} required>
                     <option value="not-sure">Not sure yet</option>
-                    {services.map((item) => <option key={item.slug} value={item.slug}>{item.name}</option>)}
+                    {services.map((item) => <option key={item.slug} value={item.slug}>{serviceLabels[item.slug]}</option>)}
                   </select>
                 </label>
                 <label className="ia-field"><span>When would you like to start?</span>
