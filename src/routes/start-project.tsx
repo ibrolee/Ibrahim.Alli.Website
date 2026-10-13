@@ -7,7 +7,7 @@ import { services } from "@/lib/freelance-services";
 const DESTINATION_EMAIL = "alliibrahim3@gmail.com";
 const WHATSAPP_NUMBER = "905488534011";
 
-const serviceLabels: Record<(typeof services)[number]["slug"], string> = {
+const serviceLabels: Record<(typeof services)[number]["slug"] | "website-maintenance", string> = {
   "business-websites": "Business website",
   "e-commerce": "E-commerce store",
   "mobile-apps": "Mobile app",
