@@ -22,6 +22,7 @@ import autoDarkCss from "../auto-dark.css?url";
 import freelanceStage1Css from "../freelance-stage1.css?url";
 import portfolioStage2Css from "../portfolio-stage2.css?url";
 import compactHomeCss from "../compact-home.css?url";
+import technicalStage3Css from "../technical-stage3.css?url";
 
 /** Accurate portfolio identity metadata; no fake ratings, addresses or client results. */
 const portfolioSchema = {
@@ -232,6 +233,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "stylesheet", href: freelanceStage1Css },
       { rel: "stylesheet", href: portfolioStage2Css },
       { rel: "stylesheet", href: compactHomeCss },
+      { rel: "stylesheet", href: technicalStage3Css },
       {
         rel: "icon",
         href: "/favicon.svg",
