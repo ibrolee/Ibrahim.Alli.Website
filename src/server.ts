@@ -2,6 +2,7 @@ import "./lib/error-capture";
 
 import { consumeLastCapturedError } from "./lib/error-capture";
 import { renderErrorPage } from "./lib/error-page";
+import { isStudioAuthorized } from "./lib/studio-session.server";
 
 type ServerEntry = {
   fetch: (request: Request, env: unknown, ctx: unknown) => Promise<Response> | Response;
@@ -47,6 +48,15 @@ function isH3SwallowedErrorBody(body: string): boolean {
 export default {
   async fetch(request: Request, env: unknown, ctx: unknown) {
     try {
+      // Protect direct SSR document requests as well as SPA route navigation.
+      // All API endpoints with private data must additionally authorize independently.
+      const url = new URL(request.url);
+      if(url.pathname === "/client-documents" || url.pathname.startsWith("/client-documents/")){
+        if(!await isStudioAuthorized(request.headers.get("cookie"))){
+          const redirected=new URL("/owner-login",request.url);
+          return Response.redirect(redirected.toString(),303);
+        }
+      }
       const handler = await getServerEntry();
       const response = await handler.fetch(request, env, ctx);
       return await normalizeCatastrophicSsrResponse(response);
