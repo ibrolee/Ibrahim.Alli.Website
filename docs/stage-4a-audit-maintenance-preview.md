@@ -1,9 +1,11 @@
 # Stage 4A — Client acquisition services (preview)
 
 **Date:** 2026-10-13  
-**Branch:** `preview/stage-4a-client-acquisition-2026-10-13`  
+**Branch:** `preview/review-stage-4a-client-acquisition-2026-10-13`  
 **Base:** production `main`, after approved Stage 2 and Stage 3.  
 **Release policy:** Preview only until the user explicitly approves publication.
+
+**Vercel build policy:** This project ignores preview Git branches that do not match `review/*` or `preview/review-*`. The earlier `preview/stage-4a-client-acquisition-2026-10-13` branch was skipped on purpose by Vercel. The review branch below complies without altering deployment settings.
 
 ## What was built
 - `/free-website-audit`: a professional landing page explaining a **free initial public website review** (mobile usability, design, content basics and enquiry flow), a realistic three-step review outline, and a validated enquiry form (name, email, public website URL, priority and optional details).
