@@ -88,6 +88,10 @@
 .portfolio-shell .ia-4b-preview-controls{display:flex;gap:8px;margin-top:22px;flex-wrap:wrap}
 .portfolio-shell .ia-4b-preview-controls>button{display:inline-flex;align-items:center;gap:8px;padding:12px 13px;border-radius:9px;background:white;border:1px solid #dce0e8;color:#485368;font-weight:800;font-size:12px}
 .portfolio-shell .ia-4b-preview-controls>button:hover{color:#c74f5b;border-color:#ce888f}
+.portfolio-shell .ia-4b-preview-controls-secondary{margin-top:14px}
+.portfolio-shell .ia-4b-preview-controls-secondary>button{background:#fff5f6;border-color:#f1d0d5;color:#ad4653}
+.portfolio-shell .ia-4b-import-input{display:none!important}
+
 .portfolio-shell .ia-4b-utility-status{font-size:11px;line-height:1.6;color:#737e8e;margin:10px 0 17px;min-height:19px}
 .portfolio-shell .ia-4b-paper{min-width:0;padding:clamp(22px,3vw,45px);background:#fff;border:1px solid #e5e7ec;box-shadow:0 18px 34px #232d4020;min-height:620px}
 .portfolio-shell .ia-4b-paper>header{display:flex;align-items:center;justify-content:space-between;gap:10px;padding-bottom:18px;border-bottom:3px solid #de6067;flex-wrap:wrap}
@@ -154,6 +158,8 @@
  .portfolio-shell .ia-4b-total-preview span{color:#e4c6cb}
  .portfolio-shell .ia-4b-total-preview strong{color:#ffadb3}
  .portfolio-shell .ia-4b-preview-controls>button,.portfolio-shell .ia-4b-legal-note{background:#343434;border-color:#525252;color:#ddd}
+ .portfolio-shell .ia-4b-preview-controls-secondary>button{background:#433137;border-color:#76515b;color:#ffbec4}
+
  .portfolio-shell .ia-4b-preview-toolbar small,.portfolio-shell .ia-4b-utility-status,.portfolio-shell .ia-4b-legal-note p{color:#d0d0d0}
  .portfolio-shell .ia-4b-paper{background:#fff;border-color:#ccc;color:#222}
  .portfolio-shell .ia-4b-paper pre{color:#2e3744}
