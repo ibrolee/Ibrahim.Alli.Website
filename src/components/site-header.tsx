@@ -15,7 +15,11 @@ export function SiteHeader() {
     <header className="p-header">
       <div className="p-container p-header-inner">
         <Link to="/" className="p-logo" aria-label="Ibrahim Alli home">
-          IBRAHIM<span> ALLI</span>
+          <span className="p-brand-dot" aria-hidden="true" />
+          <span className="p-brand-lockup">
+            <strong>IBRAHIM <span>ALLI</span></strong>
+            <small>DESIGN · DEVELOPMENT · PHOTOGRAPHY</small>
+          </span>
         </Link>
         <nav className="p-desktop-nav" aria-label="Primary navigation">
           <Link to="/" hash="work">
@@ -61,7 +65,7 @@ export function SiteHeader() {
                 Services
               </Link>
               <Link to="/" hash="contact" onClick={() => setOpen(false)}>
-                Let’s talk ↗
+                Contact me ↗
               </Link>
             </nav>
             <p>Design · Digital · Business</p>
