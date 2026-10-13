@@ -1,9 +1,11 @@
+import conceptCss from "../../super-plus-studios.css?url";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight, Box, CheckCircle2, MapPin, PackageCheck, Palette, ShieldCheck, Smartphone, Sparkles, Truck } from "lucide-react";
 import { SpsHeader, SPS_ASSETS, comingSoonDevices, spsIphoneModels, spsProducts, naira } from "@/components/super-plus-studios";
 
 export const Route = createFileRoute("/super-plus-studios/")({
-  head:()=>({meta:[
+  head:()=>({
+    links: [{ rel: "stylesheet", href: conceptCss }],meta:[
     {title:"Super Plus Studios — Custom Tech Skins"},
     {name:"description",content:"Custom tech skins, personalisation and professional installation in Lagos and Ibadan."},
     {name:"robots",content:"noindex, nofollow"},
