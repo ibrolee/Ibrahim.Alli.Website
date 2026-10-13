@@ -73,13 +73,13 @@ const webServices = [
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Ibrahim Alli — Builder, Creator & Entrepreneur" },
+      { title: "Ibrahim Alli — Web Designer, Developer & Creative" },
       {
         name: "description",
         content:
           "Ibrahim Alli designs mobile-friendly business websites, e-commerce experiences and practical digital systems. Explore real projects and enquire about a website.",
       },
-      { property: "og:title", content: "Ibrahim Alli — Builder, Creator & Entrepreneur" },
+      { property: "og:title", content: "Ibrahim Alli — Web Designer, Developer & Creative" },
       {
         property: "og:description",
         content: "Real business websites, e-commerce and useful digital systems by Ibrahim Alli.",
@@ -89,12 +89,12 @@ export const Route = createFileRoute("/")({
       { property: "og:image", content: OG_IMAGE },
       { property: "og:image:width", content: "1200" },
       { property: "og:image:height", content: "630" },
-      { property: "og:image:alt", content: "Ibrahim Alli — Builder. Creator. Entrepreneur." },
+      { property: "og:image:alt", content: "Ibrahim Alli — Web Design & Digital Projects" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "Ibrahim Alli — Builder, Creator & Entrepreneur" },
+      { name: "twitter:title", content: "Ibrahim Alli — Web Designer, Developer & Creative" },
       {
         name: "twitter:description",
-        content: "Web development, digital projects and photography by Ibrahim Alli.",
+        content: "Websites, digital systems and photography by Ibrahim Alli.",
       },
       { name: "twitter:image", content: OG_IMAGE },
     ],
