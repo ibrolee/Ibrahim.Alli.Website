@@ -29,4 +29,4 @@ jobs:
           test -f .output/server/index.mjs
           test -d .output/public
       - name: Verify Cloudflare Worker packaging (NO deploy)
-        run: npx --yes wrangler@4.68.0 deploy --dry-run --outdir .cloudflare-dryrun
+        run: npx --yes wrangler@4.135.0 deploy --dry-run --outdir .cloudflare-dryrun
