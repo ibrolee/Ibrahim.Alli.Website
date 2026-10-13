@@ -3,6 +3,7 @@ import { ArrowDown, ArrowRight, MoveUpRight, Mail, MessageCircle, Monitor, Smart
 
 import { projects } from "@/lib/portfolio-content";
 import { JisProjectVisual } from "@/components/jis-project-visual";
+import { projectFaqs, projectProcess } from "@/lib/freelance-services";
 
 const SITE_URL = "https://ibrahimalli.com";
 const OG_IMAGE = `${SITE_URL}/og-image.jpg`;
@@ -40,30 +41,35 @@ const packages = [
 const webServices = [
   {
     number: "01",
+    slug: "business-websites",
     title: "Business websites",
     description:
       "Professional, mobile-friendly websites that help businesses and personal brands present themselves clearly and make it easy for customers to get in touch.",
   },
   {
     number: "02",
+    slug: "e-commerce",
     title: "E-commerce stores",
     description:
       "Online storefronts with organised product listings, shopping carts and straightforward checkout experiences designed around the customer journey.",
   },
   {
     number: "03",
+    slug: "mobile-apps",
     title: "Mobile apps",
     description:
       "Custom Android and iOS apps that bring your business closer to customers, with intuitive design and features built around their needs. From development and testing to submission support for Google Play and the Apple App Store.",
   },
   {
     number: "04",
+    slug: "business-systems",
     title: "Business systems",
     description:
       "Practical digital tools for everyday operations, including membership management, staff portals and QR-based check-in systems.",
   },
   {
     number: "05",
+    slug: "website-redesign",
     title: "Website improvements",
     description:
       "Updates and redesigns that improve an existing website’s appearance, mobile experience, content structure and ease of use.",
@@ -127,10 +133,10 @@ function Home() {
                 <Link className="p-button" to="/about">About me <MoveUpRight size={18} /></Link>
                 <a className="p-subtle-link" href="#work">Explore my work <ArrowRight size={18} /></a>
               </div>
-              <a className="p-hero-client-cta" href={enquiryMail("New website project enquiry")}>
+              <Link className="p-hero-client-cta" to="/start-project">
                 <span className="p-client-availability"><span aria-hidden="true" /> Available for select website projects</span>
                 <strong>Have a project? Tell me about it <MoveUpRight size={16} aria-hidden="true" /></strong>
-              </a>
+              </Link>
             </div>
             <div className="p-hero-visual">
               <a
@@ -306,21 +312,22 @@ function Home() {
                 <span className="p-label">{service.number}</span>
                 <h3>{service.title}</h3>
                 <p>{service.description}</p>
-                <a
-                  href={enquiryMail(`${service.title} enquiry`)}
-                  aria-label={`Enquire about ${service.title.toLowerCase()}`}
+                <Link
+                  to="/services/$slug"
+                  params={{ slug: service.slug }}
+                  aria-label={`Explore ${service.title.toLowerCase()}`}
                   className="p-circle"
                 >
                   <MoveUpRight size={22} />
-                </a>
+                </Link>
               </article>
             ))}
           </div>
           <div className="p-services-bottom">
             <p>From a first website to a better way of working.</p>
-            <a href="#packages" className="p-subtle-link">
-              Explore website packages <ArrowRight size={18} />
-            </a>
+            <Link to="/services" className="p-subtle-link">
+              Explore all services <ArrowRight size={18} />
+            </Link>
           </div>
         </div>
       </section>
@@ -349,7 +356,7 @@ function Home() {
                 </ul>
                 <div className="p-package-bottom">
                   <span><BadgeCheck size={16} aria-hidden="true" /> Scope-based quote</span>
-                  <a href={enquiryMail(item.enquiry)}>Enquire about this <MoveUpRight size={17} aria-hidden="true" /></a>
+                  <Link to="/start-project" search={{ service: item.title === "Custom" ? "business-systems" : "business-websites" }}>Enquire about this <MoveUpRight size={17} aria-hidden="true" /></Link>
                 </div>
               </article>
             ))}
@@ -360,10 +367,52 @@ function Home() {
           </div>
         </div>
       </section>
+      <section id="process" className="ia-home-process p-section" aria-labelledby="process-heading">
+        <div className="p-container">
+          <div className="p-section-heading">
+            <div>
+              <p className="p-label">05 / The process</p>
+              <h2 id="process-heading">A clear way forward.<br /><em>From hello to launch.</em></h2>
+            </div>
+            <p>A good result starts with a good conversation. Here is how a typical project moves forward, with the scope agreed before the work begins.</p>
+          </div>
+          <div className="ia-process-grid">
+            {projectProcess.map((step) => (
+              <article key={step.number} className="ia-process-card">
+                <span>{step.number} / STEP</span>
+                <h3>{step.title}</h3>
+                <p>{step.description}</p>
+              </article>
+            ))}
+          </div>
+          <div className="ia-process-bottom">
+            <p>You'll see what you're approving at each step. No surprise add-ons.</p>
+            <Link to="/start-project" className="ia-text-action">Start with your idea <ArrowRight size={18} aria-hidden="true" /></Link>
+          </div>
+        </div>
+      </section>
+      <section id="frequently-asked-questions" className="ia-home-faq p-section" aria-labelledby="faq-heading">
+        <div className="p-container ia-faq-grid">
+          <div>
+            <p className="p-label">06 / Good to know</p>
+            <h2 id="faq-heading">Questions?<br /><em>I've got answers.</em></h2>
+            <p>Here's what clients often want to know about scope, pricing, launch and ongoing support.</p>
+            <Link to="/start-project" className="ia-text-action">Ask about your project <ArrowRight size={17} aria-hidden="true" /></Link>
+          </div>
+          <div className="ia-faq-list">
+            {projectFaqs.map((item,index) => (
+              <details key={item.question} className="ia-faq-item">
+                <summary><span>0{index+1}</span><strong>{item.question}</strong><span className="ia-faq-sign" aria-hidden="true">+</span></summary>
+                <p>{item.answer}</p>
+              </details>
+            ))}
+          </div>
+        </div>
+      </section>
       <section id="contact" className="p-section p-contact" aria-labelledby="contact-heading">
         <div className="p-container">
           <div className="p-contact-top p-reveal">
-            <p className="p-label">05 / Start a conversation</p>
+            <p className="p-label">07 / Start a conversation</p>
             <span className="p-label">Something in mind?</span>
           </div>
           <div className="p-contact-grid p-reveal">
@@ -377,16 +426,16 @@ function Home() {
                 Tell me a little about your business, what you need and when you want to launch.
                 I’ll suggest a practical scope before we discuss the final quote.
               </p>
-              <a
+              <Link
                 className="p-contact-link"
-                href={enquiryMail("New website project enquiry")}
+                to="/start-project"
               >
                 <Mail size={20} />
                 <span>
-                  Email me<small>alliibrahim3@gmail.com</small>
+                  Start a project<small>Tell me about your idea in a short form.</small>
                 </span>
                 <MoveUpRight size={20} />
-              </a>
+              </Link>
               <a
                 className="p-contact-link"
                 href="https://wa.me/905488534011?text=Hi%20Ibrahim%2C%20I%27d%20like%20to%20discuss%20a%20project."
