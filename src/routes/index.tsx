@@ -163,6 +163,7 @@ function Home() {
             ))}
           </div>
 
+          <p className="ia-home-swipe-cue">Swipe sideways to view both projects →</p>
           <div className="ia-home-work-links">
             <Link to="/work" className="ia-home-work-main">Explore detailed project work <ArrowRight size={17} aria-hidden="true"/></Link>
             <a href="/Ibrahim-Alli-Portfolio-2026.pdf" download className="ia-home-work-pdf">Download my portfolio <ArrowRight size={17} aria-hidden="true"/></a>
