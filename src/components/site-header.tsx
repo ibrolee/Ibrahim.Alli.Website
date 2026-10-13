@@ -15,14 +15,14 @@ export function SiteHeader() {
     <header className="p-header">
       <div className="p-container p-header-inner">
         <Link to="/" className="p-logo" aria-label="Ibrahim Alli home">
-          ia<span>.</span>
+          IBRAHIM<span> ALLI</span>
         </Link>
         <nav className="p-desktop-nav" aria-label="Primary navigation">
           <Link to="/" hash="work">
-            Selected work
+            Projects
           </Link>
           <Link to="/photography" activeProps={{ className: "p-active" }}>
-            Photography
+            Gallery
           </Link>
           <Link to="/about" activeProps={{ className: "p-active" }}>
             About me
@@ -31,7 +31,7 @@ export function SiteHeader() {
             Services
           </Link>
           <Link className="p-nav-contact" to="/" hash="contact">
-            Let’s talk <MoveUpRight size={15} />
+            Contact me <MoveUpRight size={15} />
           </Link>
         </nav>
         <Sheet open={open} onOpenChange={setOpen}>
