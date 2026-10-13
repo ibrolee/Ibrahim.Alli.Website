@@ -74,6 +74,8 @@ export type Project = {
   build: string;
   result: string;
   tools: string[];
+  deliverables: string[];
+  evidenceNote: string;
   url?: string;
 };
 
@@ -86,23 +88,31 @@ export const projects: Project[] = [
     type: "Business Website & Digital Systems",
     image: superplusImage,
     summary:
-      "Developing and managing the digital presence of a fitness and wellness business in Lagos — from its public website to practical internal systems.",
+      "A live fitness website supported by digital membership, payment, QR attendance and team-management workflows for a Lagos gym.",
     tags: ["Website", "Memberships", "Business systems"],
     url: "https://www.superplusfitness.com",
     challenge:
-      "Bring customer information, membership journeys, promotions and everyday business processes into a clearer digital experience.",
+      "Move beyond a simple brochure site so members can explore plans and the team can manage registrations, payments and check-ins with less disconnected manual work.",
     approach:
-      "Treat the website and internal tools as connected parts of the same business: simplify what customers see while making recurring work easier for the team.",
+      "Connect public service and pricing information with the actual operating flow used by reception, coaches and management, while keeping the customer journey mobile-friendly.",
     build:
-      "A business website with membership information, registration and payment functionality, promotions, staff and membership management systems, QR/check-in related systems, and ongoing internal tools.",
+      "Public service and plan pages, registration and payment flows, member and staff portals, reception QR check-in, personal-training management and operational reporting.",
     result:
-      "A working digital foundation for the business that supports customers, staff and continued operational development.",
+      "A functioning live customer website and connected operational tools. Features are still maintained and refined as the gym's processes evolve; no conversion uplift is claimed.",
     tools: [
-      "Wix",
-      "Canva",
-      "Business systems",
+      "React",
+      "TanStack",
+      "Vercel",
+      "Supabase",
       "Payment integration",
     ],
+    deliverables: [
+      "Responsive public website with membership information",
+      "Digital membership registration and payments",
+      "QR check-in and member account experience",
+      "Reception, coach and staff operating tools",
+    ],
+    evidenceNote: "Live website and functional workflows. No unverified revenue or conversion statistics.",
   },
   {
     slug: "jis-beauty-fashion",
@@ -111,7 +121,7 @@ export const projects: Project[] = [
     type: "E-commerce Website",
     image: jisImage,
     summary:
-      "An e-commerce experience created to present beauty and fragrance products with clarity, polish and an easy mobile shopping journey.",
+      "A brand-led online store for beauty and fragrance shoppers, with mobile product browsing and a clear path from discovery to checkout.",
     tags: [
       "E-commerce",
       "Responsive design",
@@ -119,13 +129,13 @@ export const projects: Project[] = [
     ],
     url: "https://jisbeautyfashion.com",
     challenge:
-      "Give a beauty and fragrance business a credible digital storefront where products and brand character could be presented together.",
+      "Make the JIS brand and product range easy to understand and shop on mobile, without losing the personality of the beauty and fragrance business.",
     approach:
-      "Use a refined visual hierarchy and mobile-first product flow so browsing and purchasing feel clear rather than crowded.",
+      "Give fragrance categories room to breathe, guide visitors through products and make important shopping information visible before checkout.",
     build:
-      "Product presentation, e-commerce functionality, brand-led layouts, responsive pages and a customer purchasing experience.",
+      "A responsive storefront with product categories, product detail pages, cart/checkout experience, brand presentation and supporting editorial content.",
     result:
-      "A live, mobile-responsive e-commerce storefront designed around product discovery and purchasing, now available at jisbeautyfashion.com.",
+      "A live storefront where customers can explore products and follow a shopping flow. Sales growth and checkout conversion are not represented as measured outcomes.",
     tools: [
       "Website design",
       "E-commerce",
@@ -134,6 +144,13 @@ export const projects: Project[] = [
       "Vercel",
       "Supabase",
     ],
+    deliverables: [
+      "Mobile-first store layout and product discovery",
+      "Fragrance categories and product presentation",
+      "Shopping-cart and checkout experience",
+      "Brand content and editorial section",
+    ],
+    evidenceNote: "Live business website. Results describe shipped functionality, not invented business metrics.",
   },
 
 ];
@@ -167,5 +184,7 @@ export const archivedProjects: Project[] = [
       "Business planning",
       "Brand development",
     ],
+    deliverables: ["Early business research and branding direction"],
+    evidenceNote: "Archived concept; no shipped physical products.",
   },
 ];
