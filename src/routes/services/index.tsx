@@ -82,7 +82,6 @@ function ServicesPage() {
           <div><p className="p-label">Planning to work together?</p><h2>Let's get your project <em>clearly defined.</em></h2><p>Share a structured brief before we agree scope, quotation and next steps.</p></div>
           <div className="ia-4b-bridge-actions">
             <Link to="/client-onboarding" className="ia-stage-primary">Complete a client questionnaire <ArrowUpRight size={18} aria-hidden="true"/></Link>
-            <Link to="/client-documents" className="ia-4b-studio-link">Open Document Studio <ArrowUpRight size={18} aria-hidden="true"/></Link>
           </div>
         </div>
       </section>
