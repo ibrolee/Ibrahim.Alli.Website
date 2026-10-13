@@ -7,8 +7,6 @@ import { projectFaqs, projectProcess } from "@/lib/freelance-services";
 
 const SITE_URL = "https://ibrahimalli.com";
 const OG_IMAGE = `${SITE_URL}/og-image.jpg`;
-const EMAIL = "alliibrahim3@gmail.com";
-const enquiryMail = (subject: string) => `mailto:${EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent("Hello Ibrahim,\n\nI'd like to discuss a project.\n\nBusiness / brand:\nWhat I need:\nTimeline:\nBudget range (optional):\n\nThank you.")}`;
 
 const packages = [
   {
