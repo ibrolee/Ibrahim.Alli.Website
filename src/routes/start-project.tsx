@@ -13,11 +13,13 @@ const serviceLabels: Record<(typeof services)[number]["slug"], string> = {
   "mobile-apps": "Mobile app",
   "business-systems": "Business system",
   "website-redesign": "Website improvement",
+  "website-maintenance": "Website maintenance",
 };
 
 export const Route = createFileRoute("/start-project")({
   validateSearch: (search: Record<string, unknown>) => ({
     service: typeof search.service === "string" ? search.service : "",
+    plan: typeof search.plan === "string" ? search.plan.slice(0,60) : "",
   }),
   head: () => ({
     meta: [
@@ -33,17 +35,16 @@ export const Route = createFileRoute("/start-project")({
 });
 
 function StartProjectPage() {
-  const { service } = Route.useSearch();
+  const { service, plan } = Route.useSearch();
   const formRef = useRef<HTMLFormElement>(null);
-  const selectedService = services.some((item) => item.slug === service) ? service : "not-sure";
+  const selectedService = Object.prototype.hasOwnProperty.call(serviceLabels, service) ? service : "not-sure";
 
   function buildBrief() {
     const form = formRef.current;
     if (!form || !form.reportValidity()) return null;
     const data = new FormData(form);
     const get = (field: string) => String(data.get(field) ?? "").trim();
-    const chosen = services.find((item) => item.slug === get("service"));
-    const serviceName = chosen ? serviceLabels[chosen.slug] : "Not sure yet";
+    const serviceName = serviceLabels[get("service") as keyof typeof serviceLabels] ?? "Not sure yet";
     const brief = [
       "Hello Ibrahim,",
       "",
@@ -53,6 +54,7 @@ function StartProjectPage() {
       `Email: ${get("email")}`,
       `Business / brand: ${get("business") || "Not provided"}`,
       `Project type: ${serviceName}`,
+      ...(get("plan") ? [`Support option: ${get("plan")}`] : []),
       `Budget range: ${get("budget") || "To be discussed"}`,
       `Target timeline: ${get("timeline") || "Flexible"}`,
       "",
@@ -107,7 +109,11 @@ function StartProjectPage() {
               <div><CheckCircle2 size={19} aria-hidden="true" /><span>Mobile-friendly design as a priority</span></div>
               <div><CheckCircle2 size={19} aria-hidden="true" /><span>Direct conversation with me</span></div>
             </div>
-            <Link to="/services" className="ia-text-action">Explore services first <ArrowRight size={17} aria-hidden="true" /></Link>
+            <div className="ia-4a-side-links">
+              <Link to="/services" className="ia-text-action">Explore all services <ArrowRight size={17} aria-hidden="true"/></Link>
+              <Link to="/free-website-audit" className="ia-text-action">Request a free website audit <ArrowRight size={17} aria-hidden="true"/></Link>
+              <Link to="/website-maintenance" className="ia-text-action">Explore website maintenance <ArrowRight size={17} aria-hidden="true"/></Link>
+            </div>
           </div>
           <div className="ia-enquiry-card">
             <div className="ia-enquiry-card-heading">
@@ -115,6 +121,7 @@ function StartProjectPage() {
               <span>01—06 / A short brief</span>
             </div>
             <form ref={formRef} onSubmit={onSubmit} className="ia-enquiry-form">
+              <input type="hidden" name="plan" value={plan} readOnly/>
               <div className="ia-field-row">
                 <label className="ia-field"><span>Your name <strong>*</strong></span><input name="name" placeholder="What should I call you?" autoComplete="name" maxLength={90} required /></label>
                 <label className="ia-field"><span>Email address <strong>*</strong></span><input name="email" type="email" placeholder="you@example.com" autoComplete="email" maxLength={150} required /></label>
@@ -125,6 +132,7 @@ function StartProjectPage() {
                   <select name="service" defaultValue={selectedService} required>
                     <option value="not-sure">Not sure yet</option>
                     {services.map((item) => <option key={item.slug} value={item.slug}>{serviceLabels[item.slug]}</option>)}
+                    <option value="website-maintenance">Website maintenance</option>
                   </select>
                 </label>
                 <label className="ia-field"><span>When would you like to start?</span>
