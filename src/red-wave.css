@@ -1,0 +1,576 @@
+/* Red-wave portfolio concept — isolated on the preview branch.
+   Preserves the original site routes, copy, case studies and standalone demos. */
+.portfolio-shell{
+ --background:#f4f5f9;--foreground:#171a26;--card:#fff;--card-foreground:#171a26;
+ --popover:#fff;--popover-foreground:#171a26;--primary:#e14e50;--primary-foreground:#fff;
+ --secondary:#e9ebf3;--secondary-foreground:#222633;--muted:#edf0f5;
+ --muted-foreground:#686d7f;--accent:#e14e50;--accent-foreground:#fff;
+ --border:#dfe3eb;--input:#cfd5e0;--ring:#e65a59;
+ --ink:#1b202d;--paper:#f8f9fc;--soft:#edf0f6;--accent-mark:#d94852;
+ background:linear-gradient(110deg,#e8eaf0,#f8f9fc 40%,#e8ecf5);color:#1a1e2c;
+ font-family:Manrope,"DM Sans",ui-sans-serif,system-ui,sans-serif;
+}
+.portfolio-shell em{font-family:inherit;font-style:normal;font-weight:inherit}
+.portfolio-shell .p-container{width:calc(100% - 112px);max-width:1320px}
+.portfolio-shell .p-label,.portfolio-shell .eyebrow{color:#d24c52;font-weight:800;letter-spacing:.16em}
+.portfolio-shell .p-header{position:absolute;left:0;right:0;top:38px;z-index:40}
+.portfolio-shell .p-header-inner{max-width:1320px;height:78px;padding:0 38px;width:calc(100% - 112px);border-bottom:0}
+.portfolio-shell .p-logo{font-family:inherit;font-size:22px;font-weight:900;letter-spacing:-.045em;color:#d64d52;white-space:nowrap}
+.portfolio-shell .p-logo span{color:#1b202d}
+.portfolio-shell .p-desktop-nav{gap:28px;color:#2b3140;font-weight:650;font-size:13px}
+.portfolio-shell .p-desktop-nav>a:not(:last-child)::after{height:2px;background:#de5658}
+.portfolio-shell .p-nav-contact{border:0;background:linear-gradient(120deg,#ed6864,#d74452);color:#fff!important;padding:13px 20px;box-shadow:0 8px 22px #d9555240}
+.portfolio-shell .p-nav-contact:hover{background:linear-gradient(120deg,#e85f60,#ba3546)}
+.portfolio-shell .p-menu-button{color:#e65359}
+.portfolio-shell .p-hero{padding:0 0 36px;background:transparent;overflow:visible}
+.portfolio-shell .p-hero>.p-container{
+ position:relative;isolation:isolate;max-width:1400px;width:calc(100% - 72px);
+ min-height:min(790px,92svh);padding:145px 66px 30px;
+ border-radius:28px;
+ background:radial-gradient(ellipse at 88% 5%,#f8faff 0,transparent 40%),
+ linear-gradient(135deg,#e8edf7 0%,#f4f6fb 43%,#e4eaf5 100%);
+ box-shadow:0 25px 38px #29314726,0 60px 110px #28324716;
+ overflow:hidden
+}
+.portfolio-shell .p-hero>.p-container:before{
+ content:"";pointer-events:none;position:absolute;z-index:-1;
+ top:-74%;left:-32%;width:110%;height:200%;transform:rotate(-27deg);
+ background:repeating-radial-gradient(ellipse at 2% 60%, transparent 0 45px,rgba(255,255,255,.88) 46px 51px,transparent 53px 79px);
+ opacity:.92;filter:blur(.4px);
+}
+.portfolio-shell .p-hero>.p-container:after{
+ content:"";pointer-events:none;position:absolute;z-index:-1;
+ width:44%;height:70%;border-radius:50%;right:-9%;bottom:-30%;
+ background:radial-gradient(ellipse,#ffcfc8aa,transparent 68%);filter:blur(25px)
+}
+.portfolio-shell .p-hero-top{align-items:center}
+.portfolio-shell .p-hero-top .p-label:last-child{color:#8d96aa}
+.portfolio-shell .p-hero-grid{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(270px,.75fr);gap:2%;align-items:center;min-height:470px;padding:35px 0 12px}
+.portfolio-shell .p-overline{display:inline-flex;align-items:center;gap:9px;margin:0 0 28px;
+ padding:10px 14px;background:#ffffffaf;border:1px solid #fff;border-radius:40px;
+ box-shadow:0 7px 22px #7684a319;color:#7b8395;font-size:11px;font-weight:750;letter-spacing:.11em;text-transform:uppercase}
+.portfolio-shell .p-overline:before{content:"";width:7px;height:7px;border-radius:50%;background:#e55d60;box-shadow:0 0 0 4px #fae0e0}
+.portfolio-shell .p-hero h1{font-family:Manrope,"DM Sans",sans-serif;font-size:clamp(46px,5.3vw,81px);font-weight:850;line-height:1.08;letter-spacing:-.066em;margin:0;color:#171b26;max-width:850px}
+.portfolio-shell .p-hero h1 em{background:linear-gradient(100deg,#ed6b5a 4%,#d83b58 82%);background-clip:text;-webkit-background-clip:text;color:transparent;font-weight:850}
+.portfolio-shell .p-hero-description{font-size:17px;line-height:1.8;color:#677184;max-width:530px;margin-top:25px}
+.portfolio-shell .p-actions{margin-top:35px;gap:14px}
+.portfolio-shell .p-button{background:linear-gradient(115deg,#ef695e,#dd4355);color:#fff!important;
+ border-radius:100px;min-height:56px;min-width:185px;padding:16px 24px;font-weight:750;
+ box-shadow:0 16px 27px #e9545740, inset 0 1px #ffffff55}
+.portfolio-shell .p-button:hover{background:linear-gradient(115deg,#e34c4e,#bd394f);box-shadow:0 18px 30px #e9545760}
+.portfolio-shell .p-actions .p-subtle-link{border:0;background:#fff;color:#2a2b35!important;
+ border-radius:100px;min-height:56px;padding:16px 25px;font-weight:750;
+ box-shadow:0 13px 26px #54627c20}
+.portfolio-shell .p-hero-visual{position:relative;display:flex;align-items:center;justify-content:center;padding:0;min-width:0}
+.portfolio-shell .hero-figure{position:relative;display:block;width:min(100%,410px);margin:auto;filter:drop-shadow(0 26px 22px #59637635)}
+.portfolio-shell .hero-figure svg{display:block;width:100%;height:auto;max-height:495px}
+.portfolio-shell .hero-figure:before{content:"";position:absolute;z-index:-1;inset:16% -6% 7%;border-radius:48% 52% 38% 62%;
+ background:radial-gradient(ellipse at 30% 35%,#ffffffda,#dce5f4a0 72%,transparent);
+ box-shadow:inset 0 0 24px #ffffffa3}
+.portfolio-shell .hero-figure-bubble{position:absolute;right:-8%;top:6%;
+ background:#ffffffec;box-shadow:0 14px 40px #49567228;backdrop-filter:blur(10px);
+ border:1px solid #fff;border-radius:20px;padding:14px 19px;font-size:12px;font-weight:800;color:#d74b56;transform:rotate(7deg)}
+.portfolio-shell .hero-figure-bubble span{display:block;color:#8a93a3;font-weight:500;font-size:10px;margin-top:3px}
+.portfolio-shell .p-hero-bottom{border-top:1px solid #cbd4e2a8;color:#818a9d;padding:21px 0 0}
+.portfolio-shell .p-hero-bottom a{color:#d04b54;font-weight:800}
+.portfolio-shell .p-disciplines{background:#f9f9fc;border:0;border-block:1px solid #e4e5ed;padding:25px 0}
+.portfolio-shell .p-ticker-group{font-family:inherit;font-weight:750;font-size:18px;letter-spacing:.01em;color:#7a8092}
+.portfolio-shell .p-ticker-group i{color:#df575e}
+.portfolio-shell .p-section{padding:104px 0}
+.portfolio-shell .p-section h2{font-family:Manrope,"DM Sans",sans-serif;font-weight:850;letter-spacing:-.065em;font-size:clamp(40px,4.6vw,69px)}
+.portfolio-shell .p-section h2 em{color:#e05457}
+.portfolio-shell .p-section-heading>p,.portfolio-shell .p-project-body>p{color:#778092}
+.portfolio-shell .p-work{background:#f7f8fb}
+.portfolio-shell .p-projects{gap:26px}
+.portfolio-shell .p-project{padding:14px 14px 24px;background:#fff;border:1px solid #e8ebf2;border-radius:23px;box-shadow:0 14px 38px #47576f0d;transition:transform .3s,box-shadow .3s}
+.portfolio-shell .p-project:hover{transform:translateY(-6px);box-shadow:0 20px 42px #47576f1b}
+.portfolio-shell .p-project:nth-child(2){padding-top:14px}
+.portfolio-shell .p-project-image{border-radius:15px;background:#e9edf4}
+.portfolio-shell .p-project-image img{aspect-ratio:1.55}
+.portfolio-shell .p-project-view{color:#e04b55;background:#fff;font-weight:750}
+.portfolio-shell .p-project-body{padding:22px 13px 0}
+.portfolio-shell .p-project-index{color:#8d94a3}
+.portfolio-shell .p-project-title{font-family:inherit;font-weight:850;font-size:clamp(24px,2.7vw,37px);letter-spacing:-.045em;color:#202332}
+.portfolio-shell .p-project-title svg{color:#e1545e}
+.portfolio-shell .p-tags span{border-color:#ece3e5;color:#c94c56;background:#fff3f3}
+.portfolio-shell .p-about{background:linear-gradient(115deg,#eef1f8,#e0e8f4);color:#222633}
+.portfolio-shell .p-about-mark{font-family:inherit;color:#d9575e;font-weight:900;font-size:160px;letter-spacing:-.13em}
+.portfolio-shell .p-about-mark span{color:#e65b5e}
+.portfolio-shell .p-about h2 em{color:#d6515b}
+.portfolio-shell .p-about h2~p{color:#677286}
+.portfolio-shell .p-services{background:#fff;color:#262a36}
+.portfolio-shell .p-service-list{border-top:1px solid #e1e5ee}
+.portfolio-shell .p-service{border-bottom:1px solid #e1e5ee;border-radius:18px;padding:30px 12px;transition:background .2s}
+.portfolio-shell .p-service:hover{background:#fff5f4}
+.portfolio-shell .p-service h3{font-family:inherit;font-size:clamp(23px,2.4vw,34px);font-weight:800;letter-spacing:-.04em}
+.portfolio-shell .p-service>p,.portfolio-shell .p-services-bottom p{color:#768193}
+.portfolio-shell .p-circle{border:0;background:#fcecec;color:#d94b54}
+.portfolio-shell .p-circle:hover{background:#f4ced1}
+.portfolio-shell .p-contact{background:linear-gradient(130deg,#f1f4fa 0%,#e1e8f4 100%);color:#202433}
+.portfolio-shell .p-contact h2{font-family:inherit;font-size:clamp(55px,7vw,105px)}
+.portfolio-shell .p-contact-grid>div>p,.portfolio-shell .p-contact-link small{color:#788294}
+.portfolio-shell .p-contact-link{border-color:#cfd7e5}
+.portfolio-shell .p-contact-link>svg:first-child{color:#d74853}
+.portfolio-shell .p-footer{background:#1d2230;color:#eef1f7}
+.portfolio-shell .p-footer-top{border-color:#3a4050}
+.portfolio-shell .p-footer-signature{font-family:inherit;font-size:44px;font-weight:900;letter-spacing:-.07em;color:#f46968}
+.portfolio-shell .p-footer-top p,.portfolio-shell .p-footer-bottom{color:#afb8c6}
+.portfolio-shell .p-footer-bottom{border-color:#343b49}
+.portfolio-shell .p-footer .footer-socials a{border-color:#687083}
+.portfolio-shell .p-mobile-sheet{background:#f7f8fb;color:#252936}
+.portfolio-shell .p-mobile-sheet nav a{color:#252936}
+.portfolio-shell .p-mobile-sheet p{color:#d45159}
+/* Shared interiors — about, gallery, case study */
+.portfolio-shell .about-page,.portfolio-shell .photo-page{background:#f5f7fb;color:#202434}
+.portfolio-shell .about-hero,.portfolio-shell .photo-hero{
+ position:relative;color:#202434!important;
+ background:radial-gradient(circle at 96% 90%,#f8cfd130,transparent 45%),repeating-radial-gradient(ellipse at -18% -90%,transparent 0 71px,#ffffffcb 73px 78px,transparent 80px 111px),linear-gradient(115deg,#e7edf7,#f8faff)!important;
+ border-bottom:1px solid #e0e5ef;border-radius:0 0 34px 34px
+}
+.portfolio-shell .about-hero .back-link{color:#d7535e;opacity:1}
+.portfolio-shell .about-title,.portfolio-shell .photo-hero h1{font-family:inherit;font-weight:850;letter-spacing:-.066em;color:#171d29}
+.portfolio-shell .about-title em,.portfolio-shell .photo-hero h1 em{color:#d8505b}
+.portfolio-shell .about-hero .eyebrow,.portfolio-shell .photo-hero .p-label{color:#d8505b}
+.portfolio-shell .about-lead,.portfolio-shell .photo-lead{color:#5b6678;font-family:inherit}
+.portfolio-shell .photo-hero{padding:170px 0 90px}
+.portfolio-shell .photo-hero-copy>p:not(.photo-lead){color:#808b9a}
+.portfolio-shell .photo-jump-links a{color:#d34e5a;border-color:#e9bdc2;background:#fff}
+.portfolio-shell .photo-jump-links a:hover{background:#fff0f0;border-color:#d44a56;color:#ab3243}
+.portfolio-shell .photo-pexels-cta{background:#de5158;color:#fff!important}
+.portfolio-shell .photo-pexels-cta span,.portfolio-shell .photo-pexels-cta svg{color:#fff!important;-webkit-text-fill-color:#fff}
+.portfolio-shell .photo-pexels-cta:hover{background:#c33d4a}
+.portfolio-shell .photo-section-head{border-color:#dce2eb}
+.portfolio-shell .photo-section-head h2{font-family:inherit;font-weight:800;letter-spacing:-.05em}
+.portfolio-shell .photo-section-head>p{color:#8a95a5}
+.portfolio-shell .photo-frame{border-radius:19px;box-shadow:0 15px 30px #45566e1c}
+.portfolio-shell .photo-note{background:#e6edf7;color:#202434}
+.portfolio-shell .photo-note-copy p{color:#202434}
+.portfolio-shell .photo-note-link{color:#d84d5a}
+.portfolio-shell .about-block{background:#f7f9fc!important;color:#242936}
+.portfolio-shell .background-block,.portfolio-shell .interests-block{background:#ecf0f7!important}
+.portfolio-shell .skills-block{background:#242937!important;color:#fff}
+.portfolio-shell .skills-block .section-title,.portfolio-shell .skills-block .skill-group h3{color:#fff}
+.portfolio-shell .personal-list strong{color:#242936}
+.portfolio-shell .personal-block .personal-story-trigger{background:#262b38!important;color:#fff!important;border:0;border-radius:19px}
+.portfolio-shell .personal-block .personal-story-trigger strong{color:#fff}
+.portfolio-shell .personal-block .personal-story-trigger summary,.portfolio-shell .personal-block .personal-story-trigger>span{color:#fb9e9c!important}
+.portfolio-shell .about-prose p:first-child{color:#242936}
+.portfolio-shell .education-card,.portfolio-shell .experience-card{border-radius:18px}
+.portfolio-shell .education-card:hover,.portfolio-shell .experience-card:hover{background:#f3e7e8}
+.portfolio-shell .section-title{font-family:inherit;font-weight:850;letter-spacing:-.06em}
+.portfolio-shell .section-title em{color:#d84d57}
+.portfolio-shell .premium-project-page{background:#f8f9fc;color:#232734}
+.portfolio-shell .premium-project-page .eyebrow{color:#d34c5a}
+.portfolio-shell .premium-project-page h1,.portfolio-shell .premium-project-page h2{font-family:inherit;font-weight:850;letter-spacing:-.056em}
+.portfolio-shell .premium-project-page figure>img{border-radius:21px}
+.portfolio-shell .premium-project-page .bg-accent{background:linear-gradient(110deg,#ee6763,#d63d53);color:#fff}
+.portfolio-shell .premium-project-page .bg-ink{background:#212838;color:#fff}
+.portfolio-shell .premium-project-page .bg-ink article{background:#212838}
+.portfolio-shell .premium-project-page .text-paper{color:#f5f6fa}
+.portfolio-shell .premium-project-page .text-accent{color:#ff9f9f}
+@media(max-width:1050px){
+ .portfolio-shell .p-header{top:18px}
+ .portfolio-shell .p-header-inner{width:calc(100% - 58px);padding:0 23px}
+ .portfolio-shell .p-hero>.p-container{width:calc(100% - 28px);padding:119px 35px 22px}
+ .portfolio-shell .p-container{width:calc(100% - 65px)}
+ .portfolio-shell .p-hero-grid{grid-template-columns:minmax(0,1.16fr) minmax(210px,.84fr);gap:0}
+ .portfolio-shell .p-hero h1{font-size:clamp(45px,5.6vw,69px)}
+ .portfolio-shell .hero-figure-bubble{right:-2%}
+}
+@media(max-width:760px){
+ .portfolio-shell .p-container{width:calc(100% - 40px)}
+ .portfolio-shell .p-header{top:10px}
+ .portfolio-shell .p-header-inner{width:calc(100% - 24px);padding:0 20px;height:75px}
+ .portfolio-shell .p-logo{font-size:19px}
+ .portfolio-shell .p-menu-button{display:flex;align-items:center;gap:10px}
+ .portfolio-shell .p-desktop-nav{display:none}
+ .portfolio-shell .p-hero>.p-container{width:calc(100% - 16px);padding:104px 22px 20px;min-height:0;border-radius:22px}
+ .portfolio-shell .p-hero-top .p-label:last-child{display:none}
+ .portfolio-shell .p-label{font-size:10px}
+ .portfolio-shell .p-hero-grid{grid-template-columns:1fr;padding:34px 0 14px;min-height:0;gap:10px}
+ .portfolio-shell .p-hero h1{font-size:clamp(43px,9.2vw,66px);line-height:1.13;letter-spacing:-.065em}
+ .portfolio-shell .p-hero-description{font-size:14px;line-height:1.75}
+ .portfolio-shell .p-overline{font-size:10px;margin-bottom:21px}
+ .portfolio-shell .p-actions{gap:11px;margin-top:28px}
+ .portfolio-shell .p-button,.portfolio-shell .p-actions .p-subtle-link{min-height:49px;min-width:0;padding:12px 18px;font-size:12px}
+ .portfolio-shell .p-hero-visual{max-height:280px}
+ .portfolio-shell .hero-figure{width:235px;max-height:270px}
+ .portfolio-shell .hero-figure svg{max-height:270px}
+ .portfolio-shell .hero-figure-bubble{right:-16%;top:24%;padding:9px 11px;font-size:10px}
+ .portfolio-shell .p-hero-bottom{font-size:10px;padding:16px 0 0}
+ .portfolio-shell .p-hero-bottom span:first-child{display:none}
+ .portfolio-shell .p-disciplines{padding:16px 0}
+ .portfolio-shell .p-ticker-group{font-size:15px;gap:25px}
+ .portfolio-shell .p-section{padding:70px 0}
+ .portfolio-shell .p-section-heading{gap:20px}
+ .portfolio-shell .p-section h2{font-size:clamp(37px,8vw,58px)}
+ .portfolio-shell .p-projects{grid-template-columns:1fr;gap:20px}
+ .portfolio-shell .p-project:nth-child(2){padding-top:14px}
+ .portfolio-shell .p-project-image img{aspect-ratio:1.45}
+ .portfolio-shell .p-about-mark{font-size:118px}
+ .portfolio-shell .p-about-grid{gap:20px}
+ .portfolio-shell .p-service{gap:12px}
+ .portfolio-shell .p-service h3{font-size:23px}
+ .portfolio-shell .p-contact h2{font-size:clamp(53px,12vw,80px)}
+ .portfolio-shell .p-footer-bottom{flex-wrap:wrap}
+ .portfolio-shell .p-footer-bottom nav{flex-wrap:wrap;gap:15px}
+ .portfolio-shell .photo-hero{padding:143px 0 66px}
+ .portfolio-shell .photo-hero h1,.portfolio-shell .about-title{font-size:clamp(58px,11vw,93px)}
+ .portfolio-shell .section-title{font-size:clamp(38px,9vw,62px)}
+}
+@media(max-width:420px){
+ .portfolio-shell .p-actions{align-items:stretch}
+ .portfolio-shell .p-button,.portfolio-shell .p-actions .p-subtle-link{justify-content:center;flex:1 1 45%}
+ .portfolio-shell .hero-figure{width:207px}
+ .portfolio-shell .hero-figure-bubble{right:-11%;top:18%}
+}
+@media(prefers-reduced-motion:reduce){
+ .portfolio-shell *,.portfolio-shell *:before,.portfolio-shell *:after{animation-duration:.01ms!important;transition-duration:.01ms!important;scroll-behavior:auto!important}
+}
+
+/* === 2026-10-13: portfolio showcase, accessible navigation and experience fixes === */
+/* Keep the navigation reachable on scroll. Its background is frosted glass,
+   while the actual hero card remains visible underneath it. */
+.portfolio-shell .p-header{
+  position:sticky;
+  inset:auto;
+  top:0;
+  z-index:60;
+  padding:12px 0 0;
+  margin-bottom:-102px;
+  pointer-events:none;
+}
+.portfolio-shell .p-header-inner{
+  height:80px;
+  width:calc(100% - 112px);
+  max-width:1320px;
+  padding:0 clamp(18px,2.2vw,32px);
+  background:rgba(255,255,255,.85);
+  border:1px solid rgba(255,255,255,.95);
+  border-radius:22px;
+  box-shadow:0 12px 38px rgba(43,57,87,.11),inset 0 1px rgba(255,255,255,.9);
+  backdrop-filter:blur(19px);
+  -webkit-backdrop-filter:blur(19px);
+  pointer-events:auto;
+}
+.portfolio-shell .p-logo{
+  display:flex;
+  align-items:center;
+  gap:11px;
+  flex-shrink:0;
+  min-width:0;
+  letter-spacing:normal;
+  text-decoration:none;
+}
+.portfolio-shell .p-logo .p-brand-dot{
+  display:block;
+  flex:0 0 11px;
+  height:11px;
+  width:11px;
+  border-radius:50%;
+  background:linear-gradient(140deg,#ff8c75,#e23d54);
+  box-shadow:0 0 0 5px #fce5e6;
+}
+.portfolio-shell .p-logo .p-brand-lockup{display:flex;flex-direction:column;gap:4px;min-width:0}
+.portfolio-shell .p-brand-lockup strong{
+  display:block;
+  color:#1e2636;
+  font:850 18px/1.05 Manrope,"DM Sans",sans-serif;
+  letter-spacing:-.055em;
+  white-space:nowrap;
+}
+.portfolio-shell .p-brand-lockup strong span{color:#e05259}
+.portfolio-shell .p-brand-lockup small{
+  display:block;
+  font-size:9px;
+  font-weight:800;
+  letter-spacing:.17em;
+  line-height:1.3;
+  color:#717b90;
+  white-space:nowrap;
+}
+.portfolio-shell .p-desktop-nav{gap:clamp(13px,2vw,30px)}
+.portfolio-shell .p-desktop-nav>a{font-size:13px;color:#263144}
+.portfolio-shell .p-desktop-nav>a:not(.p-nav-contact):hover{color:#ce4751}
+.portfolio-shell .p-nav-contact{color:#fff!important}
+.portfolio-shell .p-menu-button{
+  border:1px solid #fff;
+  background:linear-gradient(160deg,#fff,#f7f8fb);
+  border-radius:100px;
+  min-height:46px;
+  padding:9px 16px;
+  color:#2c3344;
+  font-size:13px;
+  font-weight:800;
+  box-shadow:0 7px 20px #4d5b7720;
+}
+.portfolio-shell .p-menu-button svg{color:#e15158}
+.portfolio-shell .p-hero>.p-container{padding-top:151px}
+
+/* Restore the original real-service website/app showcase, now redesigned to
+   complement the coral/grey theme. No person illustration or cartoon. */
+.portfolio-shell .p-hero-visual{
+  min-height:0;
+  max-height:none;
+  overflow:visible;
+  padding:25px 2px 25px 0;
+}
+.portfolio-shell .p-service-showcase{
+  display:block;
+  width:100%;
+  max-width:575px;
+  padding:clamp(21px,3.2vw,38px);
+  background:linear-gradient(150deg,#fffefc,#f7f5f3 64%,#f0f0f0);
+  border:1px solid #fff;
+  border-radius:23px;
+  box-shadow:0 29px 60px rgba(42,52,74,.22),0 8px 18px rgba(42,52,74,.08);
+  color:#202533!important;
+  transform:rotate(-3deg);
+  transition:transform .3s ease,box-shadow .3s ease;
+}
+.portfolio-shell .p-service-showcase:hover{
+  transform:rotate(0) translateY(-5px);
+  box-shadow:0 36px 70px rgba(42,52,74,.23);
+}
+.portfolio-shell .p-showcase-top{gap:16px}
+.portfolio-shell .p-showcase-top>span:first-child{
+  color:#596174;
+  font-size:11px;
+  letter-spacing:.16em;
+  font-weight:800;
+}
+.portfolio-shell .p-showcase-mark{
+  color:#252936;
+  font-family:"Instrument Serif",Georgia,serif;
+  font-size:42px;
+  letter-spacing:-.065em;
+}
+.portfolio-shell .p-showcase-mark span{color:#e5545e}
+.portfolio-shell .p-service-showcase h2{
+  margin:27px 0 30px;
+  font-family:"Instrument Serif",Georgia,serif;
+  font-size:clamp(41px,4.3vw,67px);
+  font-weight:400;
+  letter-spacing:-.035em;
+  line-height:1.01;
+  color:#222736;
+}
+.portfolio-shell .p-service-showcase h2 em{
+  font-family:"Instrument Serif",Georgia,serif;
+  font-style:italic;
+  font-weight:400;
+  color:#596071;
+}
+.portfolio-shell .p-showcase-platforms{gap:12px}
+.portfolio-shell .p-showcase-platforms>div{
+  min-height:175px;
+  padding:clamp(16px,1.9vw,25px);
+  border-radius:13px;
+}
+.portfolio-shell .p-showcase-web{background:#e8e9e8;color:#242937}
+.portfolio-shell .p-showcase-app{background:#282d3c;color:#fff}
+.portfolio-shell .p-showcase-platforms svg{
+  width:38px;
+  height:38px;
+  margin:0 0 22px;
+}
+.portfolio-shell .p-showcase-app svg{color:#bdcaff}
+.portfolio-shell .p-showcase-platforms strong{
+  font-size:clamp(16px,1.65vw,21px);
+  line-height:1.2;
+  font-weight:800;
+}
+.portfolio-shell .p-showcase-platforms span{
+  color:inherit;
+  opacity:.7;
+  font-size:13px;
+  line-height:1.5;
+}
+.portfolio-shell .p-showcase-bottom{
+  margin-top:24px;
+  padding-top:17px;
+  border-top:1px solid #c5c9d1;
+  color:#5c6575;
+  font-size:12px;
+}
+.portfolio-shell .p-showcase-bottom>span:first-child{color:#6d7582}
+.portfolio-shell .p-showcase-link{font-weight:800;color:#252b38;font-size:13px}
+.portfolio-shell .p-showcase-link svg{color:#d95057}
+
+/* Work experience was pale-grey-on-pale-grey because base styles assumed a dark page. */
+.portfolio-shell .experience-block{background:#f7f9fc!important;color:#222936!important}
+.portfolio-shell .experience-block .section-title,
+.portfolio-shell .experience-block .section-title:not(em),
+.portfolio-shell .experience-block .experience-main h3{
+  color:#202636!important;
+}
+.portfolio-shell .experience-block .section-title em{color:#db4b56!important}
+.portfolio-shell .experience-block .heading-note{color:#5f6c7f!important}
+.portfolio-shell .experience-block .experience-list{
+  display:grid;
+  gap:16px;
+  border:0;
+}
+.portfolio-shell .experience-block .experience-card{
+  display:grid;
+  grid-template-columns:48px minmax(0,1.14fr) minmax(0,.9fr);
+  gap:clamp(14px,2.3vw,32px);
+  align-items:center;
+  padding:clamp(23px,2.8vw,36px);
+  background:#fff;
+  border:1px solid #e0e5ee;
+  border-radius:22px;
+  box-shadow:0 9px 30px #4c607610;
+  color:#252b3a!important;
+}
+.portfolio-shell .experience-block .experience-number{
+  color:#d84b57!important;
+  font-size:13px;
+  font-weight:850;
+}
+.portfolio-shell .experience-block .experience-period{
+  color:#616b7d!important;
+  opacity:1!important;
+  font-size:12px;
+  font-weight:750;
+  letter-spacing:.11em;
+}
+.portfolio-shell .experience-block .experience-main h3{
+  margin-top:10px;
+  font-family:Manrope,"DM Sans",sans-serif;
+  font-size:clamp(22px,2.8vw,36px);
+  font-weight:850;
+  line-height:1.18;
+  letter-spacing:-.04em;
+}
+.portfolio-shell .experience-block .experience-company{
+  margin-top:10px;
+  color:#c54450!important;
+  font-size:13px;
+  font-weight:750;
+  line-height:1.55;
+}
+.portfolio-shell .experience-block .experience-body{
+  max-width:550px;
+  margin:0;
+  color:#4e5b6e!important;
+  font-size:15px;
+  font-weight:500;
+  line-height:1.75;
+}
+
+/* Navigation sheet uses a Radix portal outside .portfolio-shell:
+   target the sheet by its class rather than assuming a nested node. */
+.p-mobile-sheet{
+  background:#fafbfe!important;
+  color:#222a3b!important;
+  border-color:#e2e6ef!important;
+  box-shadow:-16px 0 60px #2e395044;
+}
+.p-mobile-sheet>h2{
+  font:850 29px/1.12 Manrope,"DM Sans",sans-serif!important;
+  color:#202636!important;
+}
+.p-mobile-sheet>p{color:#657185!important}
+.p-mobile-sheet nav a{
+  font:750 22px/1.2 Manrope,"DM Sans",sans-serif!important;
+  color:#263044!important;
+  border-color:#e0e5ee!important;
+}
+.p-mobile-sheet nav a:hover{color:#ce4653!important}
+.p-mobile-sheet>button{color:#ce4854!important}
+
+/* Mobile: preserve the generous card, prevent cramped lines, keep header clear. */
+@media(max-width:1080px){
+  .portfolio-shell .p-desktop-nav{gap:14px}
+  .portfolio-shell .p-desktop-nav>a{font-size:12px}
+  .portfolio-shell .p-brand-lockup small{letter-spacing:.1em}
+}
+@media(max-width:920px){
+  .portfolio-shell .p-desktop-nav{display:none}
+  .portfolio-shell .p-menu-button{display:flex;align-items:center;gap:11px}
+  .portfolio-shell .p-header-inner{width:calc(100% - 34px);padding-inline:22px}
+}
+@media(max-width:760px){
+  .portfolio-shell .p-header{padding-top:10px;margin-bottom:-87px}
+  .portfolio-shell .p-header-inner{
+    width:calc(100% - 26px);
+    height:68px;
+    padding:0 16px;
+    border-radius:19px;
+  }
+  .portfolio-shell .p-brand-lockup strong{font-size:16px}
+  .portfolio-shell .p-brand-lockup small{font-size:7px;letter-spacing:.09em}
+  .portfolio-shell .p-logo{gap:10px}
+  .portfolio-shell .p-logo .p-brand-dot{width:9px;height:9px;flex-basis:9px;box-shadow:0 0 0 4px #fce5e6}
+  .portfolio-shell .p-menu-button{min-height:42px;padding:7px 13px;gap:8px}
+  .portfolio-shell .p-menu-button svg{width:19px}
+  .portfolio-shell .p-hero>.p-container{padding-top:114px}
+  .portfolio-shell .p-hero-grid{gap:14px}
+  .portfolio-shell .p-hero-visual{max-height:none;min-height:0;padding:12px 6px 35px}
+  .portfolio-shell .p-service-showcase{
+    width:100%;
+    padding:clamp(18px,5vw,27px);
+    transform:rotate(-2deg);
+    border-radius:21px;
+    box-shadow:0 22px 40px #46516a30;
+  }
+  .portfolio-shell .p-service-showcase h2{font-size:clamp(38px,9.3vw,60px);margin:24px 0}
+  .portfolio-shell .p-showcase-platforms{gap:9px}
+  .portfolio-shell .p-showcase-platforms>div{min-height:168px;padding:clamp(13px,3.5vw,22px)}
+  .portfolio-shell .p-showcase-platforms svg{height:34px;width:34px;margin-bottom:22px}
+  .portfolio-shell .p-showcase-platforms strong{font-size:clamp(15px,4.4vw,20px)}
+  .portfolio-shell .p-showcase-platforms span{font-size:12px}
+  .portfolio-shell .p-showcase-bottom{margin-top:21px;padding-top:15px;font-size:11px}
+  .portfolio-shell .experience-block .experience-card{
+    grid-template-columns:28px minmax(0,1fr);
+    gap:12px 14px;
+    padding:22px 19px;
+  }
+  .portfolio-shell .experience-block .experience-number{grid-column:1;grid-row:1;align-self:start;padding-top:6px}
+  .portfolio-shell .experience-block .experience-main{grid-column:2;grid-row:1}
+  .portfolio-shell .experience-block .experience-body{grid-column:2;grid-row:2;font-size:14px;line-height:1.65}
+}
+@media(max-width:375px){
+  .portfolio-shell .p-brand-lockup strong{font-size:15px}
+  .portfolio-shell .p-brand-lockup small{font-size:6.5px;letter-spacing:.05em}
+  .portfolio-shell .p-menu-button{font-size:12px;padding:7px 10px}
+  .portfolio-shell .p-service-showcase{transform:rotate(-1deg)}
+  .portfolio-shell .p-showcase-platforms>div{min-height:151px;padding:12px}
+  .portfolio-shell .p-showcase-platforms strong{font-size:15px}
+}
+@media(prefers-reduced-motion:reduce){
+  .portfolio-shell .p-service-showcase{transform:none}
+}
+
+/* The Radix navigation sheet and backdrop render at z-index:50 in a portal.
+   Keep the sticky header BELOW them to prevent it covering "Explore" and
+   intercepting taps on the top part of the open drawer. */
+.portfolio-shell .p-header{z-index:35}
+
+/* Compact icon-only menu toggle, with the name provided via aria-label. */
+.portfolio-shell .p-menu-button{
+  width:48px;
+  min-width:48px;
+  height:48px;
+  min-height:48px;
+  padding:0;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  gap:0;
+  border-radius:50%;
+}
+.portfolio-shell .p-menu-button svg{width:23px;height:23px}
+@media(max-width:920px){
+  .portfolio-shell .p-menu-button{display:inline-flex}
+}
+@media(max-width:760px){
+  .portfolio-shell .p-menu-button{
+    width:44px;
+    min-width:44px;
+    height:44px;
+    min-height:44px;
+    padding:0;
+  }
+}

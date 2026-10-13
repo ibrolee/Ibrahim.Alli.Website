@@ -15,14 +15,18 @@ export function SiteHeader() {
     <header className="p-header">
       <div className="p-container p-header-inner">
         <Link to="/" className="p-logo" aria-label="Ibrahim Alli home">
-          ia<span>.</span>
+          <span className="p-brand-dot" aria-hidden="true" />
+          <span className="p-brand-lockup">
+            <strong>IBRAHIM <span>ALLI</span></strong>
+            <small>DESIGN · DEVELOPMENT · PHOTOGRAPHY</small>
+          </span>
         </Link>
         <nav className="p-desktop-nav" aria-label="Primary navigation">
           <Link to="/" hash="work">
-            Selected work
+            Projects
           </Link>
           <Link to="/photography" activeProps={{ className: "p-active" }}>
-            Photography
+            Gallery
           </Link>
           <Link to="/about" activeProps={{ className: "p-active" }}>
             About me
@@ -31,14 +35,18 @@ export function SiteHeader() {
             Services
           </Link>
           <Link className="p-nav-contact" to="/" hash="contact">
-            Let’s talk <MoveUpRight size={15} />
+            Contact me <MoveUpRight size={15} />
           </Link>
         </nav>
         <Sheet open={open} onOpenChange={setOpen}>
           <SheetTrigger asChild>
-            <button className="p-menu-button" aria-label="Open navigation menu">
-              <span>Menu</span>
-              <Menu size={21} />
+            <button
+              type="button"
+              className="p-menu-button"
+              aria-label="Open navigation menu"
+              aria-expanded={open}
+            >
+              <Menu size={23} aria-hidden="true" />
             </button>
           </SheetTrigger>
           <SheetContent className="p-mobile-sheet" side="right">
@@ -61,7 +69,7 @@ export function SiteHeader() {
                 Services
               </Link>
               <Link to="/" hash="contact" onClick={() => setOpen(false)}>
-                Let’s talk ↗
+                Contact me ↗
               </Link>
             </nav>
             <p>Design · Digital · Business</p>

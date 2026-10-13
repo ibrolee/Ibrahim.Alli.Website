@@ -1,0 +1,429 @@
+/*
+ * Ibrahim Alli personal portfolio — automatic OS theme.
+ * Loaded after red-wave.css so the approved light design remains unchanged.
+ * No JS/localStorage toggle: CSS responds live to iOS, Android, macOS,
+ * and Windows appearance settings via prefers-color-scheme.
+ * Standalone client showcases are intentionally NOT themed.
+ */
+@media (prefers-color-scheme: dark) {
+  .portfolio-shell {
+    color-scheme: dark;
+    --background:#151515;
+    --foreground:#f3f3f3;
+    --card:#282828;
+    --card-foreground:#f3f3f3;
+    --popover:#282828;
+    --popover-foreground:#f3f3f3;
+    --primary:#ee686e;
+    --primary-foreground:#151515;
+    --secondary:#2e2e2e;
+    --secondary-foreground:#f3f3f3;
+    --muted:#2c2c2c;
+    --muted-foreground:#b8b8b8;
+    --accent:#ed6b73;
+    --accent-foreground:#151515;
+    --border:#444444;
+    --input:#646464;
+    --ring:#f0858b;
+    --ink:#151515;
+    --paper:#f3f3f3;
+    --soft:#2c2c2c;
+    --accent-mark:#f18b8d;
+    background:linear-gradient(117deg,#171717 0%,#212121 47%,#161616 100%);
+    color:#efefef;
+  }
+  .portfolio-shell ::selection {background:#e45d69;color:#fff}
+  .portfolio-shell .p-label,
+  .portfolio-shell .eyebrow {color:#ff858e}
+  .portfolio-shell .p-logo .p-brand-dot {
+    background:linear-gradient(120deg,#ff9690,#ec526a);
+    box-shadow:0 0 0 5px #ee68732b;
+  }
+  .portfolio-shell .p-header-inner {
+    background:rgba(36,36,36,.94);
+    border:1px solid rgba(134,134,134,.24);
+    box-shadow:0 14px 44px #0006,inset 0 1px #fff1;
+  }
+  .portfolio-shell .p-brand-lockup strong{color:#f3f3f3}
+  .portfolio-shell .p-brand-lockup strong span{color:#fa858a}
+  .portfolio-shell .p-brand-lockup small{color:#b6b6b6}
+  .portfolio-shell .p-desktop-nav>a{color:#dcdcdc}
+  .portfolio-shell .p-desktop-nav>a:not(.p-nav-contact):hover{color:#ff9299}
+  .portfolio-shell .p-nav-contact{color:#fff!important}
+  .portfolio-shell .p-menu-button{
+    background:linear-gradient(150deg,#3a3a3a,#292929);
+    color:#f4f4f4;
+    border-color:#4f4f4f;
+    box-shadow:0 9px 22px #0005;
+  }
+  .portfolio-shell .p-menu-button svg{color:#ff8e94}
+  /* Hero: preserve flowing ribbon motif, with subtly luminous strokes. */
+  .portfolio-shell .p-hero{background:transparent}
+  .portfolio-shell .p-hero>.p-container {
+    background:
+      radial-gradient(ellipse at 96% 5%,#3f3f3f 0%,transparent 42%),
+      linear-gradient(138deg,#282828 0%,#212121 51%,#191919 100%);
+    border:1px solid #49494928;
+    box-shadow:0 32px 85px #050505d0,0 10px 24px #0007;
+  }
+  .portfolio-shell .p-hero>.p-container:before {
+    background:repeating-radial-gradient(ellipse at 2% 60%,
+      transparent 0 45px,rgba(233,233,233,.13) 46px 51px,
+      transparent 53px 79px);
+    opacity:.9;
+  }
+  .portfolio-shell .p-hero>.p-container:after {
+    background:radial-gradient(ellipse,#ec64733b,transparent 70%);
+  }
+  .portfolio-shell .p-hero-top .p-label:last-child{color:#c6c6c6}
+  .portfolio-shell .p-overline{
+    background:#343434de;
+    border-color:#4f4f4f;
+    box-shadow:0 8px 20px #0002;
+    color:#d9d9d9;
+  }
+  .portfolio-shell .p-overline:before{
+    background:#ff858e;
+    box-shadow:0 0 0 4px #fe929433;
+  }
+  .portfolio-shell .p-hero h1{color:#f7f7f7}
+  .portfolio-shell .p-hero h1 em{
+    background:linear-gradient(105deg,#ff9e8e,#f36b8c 80%);
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+  }
+  .portfolio-shell .p-hero-description{color:#cccccc}
+  .portfolio-shell .p-actions .p-subtle-link{
+    background:#363636;
+    color:#f6f6f6!important;
+    box-shadow:0 12px 25px #0003;
+  }
+  .portfolio-shell .p-actions .p-subtle-link:hover{background:#434343}
+  .portfolio-shell .p-hero-bottom{
+    border-color:#6f6f6f55;
+    color:#b9b9b9;
+  }
+  .portfolio-shell .p-hero-bottom a{color:#ff969d}
+  /* Web/app showcase keeps its premium tilt and clear icons. */
+  .portfolio-shell .p-service-showcase{
+    background:linear-gradient(155deg,#3b3b3b,#2f2f2f 63%,#292929);
+    border-color:#6b6b6b;
+    color:#f8f8fd!important;
+    box-shadow:0 31px 64px #0009,0 8px 18px #0005;
+  }
+  .portfolio-shell .p-service-showcase:hover{box-shadow:0 33px 73px #0009}
+  .portfolio-shell .p-showcase-top>span:first-child{color:#cdcdcd}
+  .portfolio-shell .p-showcase-mark{color:#f4f4f4}
+  .portfolio-shell .p-showcase-mark span{color:#ff939b}
+  .portfolio-shell .p-service-showcase h2{color:#f5f5f5}
+  .portfolio-shell .p-service-showcase h2 em{color:#c5c5c5}
+  .portfolio-shell .p-showcase-web{background:#4f4f4f;color:#fff}
+  .portfolio-shell .p-showcase-app{background:#1c1c1c;color:#fff}
+  .portfolio-shell .p-showcase-web svg{color:#f1a3a8}
+  .portfolio-shell .p-showcase-platforms span{opacity:.84}
+  .portfolio-shell .p-showcase-bottom{border-color:#7070708c;color:#d1d1d1}
+  .portfolio-shell .p-showcase-bottom>span:first-child{color:#c2c2c2}
+  .portfolio-shell .p-showcase-link{color:#f5f5f5}
+  .portfolio-shell .p-showcase-link svg{color:#ff8b91}
+  /* Running marquee and work cards */
+  .portfolio-shell .p-disciplines{
+    background:#232323;
+    border-block-color:#434343;
+  }
+  .portfolio-shell .p-ticker-group{color:#cccccc}
+  .portfolio-shell .p-ticker-group i{color:#f68b90}
+  .portfolio-shell .p-section h2{color:#f6f6f6}
+  .portfolio-shell .p-section h2 em{color:#ff8f98}
+  .portfolio-shell .p-section-heading>p{color:#c1c1c1}
+  .portfolio-shell .p-work{background:#191919}
+  .portfolio-shell .p-project{
+    background:#2a2a2a;
+    border-color:#484848;
+    box-shadow:0 15px 36px #04040455;
+  }
+  .portfolio-shell .p-project:hover{box-shadow:0 21px 48px #0007}
+  .portfolio-shell .p-project-image{background:#343434}
+  .portfolio-shell .p-project-view{background:#3d3d3d;color:#fff}
+  .portfolio-shell .p-project-index{color:#c5c5c5}
+  .portfolio-shell .p-project-title{color:#f5f5f5}
+  .portfolio-shell .p-project-title svg{color:#ff8791}
+  .portfolio-shell .p-project-body>p{color:#cbcbcb}
+  .portfolio-shell .p-tags span{
+    background:#4e2f3f;
+    border-color:#794b5b;
+    color:#ffc3c3;
+  }
+  /* Home introduction and service list */
+  .portfolio-shell .p-about{
+    background:linear-gradient(130deg,#333333,#272727);
+    color:#f4f4f4;
+  }
+  .portfolio-shell .p-about-mark{color:#ff828e}
+  .portfolio-shell .p-about-mark span{color:#ff9097}
+  .portfolio-shell .p-about h2 em{color:#ff9298}
+  .portfolio-shell .p-about h2~p{color:#cacaca}
+  .portfolio-shell .p-services{background:#1e1e1e;color:#f3f3f3}
+  .portfolio-shell .p-service-list{border-color:#454545}
+  .portfolio-shell .p-service{border-color:#454545}
+  .portfolio-shell .p-service:hover{background:#303030}
+  .portfolio-shell .p-service h3{color:#f4f4f4}
+  .portfolio-shell .p-service>p,
+  .portfolio-shell .p-services-bottom p{color:#cbcbcb}
+  .portfolio-shell .p-circle{background:#49303e;color:#ffafb2}
+  .portfolio-shell .p-circle:hover{background:#624052}
+  .portfolio-shell .p-contact{
+    background:linear-gradient(135deg,#313131,#1e1e1e);
+    color:#f3f3f3;
+  }
+  .portfolio-shell .p-contact-grid>div>p,
+  .portfolio-shell .p-contact-link small{color:#cdcdcd}
+  .portfolio-shell .p-contact-link{border-color:#545454}
+  .portfolio-shell .p-contact-link>svg:first-child{color:#ffa0a4}
+  .portfolio-shell .p-footer{background:#131313;color:#f3f3f3}
+  .portfolio-shell .p-footer-top{border-color:#424242}
+  .portfolio-shell .p-footer-top p,
+  .portfolio-shell .p-footer-bottom{color:#c7c7c7}
+  .portfolio-shell .p-footer-bottom{border-color:#424242}
+  .portfolio-shell .p-footer .footer-socials a{border-color:#676767}
+  /* About page: dark cards, matching labels, readable chronology. */
+  .portfolio-shell .about-page{background:#181818;color:#eeeeee}
+  .portfolio-shell .about-hero{
+    background:
+      radial-gradient(circle at 90% 70%,#753c5748,transparent 45%),
+      repeating-radial-gradient(ellipse at -18% -90%,transparent 0 71px,
+        #ffffff13 73px 78px,transparent 80px 111px),
+      linear-gradient(130deg,#313131,#1d1d1d)!important;
+    border-color:#525252;
+    color:#f5f5f5!important;
+  }
+  .portfolio-shell .about-title{color:#f7f7f7}
+  .portfolio-shell .about-title em{color:#ff8995}
+  .portfolio-shell .about-lead{color:#dadada}
+  .portfolio-shell .about-hero .back-link{color:#ff9ba1}
+  .portfolio-shell .about-block{
+    background:#1d1d1d!important;
+    color:#efefef;
+    border-color:#474747;
+  }
+  .portfolio-shell .background-block,
+  .portfolio-shell .interests-block{background:#262626!important}
+  .portfolio-shell .about-page .section-title{color:#f4f4f4}
+  .portfolio-shell .about-page .section-title em{color:#fc9198}
+  .portfolio-shell .about-page .section-heading-row .heading-note{color:#c6c6c6}
+  .portfolio-shell .personal-list{border-color:#4f4f4f}
+  .portfolio-shell .personal-list>div{border-color:#444444}
+  .portfolio-shell .personal-list span{color:#c3c3c3}
+  .portfolio-shell .personal-list strong{color:#f4f4f4}
+  .portfolio-shell .personal-list>div:hover:not(.personal-story-trigger){background:#ffffff0c}
+  .portfolio-shell .personal-block .personal-story-trigger{
+    background:#303030!important;
+    border:1px solid #565656;
+    color:#f6f6f6!important;
+  }
+  .portfolio-shell .personal-block .personal-story-trigger strong{color:#f7f7f7}
+  .portfolio-shell .personal-story article>p:not(.story-label){color:#d4d4d4}
+  .portfolio-shell .personal-story article strong{color:#fff}
+  .portfolio-shell .about-prose p:first-child{color:#f4f4f4}
+  .portfolio-shell .about-prose p:not(:first-child){color:#d3d3d3}
+  .portfolio-shell .education-list{border-color:#4e4e4e}
+  .portfolio-shell .education-card{border-color:#4e4e4e}
+  .portfolio-shell .education-card h3{color:#f6f6f6}
+  .portfolio-shell .education-card p{color:#dbdbdb}
+  .portfolio-shell .education-card small{color:#bababa}
+  .portfolio-shell .education-card>span{color:#ff969d}
+  .portfolio-shell .education-card:hover{background:#ffffff0b}
+  /* Retain the existing work-experience layout and explicitly override
+     its previous light-mode !important colors to protect text contrast. */
+  .portfolio-shell .experience-block{
+    background:#212121!important;
+    color:#f5f5f5!important;
+  }
+  .portfolio-shell .experience-block .section-title,
+  .portfolio-shell .experience-block .section-title:not(em),
+  .portfolio-shell .experience-block .experience-main h3{
+    color:#f6f6f6!important;
+  }
+  .portfolio-shell .experience-block .section-title em{color:#ff959c!important}
+  .portfolio-shell .experience-block .heading-note{color:#cdcdcd!important}
+  .portfolio-shell .experience-block .experience-card{
+    background:#2e2e2e;
+    border-color:#535353;
+    color:#f4f4f4!important;
+    box-shadow:0 9px 30px #0004;
+  }
+  .portfolio-shell .experience-block .experience-card:hover{background:#373737}
+  .portfolio-shell .experience-block .experience-number{color:#ffa1a7!important}
+  .portfolio-shell .experience-block .experience-period{color:#c9c9c9!important}
+  .portfolio-shell .experience-block .experience-company{color:#ff98a1!important}
+  .portfolio-shell .experience-block .experience-body{color:#d4d4d4!important}
+  .portfolio-shell .skills-block{
+    background:#171717!important;
+    color:#f4f4f4;
+  }
+  .portfolio-shell .skills-block .skill-group{border-color:#494949}
+  .portfolio-shell .skills-block .skill-group h3{color:#d4d4d4}
+  .portfolio-shell .skills-block .skill-group span{
+    border-color:#656565;
+    color:#efefef;
+  }
+  .portfolio-shell .interest-grid-about>div{border-color:#565656}
+  .portfolio-shell .interest-grid-about>div:hover{background:#353535}
+  .portfolio-shell .interest-grid-about strong{color:#f4f4f4}
+  .portfolio-shell .hobby-note{border-color:#565656}
+  .portfolio-shell .hobby-note p{color:#d3d3d3}
+  .portfolio-shell .hobby-note strong{color:#fff}
+  .portfolio-shell .about-cta{
+    background:linear-gradient(135deg,#d34c60,#9f3452);
+    color:#fff;
+  }
+  .portfolio-shell .about-cta h2,
+  .portfolio-shell .about-cta h2 em,
+  .portfolio-shell .about-cta a{color:#fff}
+  .portfolio-shell .about-cta .eyebrow{color:#ffe0e3}
+  /* Photography uses the same surfaces; don't touch the fullscreen lightbox. */
+  .portfolio-shell .photo-page{background:#191919;color:#f1f1f1}
+  .portfolio-shell .photo-hero{
+    background:
+      radial-gradient(circle at 90% 70%,#61365746,transparent 43%),
+      repeating-radial-gradient(ellipse at -18% -90%,transparent 0 71px,
+        #ffffff14 73px 78px,transparent 80px 111px),
+      linear-gradient(130deg,#333333,#1d1d1d)!important;
+    border-color:#525252;
+    color:#f5f5f5!important;
+  }
+  .portfolio-shell .photo-hero h1{color:#f6f6f6}
+  .portfolio-shell .photo-hero h1 em{color:#ff939a}
+  .portfolio-shell .photo-lead{color:#dcdcdc}
+  .portfolio-shell .photo-hero-copy>p:not(.photo-lead){color:#c4c4c4}
+  .portfolio-shell .photo-jump-links a{
+    background:#343434;
+    color:#ffd2d3;
+    border-color:#845263;
+  }
+  .portfolio-shell .photo-jump-links a:hover{
+    background:#3a3a3a;
+    color:#fff;
+    border-color:#d77884;
+  }
+  .portfolio-shell .photo-section-head{border-color:#4e4e4e}
+  .portfolio-shell .photo-section-head h2{color:#f5f5f5}
+  .portfolio-shell .photo-section-head>p{color:#c4c4c4}
+  .portfolio-shell .photo-frame{
+    background:#353535;
+    box-shadow:0 16px 34px #0007;
+  }
+  .portfolio-shell .photo-note{
+    background:#242424;
+    border-color:#4f4f4f;
+    color:#f3f3f3;
+  }
+  .portfolio-shell .photo-note-copy p{color:#d1d1d1}
+  .portfolio-shell .photo-note-link{color:#ff959b;border-color:#ae5a67}
+  /* Project detail pages: keep feature tiles dark, remove light blank bands. */
+  .portfolio-shell .premium-project-page{
+    background:#1b1b1b;
+    color:#f2f2f2;
+  }
+  .portfolio-shell .premium-project-page .bg-ink,
+  .portfolio-shell .premium-project-page .bg-ink article{
+    background:#181818;
+    color:#f5f5f5;
+  }
+  .portfolio-shell .premium-project-page .bg-accent{
+    background:linear-gradient(110deg,#e66571,#b83758);
+    color:#fff;
+  }
+  .portfolio-shell .premium-project-page figure{border-color:#494949}
+  .portfolio-shell .premium-project-page .case-sections>article{border-color:#494949}
+  .portfolio-shell .premium-project-page .case-sections h3{color:#f5f5f5}
+  .portfolio-shell .premium-project-page .case-sections article p{color:#cfcfcf}
+  .portfolio-shell .premium-project-page .case-sections article:last-child>div>div>span{
+    background:#343434;
+    color:#f0f0f0;
+    border-color:#5f5f5f;
+  }
+  .portfolio-shell .premium-project-page .text-muted-foreground{color:#c8c8c8}
+  .portfolio-shell .premium-project-page .bg-ink .text-paper\/75{color:#dcdcdc}
+}
+/* Radix navigation drawer is portaled outside .portfolio-shell. */
+@media (prefers-color-scheme: dark) {
+  .p-mobile-sheet{
+    color-scheme:dark;
+    background:#262626!important;
+    border-color:#505050!important;
+    color:#f5f5f5!important;
+    box-shadow:-15px 0 70px #000b;
+  }
+  .p-mobile-sheet>h2{color:#f6f6f6!important}
+  .p-mobile-sheet>p{color:#c6c6c6!important}
+  .p-mobile-sheet nav a{color:#f4f4f4!important;border-color:#515151!important}
+  .p-mobile-sheet nav a:hover{color:#ffa1a8!important}
+  .p-mobile-sheet>button{color:#ff959d!important}
+}
+
+/* OLED-oriented black / charcoal finishing palette, retaining coral accents. */
+@media (prefers-color-scheme: dark) {
+  .portfolio-shell{
+    --background:#090909;
+    --foreground:#f5f5f5;
+    --card:#1e1e20;
+    --card-foreground:#f5f5f5;
+    --popover:#1e1e20;
+    --popover-foreground:#f5f5f5;
+    --secondary:#27272a;
+    --secondary-foreground:#f5f5f5;
+    --muted:#242426;
+    --muted-foreground:#bdbdc2;
+    --border:#39393d;
+    --input:#56565a;
+    --ink:#090909;
+    --paper:#f5f5f5;
+    --soft:#202023;
+    background:#090909;
+  }
+  .portfolio-shell .p-hero>.p-container{
+    background:
+      radial-gradient(ellipse at 92% 8%,#25252880,transparent 43%),
+      linear-gradient(135deg,#18181b,#101012 51%,#090909);
+    border-color:#333337;
+  }
+  .portfolio-shell .p-header-inner{background:rgba(25,25,27,.95);border-color:#46464a}
+  .portfolio-shell .p-work,
+  .portfolio-shell .p-services,
+  .portfolio-shell .p-contact{background:#101012;color:#f5f5f5}
+  .portfolio-shell .p-about{background:linear-gradient(120deg,#262628,#171719)}
+  .portfolio-shell .p-contact{background:linear-gradient(120deg,#1a1a1c,#101012)}
+  .portfolio-shell .p-service-showcase{
+    background:linear-gradient(150deg,#303033,#242427 68%,#1b1b1e);
+    border-color:#535358;
+  }
+  .portfolio-shell .p-showcase-web{background:#454549;color:#f5f5f5}
+  .portfolio-shell .p-showcase-app{background:#141416;color:#f5f5f5}
+  .portfolio-shell .p-project{background:#202023;border-color:#38383e}
+  .portfolio-shell .p-footer{background:#090909}
+  .portfolio-shell .about-page,
+  .portfolio-shell .photo-page,
+  .portfolio-shell .premium-project-page{background:#0d0d0f;color:#f5f5f5}
+  .portfolio-shell .about-hero,
+  .portfolio-shell .photo-hero{
+    background:
+      radial-gradient(ellipse at 95% 20%,#3a262c55,transparent 45%),
+      repeating-radial-gradient(ellipse at -18% -90%,transparent 0 71px,
+        #ffffff0c 73px 78px,transparent 80px 111px),
+      linear-gradient(130deg,#1f1f22,#0f0f11)!important;
+  }
+  .portfolio-shell .about-block{background:#141416!important}
+  .portfolio-shell .background-block,
+  .portfolio-shell .interests-block{background:#1b1b1e!important}
+  .portfolio-shell .skills-block{background:#0f0f11!important}
+  .portfolio-shell .experience-block{background:#101012!important}
+  .portfolio-shell .experience-block .experience-card{background:#222225;border-color:#3c3c41}
+  .portfolio-shell .experience-block .experience-card:hover{background:#2c2c30}
+  .portfolio-shell .photo-note{background:#1b1b1e}
+  .portfolio-shell .premium-project-page .bg-ink,
+  .portfolio-shell .premium-project-page .bg-ink article{background:#101012}
+}
+@media (prefers-color-scheme: dark) {
+  .p-mobile-sheet{background:#1a1a1d!important;border-color:#444448!important}
+}
