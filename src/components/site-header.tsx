@@ -68,6 +68,9 @@ export function SiteHeader() {
               <Link to="/services" onClick={() => setOpen(false)}>
                 Services
               </Link>
+              <Link to="/" hash="frequently-asked-questions" onClick={() => setOpen(false)}>
+                FAQs
+              </Link>
               <Link to="/start-project" onClick={() => setOpen(false)}>
                 Start a project ↗
               </Link>
