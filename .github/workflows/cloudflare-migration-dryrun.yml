@@ -1,0 +1,32 @@
+name: Cloudflare migration build check
+
+on:
+  push:
+    branches:
+      - migration/cloudflare-portfolio-2026-10-13
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  dry-run:
+    name: Build and validate Cloudflare bundle without deploying
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - name: Install exact locked dependencies
+        run: bun install --frozen-lockfile
+      - name: Build unchanged TanStack application
+        run: bun run build
+      - name: Inspect Nitro Cloudflare output
+        run: |
+          find .output -maxdepth 3 -type f | head -60
+          test -f .output/server/index.mjs
+          test -d .output/public
+      - name: Verify Cloudflare Worker packaging (NO deploy)
+        run: npx --yes wrangler@4.68.0 deploy --dry-run --outdir .cloudflare-dryrun
