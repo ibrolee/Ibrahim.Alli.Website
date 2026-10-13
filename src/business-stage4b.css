@@ -276,3 +276,38 @@
   }
   .portfolio-shell .ia-4b-onboarding-studio small{color:#d4d4d4}
 }
+
+
+/* Owner-only access screen for local document studio */
+.portfolio-shell .ia-studio-auth-page{min-height:100vh}
+.portfolio-shell .ia-studio-login-wrap{padding:145px 0 90px;background:#f2f4f8;min-height:calc(100vh - 160px)}
+.portfolio-shell .ia-studio-login-wrap>.p-container{max-width:780px}
+.portfolio-shell .ia-studio-login-card{margin:31px auto 0;padding:clamp(27px,5vw,58px);max-width:620px;background:#fff;border:1px solid #e3e6ed;border-radius:25px;box-shadow:0 25px 70px #36425915}
+.portfolio-shell .ia-studio-lock-icon{display:grid;place-items:center;width:54px;height:54px;background:linear-gradient(135deg,#fbd6da,#fff1f1);border:1px solid #edc7ce;color:#c8475b;border-radius:16px;margin-bottom:24px}
+.portfolio-shell .ia-studio-login-card h1{font:850 clamp(35px,6vw,57px)/1.1 Manrope,"DM Sans",sans-serif;color:#252a38;letter-spacing:-.065em;margin:17px 0 20px}
+.portfolio-shell .ia-studio-login-card h1 em{color:#d65864}
+.portfolio-shell .ia-studio-login-desc{font-size:14px;line-height:1.8;color:#687487;max-width:470px}
+.portfolio-shell .ia-studio-login-form{margin-top:29px;display:grid;gap:12px}
+.portfolio-shell .ia-studio-login-form>label{font-size:13px;font-weight:850;color:#2c3544}
+.portfolio-shell .ia-studio-login-form>input{width:100%;min-height:52px;padding:12px 17px;border:1px solid #d6dce6;background:#fcfcfe;border-radius:11px;color:#293344;font-size:16px}
+.portfolio-shell .ia-studio-login-primary{margin-top:9px;min-height:52px;justify-content:space-between!important;width:100%}
+.portfolio-shell .ia-studio-auth-error{background:#fff0f0;color:#b73b49;padding:13px;border:1px solid #efbec3;border-radius:10px;font-size:13px;line-height:1.6}
+.portfolio-shell .ia-studio-login-note{display:flex;align-items:flex-start;gap:10px;margin-top:24px;padding-top:22px;border-top:1px solid #e4e6ee;font-size:12px;line-height:1.75;color:#7e8897}
+.portfolio-shell .ia-studio-login-note svg{flex-shrink:0;color:#ca5662;margin-top:2px}
+.portfolio-shell .ia-studio-owner-controls{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+@media(max-width:760px){
+ .portfolio-shell .ia-studio-login-wrap{padding:105px 0 50px}
+ .portfolio-shell .ia-studio-login-card{margin-top:25px}
+}
+@media(prefers-color-scheme:dark){
+ .portfolio-shell .ia-studio-login-wrap{background:#191919}
+ .portfolio-shell .ia-studio-login-card{background:#292929;border-color:#505050;box-shadow:0 25px 70px #0005}
+ .portfolio-shell .ia-studio-login-card h1{color:#f8f8f8}
+ .portfolio-shell .ia-studio-login-card h1 em{color:#ff9fa6}
+ .portfolio-shell .ia-studio-login-desc,.portfolio-shell .ia-studio-login-note{color:#d3d3d3}
+ .portfolio-shell .ia-studio-lock-icon{background:#442d34;border-color:#6d464e;color:#ff99a4}
+ .portfolio-shell .ia-studio-login-form>label{color:#f2f2f2}
+ .portfolio-shell .ia-studio-login-form>input{background:#222;color:#fff;border-color:#555}
+ .portfolio-shell .ia-studio-auth-error{background:#492c30;border-color:#714147;color:#ffc3c9}
+ .portfolio-shell .ia-studio-login-note{border-color:#515151}
+}
