@@ -542,3 +542,35 @@
 @media(prefers-reduced-motion:reduce){
   .portfolio-shell .p-service-showcase{transform:none}
 }
+
+/* The Radix navigation sheet and backdrop render at z-index:50 in a portal.
+   Keep the sticky header BELOW them to prevent it covering "Explore" and
+   intercepting taps on the top part of the open drawer. */
+.portfolio-shell .p-header{z-index:35}
+
+/* Compact icon-only menu toggle, with the name provided via aria-label. */
+.portfolio-shell .p-menu-button{
+  width:48px;
+  min-width:48px;
+  height:48px;
+  min-height:48px;
+  padding:0;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  gap:0;
+  border-radius:50%;
+}
+.portfolio-shell .p-menu-button svg{width:23px;height:23px}
+@media(max-width:920px){
+  .portfolio-shell .p-menu-button{display:inline-flex}
+}
+@media(max-width:760px){
+  .portfolio-shell .p-menu-button{
+    width:44px;
+    min-width:44px;
+    height:44px;
+    min-height:44px;
+    padding:0;
+  }
+}
