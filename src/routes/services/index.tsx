@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowRight, ArrowUpRight, Check, LayoutGrid, MousePointerClick, Smartphone, Wrench, Sparkles, BadgeCheck, Layers3, MoveUpRight } from "lucide-react";
+import { ArrowRight, ArrowUpRight, Check, LayoutGrid, MousePointerClick, Smartphone, Wrench, Sparkles, BadgeCheck, Layers3, MoveUpRight, SearchCheck } from "lucide-react";
 import { services, projectProcess } from "@/lib/freelance-services";
 
 const packages = [
@@ -59,6 +59,22 @@ function ServicesPage() {
               );
             })}
           </div>
+        </div>
+      </section>
+      <section className="ia-4a-service-entry" aria-label="Practical next steps">
+        <div className="p-container ia-4a-entry-grid">
+          <article>
+            <div className="ia-4a-entry-top"><span>Have an existing website?</span><SearchCheck size={27} aria-hidden="true"/></div>
+            <h2>Let's find out<br/><em>what could be better.</em></h2>
+            <p>Request a free initial review of your public website's design, mobile experience and customer journey.</p>
+            <Link to="/free-website-audit">Request a free website audit <ArrowUpRight size={18} aria-hidden="true"/></Link>
+          </article>
+          <article>
+            <div className="ia-4a-entry-top"><span>Already online?</span><Wrench size={27} aria-hidden="true"/></div>
+            <h2>Keep your website<br/><em>well looked after.</em></h2>
+            <p>Explore ongoing maintenance options for content updates, functional checks and practical website support.</p>
+            <Link to="/website-maintenance">Explore website maintenance <ArrowUpRight size={18} aria-hidden="true"/></Link>
+          </article>
         </div>
       </section>
       <section id="packages" className="p-section p-packages" aria-labelledby="services-packages-heading">
