@@ -23,6 +23,7 @@ import photographyCss from "../photography.css?url";
 import superPlusStudiosCss from "../super-plus-studios.css?url";
 import mimsCss from "../mims.css?url";
 import redWaveCss from "../red-wave.css?url";
+import autoDarkCss from "../auto-dark.css?url";
 
 function NotFoundComponent() {
   return (
@@ -213,6 +214,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "stylesheet", href: superPlusStudiosCss },
       { rel: "stylesheet", href: mimsCss },
       { rel: "stylesheet", href: redWaveCss },
+      { rel: "stylesheet", href: autoDarkCss },
       {
         rel: "icon",
         href: "/favicon.svg",
