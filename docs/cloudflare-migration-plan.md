@@ -31,3 +31,7 @@ If it fails, read the build job logs and correct the *branch*. Do not change pro
 4. Keep Vercel as fallback until the agreed observation period passes.
 
 **Super Plus Fitness must be migrated separately** and pass authenticated member/staff, payroll/attendance and payment callback tests. Do not cancel Vercel Pro until that site has also been cut over safely. JIS Beauty & Fashion is inactive and should remain out of this active hosting migration until the owner authorizes launch.
+
+## Cloudflare connection progress — 13 October 2026
+
+Cloudflare Workers project `ibrahimalli-portfolio` was created from GitHub, and its first manually initiated build completed on the default `main` branch. That build **is not** validation of this migration branch. This documentation-only commit triggers a separate preview build of `migration/cloudflare-portfolio-2026-10-13` via the enabled Worker Preview Builds integration. Inspect the resulting preview build and its URL in Cloudflare before any production domain change. Keep `main` as production branch and do not merge this PR during preview evaluation.
