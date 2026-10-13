@@ -94,7 +94,7 @@ function Home() {
                 Thoughtfully designed websites, mobile apps and practical business systems — with photography as another way I see the world.
               </p>
               <div className="p-actions">
-                <a className="p-button" href="#contact">Contact me <MoveUpRight size={18} /></a>
+                <Link className="p-button" to="/about">About me <MoveUpRight size={18} /></Link>
                 <a className="p-subtle-link" href="#work">Explore my work <ArrowRight size={18} /></a>
               </div>
             </div>
