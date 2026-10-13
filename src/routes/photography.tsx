@@ -134,6 +134,8 @@ export const Route = createFileRoute("/photography")({
       },
       { property: "og:type", content: "website" },
       { property: "og:url", content: `${SITE_URL}/photography` },
+      { property: "og:image", content: `${SITE_URL}/og-image.jpg` },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
     links: [{ rel: "canonical", href: `${SITE_URL}/photography` }],
   }),
@@ -143,6 +145,11 @@ export const Route = createFileRoute("/photography")({
 function PhotographyPage() {
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const activePhoto = activeIndex === null ? null : photos[activeIndex];
+  const wasLightboxOpened = activeIndex !== null;
+  const previouslyFocusedButton = useRef<HTMLButtonElement | null>(null);
+  const closeButtonRef = useRef<HTMLButtonElement | null>(null);
+  const previousButtonRef = useRef<HTMLButtonElement | null>(null);
+  const nextButtonRef = useRef<HTMLButtonElement | null>(null);
 
   const closeLightbox = useCallback(() => setActiveIndex(null), []);
   const showPrevious = useCallback(() => {
@@ -157,13 +164,24 @@ function PhotographyPage() {
   }, []);
 
   useEffect(() => {
-    if (activeIndex === null) return;
+    if (!wasLightboxOpened) return;
 
+    // Keep keyboard focus inside the modal and return it to the thumbnail on close.
+    closeButtonRef.current?.focus();
     const originalOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
 
     const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") closeLightbox();
+      if (event.key === "Escape") { event.preventDefault(); closeLightbox(); }
+      if (event.key === "Tab") {
+        const buttons = [closeButtonRef.current, previousButtonRef.current, nextButtonRef.current].filter((item): item is HTMLButtonElement => Boolean(item));
+        if (!buttons.length) return;
+        const first = buttons[0];
+        const last = buttons[buttons.length - 1];
+        const current = document.activeElement;
+        if (event.shiftKey && (current === first || !buttons.includes(current as HTMLButtonElement))) { event.preventDefault(); last.focus(); }
+        else if (!event.shiftKey && (current === last || !buttons.includes(current as HTMLButtonElement))) { event.preventDefault(); first.focus(); }
+      }
       if (event.key === "ArrowLeft") showPrevious();
       if (event.key === "ArrowRight") showNext();
     };
@@ -172,10 +190,12 @@ function PhotographyPage() {
     return () => {
       document.body.style.overflow = originalOverflow;
       window.removeEventListener("keydown", onKeyDown);
+      previouslyFocusedButton.current?.focus();
     };
-  }, [activeIndex, closeLightbox, showNext, showPrevious]);
+  }, [wasLightboxOpened, closeLightbox, showNext, showPrevious]);
 
-  const openPhoto = (photo: PortfolioPhoto) => {
+  const openPhoto = (photo: PortfolioPhoto, trigger: HTMLButtonElement) => {
+    previouslyFocusedButton.current = trigger;
     setActiveIndex(photos.indexOf(photo));
   };
 
@@ -288,6 +308,7 @@ function PhotographyPage() {
           <button
             type="button"
             className="photo-lightbox-close"
+            ref={closeButtonRef}
             onClick={closeLightbox}
             aria-label="Close photograph"
           >
@@ -296,6 +317,7 @@ function PhotographyPage() {
           <button
             type="button"
             className="photo-lightbox-nav photo-lightbox-nav--previous"
+            ref={previousButtonRef}
             onClick={showPrevious}
             aria-label="Previous photograph"
           >
@@ -321,6 +343,7 @@ function PhotographyPage() {
           <button
             type="button"
             className="photo-lightbox-nav photo-lightbox-nav--next"
+            ref={nextButtonRef}
             onClick={showNext}
             aria-label="Next photograph"
           >
@@ -338,7 +361,7 @@ function PhotoGrid({
   className = "",
 }: {
   photos: PortfolioPhoto[];
-  onOpen: (photo: PortfolioPhoto) => void;
+  onOpen: (photo: PortfolioPhoto, trigger: HTMLButtonElement) => void;
   className?: string;
 }) {
   return (
@@ -348,7 +371,7 @@ function PhotoGrid({
           type="button"
           className="photo-card"
           key={photo.src}
-          onClick={() => onOpen(photo)}
+          onClick={(event) => onOpen(photo, event.currentTarget)}
           aria-label={`Open ${photo.title.toLowerCase()}`}
         >
           <span className="photo-frame">
@@ -357,7 +380,7 @@ function PhotoGrid({
               alt={photo.alt}
               width={photo.width}
               height={photo.height}
-              loading={index < 2 ? "eager" : "lazy"}
+              loading={photo.category === "people" && index === 0 ? "eager" : "lazy"}
               decoding="async"
             />
             <span className="photo-view" aria-hidden="true">

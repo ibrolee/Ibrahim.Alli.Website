@@ -1,8 +1,10 @@
+import conceptCss from "../../../sallys-apparel.css?url";
 import { createFileRoute } from "@tanstack/react-router";
 import { SallysProduct } from "@/components/sallys-apparel";
 
 export const Route = createFileRoute("/sallys-apparel/product/$slug")({
   head: () => ({
+    links: [{ rel: "stylesheet", href: conceptCss }],
     meta: [
       { title: "Product — Sally's Apparel Concept" },
       {

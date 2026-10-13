@@ -6,12 +6,18 @@ export const Route = createFileRoute("/about")({
   head: () => ({
     meta: [
       { title: "About Ibrahim Alli" },
+      { property: "og:title", content: "About Ibrahim Alli — Web Designer & Digital Builder" },
+      { property: "og:description", content: "Meet Ibrahim Alli, an independent web designer and developer creating useful digital experiences for real businesses." },
+      { property: "og:type", content: "profile" },
+      { property: "og:url", content: "https://ibrahimalli.com/about" },
+      { property: "og:image", content: "https://ibrahimalli.com/og-image.jpg" },
       {
         name: "description",
         content:
           "Background, education, experience, skills and interests of Ibrahim Alli.",
       },
     ],
+    links: [{ rel: "canonical", href: "https://ibrahimalli.com/about" }],
   }),
   component: About,
 });

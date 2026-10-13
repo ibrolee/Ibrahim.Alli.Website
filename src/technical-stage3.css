@@ -1,0 +1,39 @@
+/* Stage 3: focused accessibility and mobile refinements.
+   These changes preserve the established light/red and automatic charcoal theme. */
+html{scroll-padding-top:112px}
+.portfolio-shell [id]{scroll-margin-top:112px}
+.portfolio-shell :is(a,button,summary,input,select,textarea):focus-visible{
+  outline:3px solid #e76470;
+  outline-offset:4px;
+}
+.portfolio-shell .p-hero-client-cta:focus-visible,
+.portfolio-shell .p-project-image:focus-visible,
+.portfolio-shell .ia-service-card-bottom a:focus-visible{
+  outline-offset:5px;
+}
+.p-mobile-sheet :is(a,button):focus-visible{
+  outline:3px solid #e76470;
+  outline-offset:4px;
+}
+.portfolio-shell .ia-home-condensed .p-projects{
+  -webkit-overflow-scrolling:touch;
+}
+@media(max-width:760px){
+  html{scroll-padding-top:96px}
+  .portfolio-shell [id]{scroll-margin-top:96px}
+  /* iOS zooms the entire page when a focused form control uses a smaller font. */
+  .portfolio-shell .ia-field :is(input,select,textarea){
+    font-size:16px;
+    min-height:48px;
+  }
+  .portfolio-shell .ia-field textarea{min-height:144px}
+  .portfolio-shell .ia-faq-item summary{min-height:48px}
+  .portfolio-shell .ia-home-condensed .p-projects{scroll-padding-inline:2px}
+  .portfolio-shell .ia-home-condensed .ia-home-work-links a{min-height:44px;align-items:center}
+}
+@media(prefers-color-scheme:dark){
+  .portfolio-shell :is(a,button,summary,input,select,textarea):focus-visible,
+  .p-mobile-sheet :is(a,button):focus-visible{
+    outline-color:#ffabb1;
+  }
+}

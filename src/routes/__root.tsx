@@ -15,18 +15,42 @@ import { SiteFooter } from "@/components/site-footer";
 
 import appCss from "../styles.css?url";
 import aboutCss from "../about-editorial.css?url";
-import dayyahCss from "../dayyah-couture.css?url";
-import safiyyrCss from "../safiyyr.css?url";
-import sallysCss from "../sallys-apparel.css?url";
 import premiumCss from "../premium.css?url";
 import photographyCss from "../photography.css?url";
-import superPlusStudiosCss from "../super-plus-studios.css?url";
-import mimsCss from "../mims.css?url";
 import redWaveCss from "../red-wave.css?url";
 import autoDarkCss from "../auto-dark.css?url";
 import freelanceStage1Css from "../freelance-stage1.css?url";
 import portfolioStage2Css from "../portfolio-stage2.css?url";
 import compactHomeCss from "../compact-home.css?url";
+import technicalStage3Css from "../technical-stage3.css?url";
+
+/** Accurate portfolio identity metadata; no fake ratings, addresses or client results. */
+const portfolioSchema = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Person",
+      "@id": "https://ibrahimalli.com/#person",
+      name: "Ibrahim Alli",
+      url: "https://ibrahimalli.com/",
+      jobTitle: "Independent Web Designer and Developer",
+      description: "Designs and develops business websites, online stores and practical digital systems.",
+      sameAs: [
+        "https://www.instagram.com/ibroleee_/",
+        "https://www.pexels.com/@ibrolee/",
+      ],
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://ibrahimalli.com/#website",
+      name: "Ibrahim Alli — Portfolio",
+      url: "https://ibrahimalli.com/",
+      inLanguage: "en",
+      publisher: { "@id": "https://ibrahimalli.com/#person" },
+    },
+  ],
+};
+
 
 function NotFoundComponent() {
   return (
@@ -187,6 +211,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         content: "width=device-width, initial-scale=1",
       },
       { name: "author", content: "Ibrahim Alli" },
+      { name: "theme-color", content: "#f4f5f9", media: "(prefers-color-scheme: light)" },
+      { name: "theme-color", content: "#171717", media: "(prefers-color-scheme: dark)" },
       { property: "og:site_name", content: "Ibrahim Alli" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -200,27 +226,14 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         rel: "stylesheet",
         href: aboutCss,
       },
-      {
-        rel: "stylesheet",
-        href: dayyahCss,
-      },
-      {
-        rel: "stylesheet",
-        href: safiyyrCss,
-      },
-      {
-        rel: "stylesheet",
-        href: sallysCss,
-      },
       { rel: "stylesheet", href: premiumCss },
       { rel: "stylesheet", href: photographyCss },
-      { rel: "stylesheet", href: superPlusStudiosCss },
-      { rel: "stylesheet", href: mimsCss },
       { rel: "stylesheet", href: redWaveCss },
       { rel: "stylesheet", href: autoDarkCss },
       { rel: "stylesheet", href: freelanceStage1Css },
       { rel: "stylesheet", href: portfolioStage2Css },
       { rel: "stylesheet", href: compactHomeCss },
+      { rel: "stylesheet", href: technicalStage3Css },
       {
         rel: "icon",
         href: "/favicon.svg",
@@ -289,6 +302,14 @@ function RootComponent() {
             Skip to content
           </a>
           <SiteHeader />
+          {pathname === "/" && (
+            <script
+              type="application/ld+json"
+              dangerouslySetInnerHTML={{
+                __html: JSON.stringify(portfolioSchema).replace(/</g, "\\u003c"),
+              }}
+            />
+          )}
           <ScrollAnimations />
           <Outlet />
           <SiteFooter />

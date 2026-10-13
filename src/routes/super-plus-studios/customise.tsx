@@ -1,3 +1,4 @@
+import conceptCss from "../../super-plus-studios.css?url";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowLeft, ArrowRight, Check, Clock3, Smartphone } from "lucide-react";
 import { FormEvent, useMemo, useState } from "react";
@@ -15,7 +16,7 @@ import {
 export const Route=createFileRoute("/super-plus-studios/customise")({
   head:()=>({
     meta:[{title:"Device Studio — Super Plus Studios"},{name:"robots",content:"noindex, nofollow"}],
-    links:[{rel:"preload",as:"image",href:"/sps-preview/stealth-black.svg"}],
+    links:[{ rel: "stylesheet", href: conceptCss },{rel:"preload",as:"image",href:"/sps-preview/stealth-black.svg"}],
   }),
   component:DeviceStudio,
 });

@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { track } from "@vercel/analytics";
 import { ArrowDown, ArrowRight, MoveUpRight, MessageCircle, Monitor, Smartphone, ArrowUpRight } from "lucide-react";
 import { projects } from "@/lib/portfolio-content";
 import { JisProjectVisual } from "@/components/jis-project-visual";
@@ -54,7 +55,7 @@ function Home() {
                 <Link className="p-button" to="/about">About me <MoveUpRight size={18} /></Link>
                 <a className="p-subtle-link" href="#work">Explore my work <ArrowRight size={18} /></a>
               </div>
-              <Link className="p-hero-client-cta" to="/start-project">
+              <Link className="p-hero-client-cta" to="/start-project" onClick={() => track("portfolio_cta_click", { placement: "hero", destination: "project_form" })}>
                 <span className="p-client-availability"><span aria-hidden="true" /> Available for select website projects</span>
                 <strong>Have a project? Tell me about it <MoveUpRight size={16} aria-hidden="true" /></strong>
               </Link>
@@ -166,7 +167,7 @@ function Home() {
           <p className="ia-home-swipe-cue">Swipe sideways to view both projects →</p>
           <div className="ia-home-work-links">
             <Link to="/work" className="ia-home-work-main">Explore detailed project work <ArrowRight size={17} aria-hidden="true"/></Link>
-            <a href="/Ibrahim-Alli-Portfolio-2026.pdf" download className="ia-home-work-pdf">Download my portfolio <ArrowRight size={17} aria-hidden="true"/></a>
+            <a href="/Ibrahim-Alli-Portfolio-2026.pdf" download className="ia-home-work-pdf" onClick={() => track("portfolio_cta_click", { placement: "selected_work", destination: "portfolio_pdf" })}>Download my portfolio <ArrowRight size={17} aria-hidden="true"/></a>
           </div>
         </div>
       </section>
@@ -197,7 +198,7 @@ function Home() {
             <p>Tell me what you're building. We can discuss the right scope before any quote.</p>
           </div>
           <div className="ia-home-contact-actions">
-            <Link to="/start-project" className="ia-home-contact-primary">Start a project <ArrowUpRight size={19} aria-hidden="true"/></Link>
+            <Link to="/start-project" className="ia-home-contact-primary" onClick={() => track("portfolio_cta_click", { placement: "contact_section", destination: "project_form" })}>Start a project <ArrowUpRight size={19} aria-hidden="true"/></Link>
             <a href="https://wa.me/905488534011?text=Hi%20Ibrahim%2C%20I%27d%20like%20to%20discuss%20a%20project." target="_blank" rel="noopener noreferrer"><MessageCircle size={18} aria-hidden="true"/> WhatsApp me <ArrowRight size={17} aria-hidden="true"/></a>
           </div>
         </div>

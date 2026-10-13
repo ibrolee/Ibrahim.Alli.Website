@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { track } from "@vercel/analytics";
 import { useRef, type FormEvent } from "react";
 import { ArrowLeft, ArrowRight, ArrowUpRight, CheckCircle2, Mail, MessageCircle, ShieldCheck, Sparkles } from "lucide-react";
 import { services } from "@/lib/freelance-services";
@@ -67,6 +68,8 @@ function StartProjectPage() {
   function sendVia(method: "email" | "whatsapp") {
     const payload = buildBrief();
     if (!payload) return;
+    // Records only a click to open the chosen app, never a completed enquiry or personal details.
+    track("portfolio_enquiry_handoff", { channel: method, service: payload.serviceName });
     if (method === "email") {
       const subject = encodeURIComponent(`Project enquiry — ${payload.serviceName}`);
       window.location.href = `mailto:${DESTINATION_EMAIL}?subject=${subject}&body=${encodeURIComponent(payload.brief)}`;
