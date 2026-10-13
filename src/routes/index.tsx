@@ -3,6 +3,7 @@ import { ArrowDown, ArrowRight, MoveUpRight, Mail, MessageCircle, Monitor, Smart
 
 import { projects } from "@/lib/portfolio-content";
 import { JisProjectVisual } from "@/components/jis-project-visual";
+import { HeroIllustration } from "@/components/hero-illustration";
 
 const SITE_URL = "https://ibrahimalli.com";
 const OG_IMAGE = `${SITE_URL}/og-image.jpg`;
@@ -79,73 +80,33 @@ function Home() {
       <section className="p-hero" aria-labelledby="hero-heading">
         <div className="p-container">
           <div className="p-hero-top">
-            <span className="p-label">Ibrahim Alli · Independent creative</span>
-            <span className="p-label">Nigeria / North Cyprus</span>
+            <span className="p-label">IBRAHIM ALLI / INDEPENDENT CREATIVE</span>
+            <span className="p-label">NIGERIA · NORTH CYPRUS</span>
           </div>
           <div className="p-hero-grid">
             <div className="p-hero-copy">
-              <p className="p-overline">Builder. Creator. Entrepreneur.</p>
+              <p className="p-overline">Web designer · App builder · Creative</p>
               <h1 id="hero-heading">
-                Ideas with
-                <br />
-                purpose.
-                <br />
-                <em>Made digital.</em>
+                I create digital<br />
+                experiences<br />
+                <em>that work.</em>
               </h1>
               <p className="p-hero-description">
-                I build digital experiences and document the world around me through photography.
+                Thoughtfully designed websites, mobile apps and practical business systems — with photography as another way I see the world.
               </p>
               <div className="p-actions">
-                <a className="p-button" href="#work">
-                  Explore my work <MoveUpRight size={18} />
-                </a>
-                <Link className="p-subtle-link" to="/about">
-                  About me <ArrowRight size={17} />
-                </Link>
+                <a className="p-button" href="#contact">Contact me <MoveUpRight size={18} /></a>
+                <a className="p-subtle-link" href="#work">Explore my work <ArrowRight size={18} /></a>
               </div>
             </div>
             <div className="p-hero-visual">
-              <a className="p-service-showcase" href="#web-development" aria-label="Explore website and mobile app services">
-                <div className="p-showcase-top">
-                  <span>Web & app development</span>
-                  <span className="p-showcase-mark" aria-hidden="true">ia.</span>
-                </div>
-                <h2>Your business.<br /><em>On every screen.</em></h2>
-                <div className="p-showcase-platforms">
-                  <div className="p-showcase-web">
-                    <Monitor aria-hidden="true" strokeWidth={1} />
-                    <strong>Websites</strong>
-                    <span>Business & e-commerce</span>
-                  </div>
-                  <div className="p-showcase-app">
-                    <Smartphone aria-hidden="true" strokeWidth={1} />
-                    <strong>Mobile apps</strong>
-                    <span>Android & iOS</span>
-                  </div>
-                </div>
-                <div className="p-showcase-bottom">
-                  <span>From idea to launch</span>
-                  <span className="p-showcase-link">Explore services <MoveUpRight size={18} aria-hidden="true" /></span>
-                </div>
-              </a>
-              <div className="p-visual-note">
-                <span className="p-spark" aria-hidden="true">
-                  ✳
-                </span>
-                <p>
-                  Good design is how it looks.
-                  <br />
-                  <span>Great work is how it works.</span>
-                </p>
-              </div>
+              <HeroIllustration />
             </div>
           </div>
           <div className="p-hero-bottom">
-            <span>Design-led. Business-minded.</span>
-            <a href="#work">
-              Discover the work <ArrowDown size={15} />
-            </a>
-            <span>Portfolio — 2026</span>
+            <span>Design led. Business minded.</span>
+            <a href="#work">Scroll to discover <ArrowDown size={18} /></a>
+            <span>PORTFOLIO — 2026</span>
           </div>
         </div>
       </section>
