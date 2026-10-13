@@ -76,6 +76,8 @@ export type Project = {
   tools: string[];
   deliverables: string[];
   evidenceNote: string;
+  engagementContext: string;
+  walkthrough: { label: string; title: string; detail: string; value: string }[];
   url?: string;
 };
 
@@ -113,6 +115,27 @@ export const projects: Project[] = [
       "Reception, coach and staff operating tools",
     ],
     evidenceNote: "Live website and functional workflows. No unverified revenue or conversion statistics.",
+    engagementContext: "An ongoing digital project for a family-operated fitness and wellness business I help manage — not an unrelated external agency commission.",
+    walkthrough: [
+      {
+        label: "01 / Discover",
+        title: "Find a membership that fits.",
+        detail: "The public site brings services and membership information into a single browsing journey, instead of making prospective members rely on scattered messages.",
+        value: "Clearer access to plan and service information",
+      },
+      {
+        label: "02 / Join",
+        title: "Move from interest to registration.",
+        detail: "Membership registration and payment steps connect the customer-facing pages with the business's actual membership workflow.",
+        value: "Registration and payment journeys linked to the operation",
+      },
+      {
+        label: "03 / Return",
+        title: "Make everyday visits easier.",
+        detail: "Member QR check-ins and reception or staff tools support the recurring tasks that happen after someone joins.",
+        value: "Tools for members and the people running the gym",
+      },
+    ],
   },
   {
     slug: "jis-beauty-fashion",
@@ -151,6 +174,27 @@ export const projects: Project[] = [
       "Brand content and editorial section",
     ],
     evidenceNote: "Live business website. Results describe shipped functionality, not invented business metrics.",
+    engagementContext: "A real, family-operated beauty and fragrance business. I designed its online storefront and continue improving its digital experience.",
+    walkthrough: [
+      {
+        label: "01 / Discover",
+        title: "Browse fragrances by category.",
+        detail: "Product categories and a clear visual hierarchy introduce the range without overwhelming visitors, especially on a small screen.",
+        value: "Mobile-first product discovery",
+      },
+      {
+        label: "02 / Consider",
+        title: "Give each product space.",
+        detail: "Individual product pages bring together the essential information shoppers need when comparing fragrance options.",
+        value: "Branded product presentation",
+      },
+      {
+        label: "03 / Order",
+        title: "Keep the shopping path understandable.",
+        detail: "A cart and checkout journey helps customers organise selections and proceed with the store's available ordering and payment methods.",
+        value: "A guided order flow aligned with the store",
+      },
+    ],
   },
 
 ];
@@ -186,5 +230,7 @@ export const archivedProjects: Project[] = [
     ],
     deliverables: ["Early business research and branding direction"],
     evidenceNote: "Archived concept; no shipped physical products.",
+    engagementContext: "Personal early-stage research concept, not a commissioned or launched business.",
+    walkthrough: [],
   },
 ];
