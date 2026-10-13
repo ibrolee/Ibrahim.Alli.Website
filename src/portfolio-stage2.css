@@ -94,3 +94,25 @@
  .portfolio-shell .ia-proof-bottom p{color:#d5d5d5}
  .portfolio-shell .ia-proof-bottom p strong{color:#f4f4f4}
 }
+
+
+/* Verified client testimonials only appear once explicit publishing consent exists. */
+.portfolio-shell .ia-verified-feedback{background:#fff}
+.portfolio-shell .ia-verified-feedback h2{font-family:Manrope,"DM Sans",sans-serif;font-size:clamp(40px,5vw,66px);font-weight:850;letter-spacing:-.06em;margin:16px 0 34px;color:#222838}
+.portfolio-shell .ia-verified-feedback h2 em{color:#d95562}
+.portfolio-shell .ia-verified-feedback-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+.portfolio-shell .ia-verified-feedback figure{margin:0;padding:30px;border:1px solid #e4e5ed;border-radius:18px;background:#f6f7f9}
+.portfolio-shell .ia-verified-feedback blockquote{font-size:clamp(17px,2vw,23px);line-height:1.7;color:#303746;letter-spacing:-.02em}
+.portfolio-shell .ia-verified-feedback figcaption{display:grid;gap:3px;padding-top:25px;margin-top:25px;border-top:1px solid #e1e4ea}
+.portfolio-shell .ia-verified-feedback figcaption strong{color:#343a49;font-size:14px}
+.portfolio-shell .ia-verified-feedback figcaption span{color:#758092;font-size:12px}
+@media(max-width:700px){.portfolio-shell .ia-verified-feedback-grid{grid-template-columns:minmax(0,1fr)}}
+@media(prefers-color-scheme:dark){
+ .portfolio-shell .ia-verified-feedback{background:#1a1a1a}
+ .portfolio-shell .ia-verified-feedback h2{color:#f4f4f4}
+ .portfolio-shell .ia-verified-feedback h2 em{color:#ff949a}
+ .portfolio-shell .ia-verified-feedback figure{background:#292929;border-color:#4b4b4b}
+ .portfolio-shell .ia-verified-feedback blockquote,.portfolio-shell .ia-verified-feedback figcaption strong{color:#ededed}
+ .portfolio-shell .ia-verified-feedback figcaption{border-color:#4b4b4b}
+ .portfolio-shell .ia-verified-feedback figcaption span{color:#ccc}
+}
