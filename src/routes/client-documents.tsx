@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useRef, type ChangeEvent } from "react";
 import { ArrowLeft, ArrowRight, Check, Clipboard, Download, FileText, Plus, Printer, ShieldCheck, Trash2, WandSparkles } from "lucide-react";
 import { calculateClientTotals, documentKinds, initialClientDocument, makeClientDocument, type ClientDocument, type DocumentKind } from "@/lib/client-documents";
 
@@ -48,6 +48,7 @@ function ClientDocuments(){
   const [kind,setKind]=useState<DocumentKind>("proposal");
   const [data,setData]=useState<ClientDocument>(initialClientDocument);
   const [status,setStatus]=useState("");
+  const fileInputRef=useRef<HTMLInputElement>(null);
   const doc=useMemo(()=>makeClientDocument(kind,data),[kind,data]);
   const totals=useMemo(()=>calculateClientTotals(data),[data]);
   const selected=documentKinds.find(t=>t.value===kind);
@@ -76,6 +77,44 @@ function ClientDocuments(){
     anchor.remove();
     URL.revokeObjectURL(url);
     setStatus("Text file prepared. Review the content before sharing.");
+  }
+  function exportEditable(){
+    const safeFile=(data.clientBusiness||data.clientName||"client").toLowerCase().replace(/[^a-z0-9]+/g,"-").slice(0,32)||"client";
+    const bundle=JSON.stringify({version:1,kind,data},null,2);
+    const url=URL.createObjectURL(new Blob([bundle],{type:"application/json"}));
+    const a=document.createElement("a");
+    a.href=url;a.download="ibrahim-alli-working-draft-"+safeFile+".json";
+    document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);
+    setStatus("Editable draft saved to your device. Store it securely; it may contain client information.");
+  }
+  async function importEditable(event:ChangeEvent<HTMLInputElement>){
+    const file=event.target.files?.[0];if(!file)return;
+    try{
+      if(file.size>100000)throw new Error("File too large");
+      const parsed:unknown=JSON.parse(await file.text());
+      if(!parsed||typeof parsed!=="object"||!("data" in parsed)||!("kind" in parsed))throw new Error("Not a document draft");
+      const input=parsed as {version?:unknown;kind?:unknown;data?:unknown};
+      if(input.version!==1||!documentKinds.some(x=>x.value===input.kind))throw new Error("Invalid version or template");
+      if(!input.data||typeof input.data!=="object")throw new Error("Missing fields");
+      const source=input.data as Record<string,unknown>;
+      const next:ClientDocument={...initialClientDocument,items:[{...initialClientDocument.items[0]}]};
+      for(const key of Object.keys(initialClientDocument) as (keyof ClientDocument)[]){
+        if(key==="items")continue;
+        const v=source[key];
+        if(typeof v==="string"&&v.length<=3000)(next as unknown as Record<string,unknown>)[key]=v;
+      }
+      if(!["NGN","GBP","USD","EUR","TRY"].includes(next.currency))next.currency="NGN";
+      if(Array.isArray(source.items)){
+        const imported=source.items.slice(0,8).filter(item=>item&&typeof item==="object").map(item=>{
+          const x=item as Record<string,unknown>;
+          return {description:typeof x.description==="string"?x.description.slice(0,250):"",quantity:typeof x.quantity==="string"?x.quantity.slice(0,25):"1",rate:typeof x.rate==="string"?x.rate.slice(0,25):""};
+        });
+        if(imported.length)next.items=imported;
+      }
+      setData(next);setKind(input.kind as DocumentKind);
+      setStatus("Editable draft loaded. Review details before sharing.");
+    }catch{setStatus("Could not load this draft. Choose an exported Stage 4B JSON file.");}
+    event.target.value="";
   }
   function printDocument(){
     window.print();
@@ -192,6 +231,11 @@ function ClientDocuments(){
               <div className="ia-4b-preview-toolbar">
                 <div><span>03 / Live preview</span><strong>{selected?.label}</strong><small>{selected?.description}</small></div>
                 <span className="ia-4b-draft-badge">Draft only</span>
+              </div>
+              <div className="ia-4b-preview-controls ia-4b-preview-controls-secondary">
+                <button type="button" onClick={exportEditable}><Download size={16} aria-hidden="true"/> Save editable draft</button>
+                <button type="button" onClick={()=>fileInputRef.current?.click()}><FileText size={16} aria-hidden="true"/> Open saved draft</button>
+                <input ref={fileInputRef} className="ia-4b-import-input" type="file" accept=".json,application/json" onChange={importEditable} aria-label="Load an editable document draft file"/>
               </div>
               <div className="ia-4b-preview-controls">
                 <button type="button" onClick={copyDocument}><Clipboard size={16} aria-hidden="true"/> Copy</button>
