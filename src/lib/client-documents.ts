@@ -65,19 +65,23 @@ function currencyAmount(n:number|null,currency:string){
 }
 export function calculateClientTotals(data:ClientDocument){
   let any=false;
+  let incomplete=false;
   const subtotal=data.items.reduce((sum,item)=>{
     const price=financialNumber(item.rate);
     const qty=financialNumber(item.quantity);
-    if(price!==null&&qty!==null){any=true;return sum+qty*price}
+    if(item.description.trim()||item.rate.trim()){
+      if(price===null||qty===null){incomplete=true;return sum;}
+      any=true;return sum+qty*price;
+    }
     return sum;
   },0);
   const taxable=financialNumber(data.taxPercent);
   const taxRate=taxable===null?0:Math.min(taxable,100);
-  const tax=any?subtotal*taxRate/100:null;
-  const total=any?subtotal+(tax??0):null;
+  const tax=any&&!incomplete?subtotal*taxRate/100:null;
+  const total=any&&!incomplete?subtotal+(tax??0):null;
   const depositRate=financialNumber(data.depositPercent);
   const deposit=total!==null&&depositRate!==null?total*Math.min(depositRate,100)/100:null;
-  return {subtotal:any?subtotal:null,tax,total,deposit,taxRate,depositRate};
+  return {subtotal:any&&!incomplete?subtotal:null,tax,total,deposit,taxRate,depositRate};
 }
 function header(kind:string,data:ClientDocument){
   return [
