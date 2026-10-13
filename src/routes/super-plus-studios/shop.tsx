@@ -1,10 +1,12 @@
+import conceptCss from "../../super-plus-studios.css?url";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight, Search } from "lucide-react";
 import { useMemo, useState } from "react";
 import { SpsHeader, spsProducts, naira } from "@/components/super-plus-studios";
 
 export const Route=createFileRoute("/super-plus-studios/shop")({
-  head:()=>({meta:[{title:"Shop Skins — Super Plus Studios"},{name:"robots",content:"noindex, nofollow"}]}),
+  head:()=>({
+    links:[{ rel: "stylesheet", href: conceptCss }],meta:[{title:"Shop Skins — Super Plus Studios"},{name:"robots",content:"noindex, nofollow"}]}),
   component:SpsShop,
 });
 
