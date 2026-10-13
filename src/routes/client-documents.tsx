@@ -1,9 +1,14 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, redirect } from "@tanstack/react-router";
+import { isOwnerSignedIn, signOutStudio } from "@/lib/studio-auth";
 import { useMemo, useState, useRef, type ChangeEvent } from "react";
 import { ArrowLeft, ArrowRight, Check, Clipboard, Download, FileText, Plus, Printer, ShieldCheck, Trash2, WandSparkles } from "lucide-react";
 import { calculateClientTotals, documentKinds, initialClientDocument, makeClientDocument, type ClientDocument, type DocumentKind } from "@/lib/client-documents";
 
 export const Route = createFileRoute("/client-documents")({
+  beforeLoad:async()=>{
+    if(!await isOwnerSignedIn())throw redirect({to:"/owner-login"});
+  },
+  headers:()=>({"Cache-Control":"private, no-store"}),
   head:()=>({
     meta:[
       {title:"Client Document Studio — Ibrahim Alli"},
@@ -120,6 +125,9 @@ function ClientDocuments(){
     window.print();
     setStatus("Use your browser's print options to print or save a PDF.");
   }
+  async function logout(){
+    try{await signOutStudio();}finally{window.location.assign("/owner-login");}
+  }
   function resetDocument(){
     if(!window.confirm("Clear all client details and draft figures? This cannot be undone."))return;
     setData({...initialClientDocument,items:[{...initialClientDocument.items[0]}]});
@@ -148,7 +156,10 @@ function ClientDocuments(){
         <div className="p-container">
           <div className="ia-4b-doc-topbar">
             <div><p className="p-label">01 / Choose a document</p><h2>What are you preparing?</h2></div>
-            <button className="ia-4b-clear" type="button" onClick={resetDocument}><Trash2 size={16} aria-hidden="true"/> Clear draft</button>
+            <div className="ia-studio-owner-controls">
+              <button className="ia-4b-clear" type="button" onClick={resetDocument}><Trash2 size={16} aria-hidden="true"/> Clear draft</button>
+              <button className="ia-4b-clear" type="button" onClick={logout}><ShieldCheck size={16} aria-hidden="true"/> Sign out</button>
+            </div>
           </div>
           <div className="ia-4b-doc-picker" role="group" aria-label="Document template">
             {documentKinds.map(item=>(
