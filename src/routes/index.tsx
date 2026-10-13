@@ -3,7 +3,6 @@ import { ArrowDown, ArrowRight, MoveUpRight, Mail, MessageCircle, Monitor, Smart
 
 import { projects } from "@/lib/portfolio-content";
 import { JisProjectVisual } from "@/components/jis-project-visual";
-import { HeroIllustration } from "@/components/hero-illustration";
 
 const SITE_URL = "https://ibrahimalli.com";
 const OG_IMAGE = `${SITE_URL}/og-image.jpg`;
@@ -100,7 +99,35 @@ function Home() {
               </div>
             </div>
             <div className="p-hero-visual">
-              <HeroIllustration />
+              <a
+                className="p-service-showcase"
+                href="#web-development"
+                aria-label="Explore website and mobile app services"
+              >
+                <div className="p-showcase-top">
+                  <span>Web &amp; app development</span>
+                  <span className="p-showcase-mark" aria-hidden="true">ia<span>.</span></span>
+                </div>
+                <h2>Your business.<br /><em>On every screen.</em></h2>
+                <div className="p-showcase-platforms">
+                  <div className="p-showcase-web">
+                    <Monitor size={39} aria-hidden="true" strokeWidth={1.6} />
+                    <strong>Websites</strong>
+                    <span>Business &amp; e-commerce</span>
+                  </div>
+                  <div className="p-showcase-app">
+                    <Smartphone size={39} aria-hidden="true" strokeWidth={1.6} />
+                    <strong>Mobile apps</strong>
+                    <span>Android &amp; iOS</span>
+                  </div>
+                </div>
+                <div className="p-showcase-bottom">
+                  <span>From idea to launch</span>
+                  <span className="p-showcase-link">
+                    Explore services <MoveUpRight size={17} aria-hidden="true" />
+                  </span>
+                </div>
+              </a>
             </div>
           </div>
           <div className="p-hero-bottom">
