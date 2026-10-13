@@ -71,6 +71,9 @@ export function SiteHeader() {
               <Link to="/client-onboarding" onClick={() => setOpen(false)}>
                 Client onboarding
               </Link>
+              <Link to="/client-documents" onClick={() => setOpen(false)}>
+                Document Studio
+              </Link>
               <Link to="/free-website-audit" onClick={() => setOpen(false)}>
                 Free website audit
               </Link>
