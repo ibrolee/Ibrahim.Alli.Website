@@ -105,7 +105,7 @@ function ProjectPage() {
             </Link>
           </div>
         </section>
-      )
+      )}
 
       {!isConcept && (
         <section className="p-evidence-section px-5 py-14 md:px-10 md:py-20" aria-labelledby="delivered-heading">
