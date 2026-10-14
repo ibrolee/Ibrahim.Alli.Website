@@ -1,0 +1,125 @@
+/**
+ * Targeted client-acquisition content. All examples are accurately described:
+ * gym = operated business site, JIS = developed brand/store project,
+ * school = concept/proposal only, not a delivered school contract.
+ */
+export const industryPages = {
+  fitness: {
+    slug:"fitness",
+    eyebrow:"Websites for gyms, fitness studios & wellness businesses",
+    label:"Fitness & wellness",
+    title:"More than a gym website.",
+    accent:"A smoother member experience.",
+    lead:"Help new members understand your facilities, compare memberships and contact your team — while making the everyday work of running a fitness business simpler.",
+    intro:"Your website should do more than list opening hours. It can show what makes your gym different, explain membership options and guide interested visitors towards an enquiry.",
+    service:"business-websites",
+    opening:"Gym, studio or spa website",
+    audience:"Gyms, personal trainers, fitness studios, wellness and spa businesses",
+    challenges:[
+      {title:"Plans people can understand",text:"Present membership options, coaching services and registration information without overwhelming visitors."},
+      {title:"A better mobile first impression",text:"Give people visiting from Instagram and WhatsApp a clear, fast path from discovery to enquiry."},
+      {title:"Useful everyday workflows",text:"Where appropriate, plan online memberships, staff tools or member experiences around your actual operations."},
+    ],
+    offerings:["Branded, mobile-first website design","Membership and coaching information","Clear enquiry and contact journeys","Optional custom member or staff system planning"],
+    proofTitle:"Relevant experience: Super Plus Fitness & Spa",
+    proofText:"I work on the real Super Plus Fitness & Spa website and member-facing/business operations experience. It's an example of how website design and day-to-day gym management can connect, not a promise that every gym needs the same system.",
+    proofPath:"/projects/super-plus-fitness",
+    proofCta:"Explore the fitness project",
+    proofType:"real",
+    takeaway:"A new member should know what you offer and how to get started before they have to ask.",
+    questions:[
+      {q:"Do I need online membership payments?",a:"Not necessarily. We can start with a clear website and enquiry journey. Payment features depend on your payment provider and agreed scope."},
+      {q:"Can you work with an existing gym website?",a:"Yes, where the hosting and source setup allow it. I'll assess the site before suggesting a safe improvement plan."},
+    ],
+  },
+  fashion: {
+    slug:"fashion",
+    eyebrow:"Websites for fashion, beauty & fragrance brands",
+    label:"Fashion & beauty",
+    title:"Make your brand feel",
+    accent:"as considered as your products.",
+    lead:"Create a beautiful home for your collections, services or signature products — with a straightforward journey from discovering your brand to asking a question or placing an order.",
+    intro:"Whether you sell modest fashion, skincare, beauty services or fragrances, your digital storefront should reflect your identity and help customers shop with confidence.",
+    service:"e-commerce",
+    opening:"Fashion, fragrance or beauty website",
+    audience:"Fashion designers, modest-wear brands, perfume businesses, beauty studios and independent labels",
+    challenges:[
+      {title:"A recognisable brand",text:"A polished visual identity, strong product presentation and a consistent mobile experience."},
+      {title:"Clear product discovery",text:"Thoughtful collections, categories and product details that help customers decide."},
+      {title:"A practical route to purchase",text:"WhatsApp enquiries or an online store, according to your readiness, payment setup and fulfilment process."},
+    ],
+    offerings:["Premium product and collection pages","Mobile-friendly online store planning","Product photography presentation","Contact, delivery and policy information"],
+    proofTitle:"Relevant project: JIS Beauty & Fashion",
+    proofText:"I designed and developed a branded beauty and fashion website experience for JIS Beauty & Fashion. It illustrates the design direction and store features; it is not presented as evidence of live customer orders or sales.",
+    proofPath:"/projects/jis-beauty-fashion",
+    proofCta:"View the beauty & fashion project",
+    proofType:"real",
+    takeaway:"A customer should feel the identity of your brand before scrolling through the whole catalogue.",
+    questions:[
+      {q:"Can I start without accepting card payments?",a:"Yes. Depending on the project, enquiries or manual payments can be scoped first, while more complex checkout is considered separately."},
+      {q:"Will I be able to add products later?",a:"We can plan a suitable way for you to manage collections and product information based on your budget and technical requirements."},
+    ],
+  },
+  schools: {
+    slug:"schools",
+    eyebrow:"Websites for schools & education providers",
+    label:"Schools & education",
+    title:"A school website that",
+    accent:"keeps parents informed.",
+    lead:"Give families one clear place to find admissions information, school news, events and the details they need — without adding unnecessary work for teachers.",
+    intro:"A useful school website serves parents, administrators and prospective families. It should make key information easy to find, particularly on a mobile phone.",
+    service:"business-websites",
+    opening:"School website and parent communication",
+    audience:"Nursery, primary and secondary schools, academies and education providers",
+    challenges:[
+      {title:"Admissions made clearer",text:"Present school information, admissions requirements and a straightforward way to contact the school."},
+      {title:"Useful parent updates",text:"Communicate events and announcements in a format families can actually use."},
+      {title:"A realistic portal plan",text:"Where requested, consider a parent-facing portal and lightweight teacher updates without relying on student phone use."},
+    ],
+    offerings:["School homepage and admissions pages","Events, updates and parent communication","Mobile-friendly school information","Optional parent portal discovery and requirements"],
+    proofTitle:"School website concept — not a delivered client",
+    proofText:"I've explored a proposed school website and parent portal experience, including an events area and practical teacher-admin workflows. This is a design concept and proposal, not a completed or commissioned school deployment.",
+    proofPath:null,
+    proofCta:"",
+    proofType:"concept",
+    takeaway:"Parents should be able to find the next important school update without making a phone call.",
+    questions:[
+      {q:"Do students need accounts or phones?",a:"Not necessarily. A parent-focused website can be designed without requiring students to use personal devices."},
+      {q:"Can the school add a portal later?",a:"Yes, if the scope, data protection, hosting and operational responsibilities are agreed. A basic public website can be a sensible first step."},
+    ],
+  },
+  "online-stores": {
+    slug:"online-stores",
+    eyebrow:"Websites for online stores & independent sellers",
+    label:"Online stores",
+    title:"An online shop",
+    accent:"built for real customers.",
+    lead:"Present products clearly, make buying steps easy to understand and shape a storefront around how you actually receive, prepare and deliver orders.",
+    intro:"Selling online involves more than a product grid. The best first version is one your customers can navigate and your business can realistically operate.",
+    service:"e-commerce",
+    opening:"Online store and e-commerce website",
+    audience:"Retailers, small businesses and independent brands selling physical products",
+    challenges:[
+      {title:"Help people find products",text:"Simple categories, clear product pages and consistent presentation of the things you sell."},
+      {title:"Make checkout choices clear",text:"Plan order and payment steps around your region, the providers you're eligible for and the way you fulfil orders."},
+      {title:"Set expectations early",text:"Explain delivery, returns, inventory and ways to get help before confusion turns into lost interest."},
+    ],
+    offerings:["Responsive product catalogue and navigation","Order and checkout requirements planning","Delivery and store-information pages","Practical product management workflows"],
+    proofTitle:"Storefront design experience: JIS Beauty & Fashion",
+    proofText:"I developed a branded storefront experience for JIS Beauty & Fashion. It demonstrates product and customer-flow planning, without claiming the business is already fulfilling online orders.",
+    proofPath:"/projects/jis-beauty-fashion",
+    proofCta:"Explore the storefront example",
+    proofType:"real",
+    takeaway:"A useful storefront makes the next step obvious — whether that's adding to a cart or starting a conversation.",
+    questions:[
+      {q:"Can an online store begin with WhatsApp orders?",a:"Yes. We can scope a catalogue and an enquiry flow before adding checkout integrations, if that better fits your operations."},
+      {q:"What do you need before building?",a:"Your products and images, delivery process, intended payment options, relevant policies and the core customer journey."},
+    ],
+  },
+} as const;
+
+export type IndustrySlug = keyof typeof industryPages;
+export const industrySlugs=Object.keys(industryPages) as IndustrySlug[];
+export function isIndustrySlug(value:string):value is IndustrySlug{
+  return Object.prototype.hasOwnProperty.call(industryPages,value);
+}

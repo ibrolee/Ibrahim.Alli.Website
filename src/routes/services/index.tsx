@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight, ArrowUpRight, Check, LayoutGrid, MousePointerClick, Smartphone, Wrench, Sparkles, BadgeCheck, Layers3, MoveUpRight, SearchCheck } from "lucide-react";
 import { services, projectProcess } from "@/lib/freelance-services";
+import { industryPages, industrySlugs } from "@/lib/industry-pages";
 
 const packages = [
   { tag:"01 / Launch", title:"Essential", description:"A confident online home for a business, professional or personal brand.", suitable:"Best for a new business or simple portfolio", items:["A focused, mobile-first website","Clear services and contact journey","Basic search visibility and launch guidance"], service:"business-websites" },
@@ -81,6 +82,21 @@ function ServicesPage() {
         <div className="p-container ia-4b-bridge-inner">
           <div><p className="p-label">Planning to work together?</p><h2>Let's get your project <em>clearly defined.</em></h2><p>Share a structured brief before we agree scope, quotation and next steps.</p></div>
           <Link to="/client-onboarding" className="ia-stage-primary">Complete a client questionnaire <ArrowUpRight size={18} aria-hidden="true"/></Link>
+        </div>
+      </section>
+      <section className="ia-4c-service-bridge" aria-label="Web design by industry">
+        <div className="p-container">
+          <div className="ia-4c-service-top">
+            <div><p className="p-label">Industry-specific websites</p><h2>For the business <em>you're building.</em></h2></div>
+            <Link to="/industries">Explore all industries <ArrowUpRight size={17} aria-hidden="true"/></Link>
+          </div>
+          <div className="ia-4c-service-cards">
+            {industrySlugs.map(slug=>(
+              <Link key={slug} to="/for/$industry" params={{industry:slug}}>
+                {industryPages[slug].label}<ArrowUpRight size={17} aria-hidden="true"/>
+              </Link>
+            ))}
+          </div>
         </div>
       </section>
       <section id="packages" className="p-section p-packages" aria-labelledby="services-packages-heading">
