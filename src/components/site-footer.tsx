@@ -101,6 +101,9 @@ export function SiteFooter() {
             <Link to="/industries">
               Industries
             </Link>
+            <Link to="/insights">
+              Guides
+            </Link>
             <Link to="/client-onboarding">
               Client onboarding
             </Link>

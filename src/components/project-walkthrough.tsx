@@ -25,10 +25,10 @@ export function ProjectWalkthrough({ project }: { project: Project }) {
                   <img src={project.image} alt="" width={1600} height={1000} loading="lazy" decoding="async" />}
               </div>
             </div>
-            <figcaption>Project presentation, not a live interactive demo. Use the live website link to explore the current experience.</figcaption>
+            <figcaption>{isJis ? "Project presentation, not an active selling site. The storefront was developed ahead of commercial launch." : "Project presentation, not a live interactive demo. Use the linked website to explore the current experience."}</figcaption>
             <div className="ia-walkthrough-source">
               <span><Check size={16} aria-hidden="true"/> Real operating business</span>
-              {project.url && <a href={project.url} target="_blank" rel="noopener noreferrer">View live website <ExternalLink size={16} aria-hidden="true"/></a>}
+              {project.url && <a href={project.url} target="_blank" rel="noopener noreferrer">{isJis ? "View developed storefront" : "View live website"} <ExternalLink size={16} aria-hidden="true"/></a>}
             </div>
           </figure>
           <div className="ia-walkthrough-steps">

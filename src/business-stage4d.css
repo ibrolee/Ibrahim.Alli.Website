@@ -1,0 +1,118 @@
+/* Stage 4D — editorial guides and verifiable case-study decisions.
+   No change to compact homepage or compact mobile menu. */
+.portfolio-shell .ia-4d-page{min-height:100vh;background:#f7f8fb;color:#283142}
+.portfolio-shell .ia-4d-page h2,.portfolio-shell .ia-4d-page h3,.portfolio-shell .ia-4d-case-notes h2,.portfolio-shell .ia-4d-case-notes h3{
+  font-family:Manrope,"DM Sans",ui-sans-serif,sans-serif;font-weight:850;
+  letter-spacing:-.052em;line-height:1.18
+}
+.portfolio-shell .ia-4d-page h2,.portfolio-shell .ia-4d-case-notes h2{font-size:clamp(31px,4vw,55px)}
+.portfolio-shell .ia-4d-page h2 em,.portfolio-shell .ia-4d-case-notes h2 em{color:#d65a65}
+.portfolio-shell .ia-4d-hero{padding-bottom:80px}
+.portfolio-shell .ia-4d-articles-section{background:#fff;padding:86px 0 100px}
+.portfolio-shell .ia-4d-section-head{display:grid;grid-template-columns:1.1fr .8fr;gap:9%;align-items:end;margin-bottom:38px}
+.portfolio-shell .ia-4d-section-head h2{margin-top:17px}
+.portfolio-shell .ia-4d-section-head>p{color:#6c788b;line-height:1.8;font-size:14px}
+.portfolio-shell .ia-4d-cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.portfolio-shell .ia-4d-card{display:flex;flex-direction:column;gap:30px;min-height:393px;padding:clamp(23px,2.6vw,33px);background:#f4f5f9;border:1px solid #e2e5ed;border-radius:20px;color:#303a4c;transition:transform .18s,border-color .18s,box-shadow .18s}
+.portfolio-shell .ia-4d-card:hover{transform:translateY(-3px);border-color:#e09da7;box-shadow:0 18px 32px #29374a13}
+.portfolio-shell .ia-4d-card-header{display:flex;justify-content:space-between;align-items:center;gap:10px;color:#c65360}
+.portfolio-shell .ia-4d-card-header>span{font-size:11px;font-weight:850;letter-spacing:.1em}
+.portfolio-shell .ia-4d-tag{color:#ab5360;font-size:11px;font-weight:850;text-transform:uppercase;letter-spacing:.06em}
+.portfolio-shell .ia-4d-card h3{font-size:clamp(23px,2.25vw,33px);margin:12px 0 16px}
+.portfolio-shell .ia-4d-card p{color:#687589;font-size:13px;line-height:1.83}
+.portfolio-shell .ia-4d-card-bottom{display:flex;align-items:center;justify-content:space-between;gap:10px;border-top:1px solid #dfe2e9;padding-top:17px;margin-top:auto;color:#788394;font-size:11px}
+.portfolio-shell .ia-4d-card-bottom strong{display:inline-flex;align-items:center;gap:7px;color:#bc4e5b;font-size:12px;font-weight:850}
+.portfolio-shell .ia-4d-guide-cta{padding:20px 0 75px;background:#fff}
+.portfolio-shell .ia-4d-guide-cta-inner{display:flex;align-items:center;gap:24px;padding:29px 33px;border-radius:20px;border:1px solid #ebd4da;background:linear-gradient(118deg,#fde9ec,#fff 70%)}
+.portfolio-shell .ia-4d-guide-cta-inner>svg{flex-shrink:0;color:#c94e5d}
+.portfolio-shell .ia-4d-guide-cta-inner>div{flex:1;min-width:0}
+.portfolio-shell .ia-4d-guide-cta-inner h2{font-size:clamp(22px,2.2vw,30px);margin-bottom:8px}
+.portfolio-shell .ia-4d-guide-cta-inner p{color:#657386;font-size:12px;line-height:1.75}
+.portfolio-shell .ia-4d-guide-cta-inner>a{flex-shrink:0;display:flex;align-items:center;gap:8px;font-size:12px;font-weight:850;color:#be4a58}
+.portfolio-shell .ia-4d-article-hero{padding-bottom:77px}
+.portfolio-shell .ia-4d-article-hero h1{max-width:1010px;font-size:clamp(46px,7.5vw,100px);line-height:1.02}
+.portfolio-shell .ia-4d-article-intro{display:flex;flex-wrap:wrap;align-items:end;justify-content:space-between;gap:19px;margin-top:34px}
+.portfolio-shell .ia-4d-article-intro p{max-width:690px;font-size:clamp(15px,1.7vw,19px);line-height:1.8;color:#626f82}
+.portfolio-shell .ia-4d-article-intro>span{display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:750;color:#7a8596}
+.portfolio-shell .ia-4d-reading-section{background:#fff;padding:85px 0 110px}
+.portfolio-shell .ia-4d-reading-layout{display:grid;grid-template-columns:minmax(0,1.32fr) minmax(250px,.68fr);gap:clamp(45px,8vw,120px);align-items:start}
+.portfolio-shell .ia-4d-reading-content{min-width:0}
+.portfolio-shell .ia-4d-reading-block{padding:0 0 42px;margin-bottom:46px;border-bottom:1px solid #e4e7ed}
+.portfolio-shell .ia-4d-reading-num{display:block;color:#cc5360;font-size:12px;font-weight:850;letter-spacing:.12em;margin-bottom:13px}
+.portfolio-shell .ia-4d-reading-block h2{font-size:clamp(27px,3vw,40px);margin:0 0 24px;color:#2b3342}
+.portfolio-shell .ia-4d-reading-block>p{color:#56647a;font-size:15px;line-height:1.94;margin:0 0 19px}
+.portfolio-shell .ia-4d-reading-block ul,.portfolio-shell .ia-4d-takeaway ul{list-style:none;display:grid;gap:12px;margin:23px 0 0;padding:0}
+.portfolio-shell .ia-4d-reading-block li,.portfolio-shell .ia-4d-takeaway li{display:flex;align-items:flex-start;gap:12px;font-size:14px;line-height:1.7;color:#536176}
+.portfolio-shell .ia-4d-reading-block li svg,.portfolio-shell .ia-4d-takeaway li svg{color:#d35763;flex-shrink:0;margin-top:3px}
+.portfolio-shell .ia-4d-takeaway{background:linear-gradient(145deg,#fff2f3,#f9fafc 76%);border:1px solid #ead8dc;border-radius:22px;padding:clamp(25px,4vw,38px)}
+.portfolio-shell .ia-4d-takeaway-top{display:flex;align-items:center;gap:12px;color:#bf4d59;font-size:12px;text-transform:uppercase;letter-spacing:.09em;font-weight:850;margin-bottom:17px}
+.portfolio-shell .ia-4d-takeaway h2{font-size:clamp(24px,3vw,37px);color:#303847}
+.portfolio-shell .ia-4d-article-aside{position:sticky;top:102px;display:grid;gap:23px}
+.portfolio-shell .ia-4d-article-aside-card{border:1px solid #e8dadc;border-radius:19px;background:linear-gradient(145deg,#fbe9ec,#fff 78%);padding:27px}
+.portfolio-shell .ia-4d-article-aside-card h2{font-size:clamp(24px,2.3vw,31px);color:#273345;margin:14px 0 17px}
+.portfolio-shell .ia-4d-article-aside-card p:not(.p-label){font-size:13px;color:#677487;line-height:1.8}
+.portfolio-shell .ia-4d-article-aside-card>a{display:flex;align-items:center;gap:9px;color:#c4515d;font-size:13px;font-weight:850;margin-top:23px}
+.portfolio-shell .ia-4d-related{border-top:1px solid #e1e4ec}
+.portfolio-shell .ia-4d-related h3{font-size:18px;color:#2d3747;padding-top:20px;margin-bottom:12px}
+.portfolio-shell .ia-4d-related>a{display:flex;align-items:center;justify-content:space-between;gap:12px;border-bottom:1px solid #e1e4ec;padding:16px 0;color:#566377;font-size:13px;font-weight:750;line-height:1.5}
+.portfolio-shell .ia-4d-related>a svg{flex-shrink:0;color:#c95765}
+.portfolio-shell .ia-4d-service-link{padding:0 0 65px;background:#f8f8fa}
+.portfolio-shell .ia-4d-service-link-inner{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:25px 30px;background:linear-gradient(120deg,#fbe9ec,#fff 75%);border:1px solid #ecd7dd;border-radius:18px}
+.portfolio-shell .ia-4d-service-link h2{font-size:clamp(21px,2.2vw,31px);color:#283040;letter-spacing:-.04em}
+.portfolio-shell .ia-4d-service-link p{font-size:13px;color:#68758a;margin-top:8px;line-height:1.65}
+.portfolio-shell .ia-4d-service-link a{display:inline-flex;align-items:center;gap:9px;color:#c14d5b;font-size:13px;font-weight:850;white-space:nowrap}
+.portfolio-shell .ia-4d-case-notes{padding:88px 0 92px;background:#f7f8fb;color:#263243}
+.portfolio-shell .ia-4d-case-notes-header{display:grid;grid-template-columns:1fr .83fr;gap:8%;align-items:end;margin-bottom:32px}
+.portfolio-shell .ia-4d-case-notes-header h2{margin-top:15px;color:#273144}
+.portfolio-shell .ia-4d-case-notes-header>p{font-size:14px;line-height:1.8;color:#69778b}
+.portfolio-shell .ia-4d-case-decisions{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.portfolio-shell .ia-4d-case-decisions article{background:#fff;border:1px solid #e3e5eb;border-radius:18px;padding:26px 23px}
+.portfolio-shell .ia-4d-case-index{color:#cc5460;font-size:11px;letter-spacing:.1em;font-weight:850}
+.portfolio-shell .ia-4d-case-decisions h3{font-size:clamp(19px,2vw,25px);margin:19px 0;color:#30394a}
+.portfolio-shell .ia-4d-case-decisions p{color:#617086;font-size:13px;line-height:1.85;margin:0 0 15px}
+.portfolio-shell .ia-4d-case-decisions p strong{color:#354054}
+.portfolio-shell .ia-4d-case-boundary{display:flex;align-items:flex-start;gap:25px;margin-top:27px;padding:22px 0;border-top:1px solid #dce2eb;border-bottom:1px solid #dce2eb}
+.portfolio-shell .ia-4d-case-boundary span{flex-shrink:0;font-size:12px;color:#bb515e;font-weight:850}
+.portfolio-shell .ia-4d-case-boundary p{font-size:13px;line-height:1.7;color:#5a687d}
+.portfolio-shell .ia-4d-case-link{display:inline-flex;align-items:center;gap:9px;color:#bd4e5b;font-size:14px;font-weight:850;margin-top:24px}
+@media(max-width:940px){
+ .portfolio-shell .ia-4d-cards{gap:11px}
+ .portfolio-shell .ia-4d-card{padding:22px;min-height:340px}
+ .portfolio-shell .ia-4d-reading-layout{grid-template-columns:minmax(0,1.2fr) minmax(230px,.8fr);gap:34px}
+ .portfolio-shell .ia-4d-case-decisions{gap:10px}
+ .portfolio-shell .ia-4d-case-decisions article{padding:22px 18px}
+}
+@media(max-width:760px){
+ .portfolio-shell .ia-4d-hero,.portfolio-shell .ia-4d-article-hero{padding-bottom:55px}
+ .portfolio-shell .ia-4d-articles-section,.portfolio-shell .ia-4d-reading-section,.portfolio-shell .ia-4d-case-notes{padding:58px 0 66px}
+ .portfolio-shell .ia-4d-section-head,.portfolio-shell .ia-4d-reading-layout,.portfolio-shell .ia-4d-case-notes-header{grid-template-columns:minmax(0,1fr);gap:22px}
+ .portfolio-shell .ia-4d-cards,.portfolio-shell .ia-4d-case-decisions{grid-template-columns:minmax(0,1fr)}
+ .portfolio-shell .ia-4d-card{min-height:260px}
+ .portfolio-shell .ia-4d-article-hero h1{font-size:clamp(41px,10vw,70px)}
+ .portfolio-shell .ia-4d-article-intro{margin-top:22px}
+ .portfolio-shell .ia-4d-reading-block{padding-bottom:30px;margin-bottom:35px}
+ .portfolio-shell .ia-4d-reading-block>p{font-size:14px}
+ .portfolio-shell .ia-4d-article-aside{position:static}
+ .portfolio-shell .ia-4d-guide-cta-inner,.portfolio-shell .ia-4d-service-link-inner{flex-wrap:wrap;padding:25px}
+ .portfolio-shell .ia-4d-guide-cta-inner>a,.portfolio-shell .ia-4d-service-link a{white-space:normal}
+ .portfolio-shell .ia-4d-case-decisions article{padding:23px}
+ .portfolio-shell .ia-4d-case-boundary{display:grid;gap:9px}
+}
+@media(prefers-color-scheme:dark){
+ .portfolio-shell .ia-4d-page,.portfolio-shell .ia-4d-articles-section,.portfolio-shell .ia-4d-reading-section,.portfolio-shell .ia-4d-guide-cta{background:#191919;color:#f2f2f2}
+ .portfolio-shell .ia-4d-page h2,.portfolio-shell .ia-4d-page h3,.portfolio-shell .ia-4d-case-notes h2,.portfolio-shell .ia-4d-case-notes h3{color:#f3f3f3}
+ .portfolio-shell .ia-4d-page h2 em,.portfolio-shell .ia-4d-case-notes h2 em{color:#ff9da5}
+ .portfolio-shell .ia-4d-section-head>p,.portfolio-shell .ia-4d-article-intro p,.portfolio-shell .ia-4d-reading-block>p,.portfolio-shell .ia-4d-reading-block li,.portfolio-shell .ia-4d-takeaway li,.portfolio-shell .ia-4d-article-aside-card p:not(.p-label),.portfolio-shell .ia-4d-case-notes-header>p,.portfolio-shell .ia-4d-case-decisions p,.portfolio-shell .ia-4d-case-boundary p{color:#d0d0d0}
+ .portfolio-shell .ia-4d-card,.portfolio-shell .ia-4d-case-decisions article{background:#292929;border-color:#4d4d4d;color:#eee}
+ .portfolio-shell .ia-4d-card h3,.portfolio-shell .ia-4d-case-decisions h3{color:#f3f3f3}
+ .portfolio-shell .ia-4d-card p,.portfolio-shell .ia-4d-card-bottom>span{color:#d5d5d5}
+ .portfolio-shell .ia-4d-card-bottom,.portfolio-shell .ia-4d-reading-block,.portfolio-shell .ia-4d-related,.portfolio-shell .ia-4d-related>a,.portfolio-shell .ia-4d-case-boundary{border-color:#4b4b4b}
+ .portfolio-shell .ia-4d-tag,.portfolio-shell .ia-4d-card-header,.portfolio-shell .ia-4d-card-bottom strong,.portfolio-shell .ia-4d-reading-num,.portfolio-shell .ia-4d-case-index,.portfolio-shell .ia-4d-case-boundary span,.portfolio-shell .ia-4d-case-link{color:#ffb0b5}
+ .portfolio-shell .ia-4d-article-intro>span,.portfolio-shell .ia-4d-related>a{color:#dedede}
+ .portfolio-shell .ia-4d-takeaway,.portfolio-shell .ia-4d-article-aside-card,.portfolio-shell .ia-4d-guide-cta-inner,.portfolio-shell .ia-4d-service-link-inner{background:linear-gradient(130deg,#38282c,#282828);border-color:#69474d}
+ .portfolio-shell .ia-4d-guide-cta-inner p,.portfolio-shell .ia-4d-service-link p{color:#d3d3d3}
+ .portfolio-shell .ia-4d-reading-block li svg,.portfolio-shell .ia-4d-takeaway li svg{color:#ffa2aa}
+ .portfolio-shell .ia-4d-related h3,.portfolio-shell .ia-4d-case-decisions p strong{color:#f4f4f4}
+ .portfolio-shell .ia-4d-service-link,.portfolio-shell .ia-4d-case-notes{background:#222}
+}
+@media(prefers-reduced-motion:reduce){.portfolio-shell .ia-4d-card{transition:none}}

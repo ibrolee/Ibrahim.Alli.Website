@@ -26,6 +26,7 @@ import technicalStage3Css from "../technical-stage3.css?url";
 import businessStage4aCss from "../business-stage4a.css?url";
 import businessStage4bCss from "../business-stage4b.css?url";
 import businessStage4cCss from "../business-stage4c.css?url";
+import businessStage4dCss from "../business-stage4d.css?url";
 
 /** Accurate portfolio identity metadata; no fake ratings, addresses or client results. */
 const portfolioSchema = {
@@ -240,6 +241,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "stylesheet", href: businessStage4aCss },
       { rel: "stylesheet", href: businessStage4bCss },
       { rel: "stylesheet", href: businessStage4cCss },
+      { rel: "stylesheet", href: businessStage4dCss },
       {
         rel: "icon",
         href: "/favicon.svg",
