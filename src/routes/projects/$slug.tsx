@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button";
 import { projects } from "@/lib/portfolio-content";
 import { JisProjectVisual } from "@/components/jis-project-visual";
 import { ProjectWalkthrough } from "@/components/project-walkthrough";
+import { projectDecisions } from "@/lib/project-decisions";
+import { track } from "@vercel/analytics";
 
 export const Route = createFileRoute("/projects/$slug")({
   loader: ({ params }) => {
@@ -38,6 +40,7 @@ function ProjectPage() {
   const project = Route.useLoaderData();
   const isFitness = project.slug === "super-plus-fitness";
   const isConcept = Boolean(project.concept);
+  const decision = projectDecisions[project.slug as keyof typeof projectDecisions];
 
   return (
     <main id="main-content" className="pt-18 premium-project-page">
@@ -55,7 +58,7 @@ function ProjectPage() {
               <p className="text-xs font-semibold uppercase tracking-[0.14em] text-accent-mark">{project.type}</p>
               <p className="mt-5 max-w-2xl text-base leading-7 text-muted-foreground md:text-lg md:leading-8">{project.summary}</p>
               {project.url && (
-                <Button asChild className="mt-7"><a href={project.url} target="_blank" rel="noopener noreferrer">{isConcept ? "View Live Concept" : "Visit Website"} <ExternalLink aria-hidden="true" /></a></Button>
+                <Button asChild className="mt-7"><a href={project.url} target="_blank" rel="noopener noreferrer">{isConcept ? "View Concept" : isFitness ? "Visit Live Gym Website" : "View Developed Storefront"} <ExternalLink aria-hidden="true" /></a></Button>
               )}
             </div>
           </div>
@@ -74,6 +77,35 @@ function ProjectPage() {
       </div>
 
       {!isConcept && <ProjectWalkthrough project={project} />}
+
+      {decision && (
+        <section className="ia-4d-case-notes" aria-labelledby="design-decisions-heading">
+          <div className="p-container">
+            <div className="ia-4d-case-notes-header">
+              <div><p className="p-label">What shaped this work</p><h2 id="design-decisions-heading">The thinking <em>behind the build.</em></h2></div>
+              <p>{decision.scope}</p>
+            </div>
+            <div className="ia-4d-case-decisions">
+              {decision.steps.map((step,index)=>(
+                <article key={step.question}>
+                  <span className="ia-4d-case-index">{String(index+1).padStart(2,"0")}</span>
+                  <h3>{step.question}</h3>
+                  <p><strong>Decision:</strong> {step.decision}</p>
+                  <p><strong>Why:</strong> {step.reason}</p>
+                </article>
+              ))}
+            </div>
+            <div className="ia-4d-case-boundary">
+              <span>{decision.label}</span>
+              <p>{decision.boundaries}</p>
+            </div>
+            <Link to="/start-project" search={{service:decision.service}} className="ia-4d-case-link"
+              onClick={()=>track("portfolio_case_study_cta_click",{project:project.slug,action:"open_project_form"})}>
+              {decision.linkText} <ArrowRight size={18} aria-hidden="true"/>
+            </Link>
+          </div>
+        </section>
+      )
 
       {!isConcept && (
         <section className="p-evidence-section px-5 py-14 md:px-10 md:py-20" aria-labelledby="delivered-heading">
