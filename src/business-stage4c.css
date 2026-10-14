@@ -304,3 +304,59 @@
 @media (prefers-reduced-motion: reduce) {
   .p-mobile-sheet.ia-compact-menu .ia-menu-grid > a { transition: none; }
 }
+/* Desktop access to the same business pages available in the compact mobile menu. */
+.portfolio-shell .ia-desktop-explore {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 8px 0;
+  border: 0;
+  background: transparent;
+  color: #263144;
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.portfolio-shell .ia-desktop-explore:hover,
+.portfolio-shell .ia-desktop-explore[data-state="open"] { color: #ce4751; }
+.portfolio-shell .ia-desktop-explore:focus-visible { outline: 2px solid #d65361; outline-offset: 5px; border-radius: 4px; }
+.ia-desktop-explore-menu {
+  min-width: 230px;
+  padding: 8px;
+  border: 1px solid #e1e5ed;
+  border-radius: 16px;
+  background: #fff;
+  color: #30394b;
+  box-shadow: 0 14px 38px #26314426;
+  font-family: "DM Sans", system-ui, sans-serif;
+}
+.ia-desktop-explore-menu > a {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 12px;
+  border-radius: 9px;
+  color: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+}
+.ia-desktop-explore-menu > a:hover,
+.ia-desktop-explore-menu > a[data-highlighted],
+.ia-desktop-explore-menu > a[aria-current="page"] { background: #fff1f3; color: #bb4354; }
+@media (max-width: 1080px) {
+  .portfolio-shell .p-desktop-nav { gap: 12px; }
+  .portfolio-shell .ia-desktop-explore { font-size: 12px; }
+}
+@media (prefers-color-scheme: dark) {
+  .portfolio-shell .ia-desktop-explore { color: #dcdcdc; }
+  .portfolio-shell .ia-desktop-explore:hover,
+  .portfolio-shell .ia-desktop-explore[data-state="open"] { color: #ff9299; }
+  .ia-desktop-explore-menu { background: #19191b; border-color: #46464a; color: #eee; }
+  .ia-desktop-explore-menu > a:hover,
+  .ia-desktop-explore-menu > a[data-highlighted],
+  .ia-desktop-explore-menu > a[aria-current="page"] { background: #352226; color: #ff9faa; }
+}
