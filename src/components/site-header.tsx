@@ -1,6 +1,12 @@
 import { Link } from "@tanstack/react-router";
-import { Menu, MoveUpRight } from "lucide-react";
+import { ChevronDown, Menu, MoveUpRight } from "lucide-react";
 import { useState } from "react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import {
   Sheet,
   SheetContent,
@@ -8,6 +14,24 @@ import {
   SheetDescription,
   SheetTrigger,
 } from "@/components/ui/sheet";
+
+const discoverLinks = [
+  { to: "/", label: "Home" },
+  { to: "/work", label: "My work" },
+  { to: "/photography", label: "Photography" },
+  { to: "/about", label: "About me" },
+  { to: "/services", label: "Services" },
+  { to: "/industries", label: "Industries" },
+] as const;
+
+const businessLinks = [
+  { to: "/insights", label: "Guides" },
+  { to: "/free-website-audit", label: "Free website audit" },
+  { to: "/client-onboarding", label: "Client onboarding" },
+  { to: "/website-maintenance", label: "Maintenance" },
+] as const;
+
+const moreLinks = [discoverLinks[0], discoverLinks[5], ...businessLinks];
 
 export function SiteHeader() {
   const [open, setOpen] = useState(false);
@@ -34,6 +58,22 @@ export function SiteHeader() {
           <Link to="/services" activeProps={{ className: "p-active" }}>
             Services
           </Link>
+          <DropdownMenu modal={false}>
+            <DropdownMenuTrigger asChild>
+              <button type="button" className="ia-desktop-more">
+                More <ChevronDown size={14} aria-hidden="true" />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="ia-desktop-menu" align="end" sideOffset={16}>
+              {moreLinks.map(({ to, label }) => (
+                <DropdownMenuItem key={to} asChild>
+                  <Link to={to} activeOptions={{ exact: true }} activeProps={{ className: "ia-current" }}>
+                    {label}
+                  </Link>
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
           <Link className="p-nav-contact" to="/start-project" activeProps={{ className: "p-active" }}>
             Start a project <MoveUpRight size={15} />
           </Link>
@@ -56,21 +96,17 @@ export function SiteHeader() {
               <div className="ia-menu-section">
                 <span className="ia-menu-group-label">Discover</span>
                 <div className="ia-menu-grid">
-                  <Link to="/" onClick={() => setOpen(false)}>Home</Link>
-                  <Link to="/work" onClick={() => setOpen(false)}>My work</Link>
-                  <Link to="/photography" onClick={() => setOpen(false)}>Photography</Link>
-                  <Link to="/about" onClick={() => setOpen(false)}>About me</Link>
-                  <Link to="/services" onClick={() => setOpen(false)}>Services</Link>
-                  <Link to="/industries" onClick={() => setOpen(false)}>Industries</Link>
+                  {discoverLinks.map(({ to, label }) => (
+                    <Link key={to} to={to} onClick={() => setOpen(false)}>{label}</Link>
+                  ))}
                 </div>
               </div>
               <div className="ia-menu-section">
                 <span className="ia-menu-group-label">For your business</span>
                 <div className="ia-menu-grid ia-menu-grid-tools">
-                  <Link to="/insights" onClick={() => setOpen(false)}>Guides</Link>
-                  <Link to="/free-website-audit" onClick={() => setOpen(false)}>Free website audit</Link>
-                  <Link to="/client-onboarding" onClick={() => setOpen(false)}>Client onboarding</Link>
-                  <Link to="/website-maintenance" onClick={() => setOpen(false)}>Maintenance</Link>
+                  {businessLinks.map(({ to, label }) => (
+                    <Link key={to} to={to} onClick={() => setOpen(false)}>{label}</Link>
+                  ))}
                 </div>
               </div>
               <Link to="/start-project" className="ia-menu-cta" onClick={() => setOpen(false)}>
