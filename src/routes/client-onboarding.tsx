@@ -97,9 +97,7 @@ function ClientOnboarding(){
                 <span><strong>{item.title}</strong><small>{item.text}</small></span>
               </label>)}
             </div>
-            <div className="ia-4b-onboarding-resources">
-              <Link to="/free-website-audit" className="ia-text-action">Have a live website to review instead? <ArrowRight size={17} aria-hidden="true"/></Link>
-            </div>
+            <Link to="/free-website-audit" className="ia-text-action">Have a live website to review instead? <ArrowRight size={17} aria-hidden="true"/></Link>
           </aside>
           <section id="client-brief" className="ia-4b-form-column" aria-labelledby="client-brief-title">
             <div className="ia-enquiry-card">
