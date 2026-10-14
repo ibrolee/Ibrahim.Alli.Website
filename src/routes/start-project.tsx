@@ -111,6 +111,7 @@ function StartProjectPage() {
             </div>
             <div className="ia-4a-side-links">
               <Link to="/services" className="ia-text-action">Explore all services <ArrowRight size={17} aria-hidden="true"/></Link>
+              <Link to="/client-onboarding" className="ia-text-action">Complete the full project questionnaire <ArrowRight size={17} aria-hidden="true"/></Link>
               <Link to="/free-website-audit" className="ia-text-action">Request a free website audit <ArrowRight size={17} aria-hidden="true"/></Link>
               <Link to="/website-maintenance" className="ia-text-action">Explore website maintenance <ArrowRight size={17} aria-hidden="true"/></Link>
             </div>

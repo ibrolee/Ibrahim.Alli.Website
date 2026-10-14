@@ -98,6 +98,9 @@ export function SiteFooter() {
             <Link to="/services">
               Services
             </Link>
+            <Link to="/client-onboarding">
+              Client onboarding
+            </Link>
             <Link to="/free-website-audit">
               Free audit
             </Link>
