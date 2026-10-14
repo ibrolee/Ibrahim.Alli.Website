@@ -78,7 +78,7 @@ export function SiteHeader() {
               </Link>
             </nav>
             <p className="ia-menu-signature">Design · Digital · Business</p>
-          </SheetContent>etContent>
+          </SheetContent>
         </Sheet>
       </div>
     </header>
