@@ -99,6 +99,12 @@ function ServicesPage() {
           </div>
         </div>
       </section>
+      <section className="ia-4d-service-link" aria-label="Practical website guides">
+        <div className="p-container ia-4d-service-link-inner">
+          <div><h2>Not sure where to start?</h2><p>Read straightforward guides to website budgets, online stores and improving an existing site.</p></div>
+          <Link to="/insights">Explore website guides <ArrowUpRight size={18} aria-hidden="true"/></Link>
+        </div>
+      </section>
       <section id="packages" className="p-section p-packages" aria-labelledby="services-packages-heading">
         <div className="p-container">
           <div className="p-section-heading">
