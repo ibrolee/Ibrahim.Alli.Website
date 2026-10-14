@@ -67,10 +67,10 @@ export function SiteHeader() {
               <div className="ia-menu-section">
                 <span className="ia-menu-group-label">For your business</span>
                 <div className="ia-menu-grid ia-menu-grid-tools">
+                  <Link to="/insights" onClick={() => setOpen(false)}>Guides</Link>
                   <Link to="/free-website-audit" onClick={() => setOpen(false)}>Free website audit</Link>
-                  <Link to="/website-maintenance" onClick={() => setOpen(false)}>Maintenance</Link>
                   <Link to="/client-onboarding" onClick={() => setOpen(false)}>Client onboarding</Link>
-                  <Link to="/faqs" onClick={() => setOpen(false)}>FAQs</Link>
+                  <Link to="/website-maintenance" onClick={() => setOpen(false)}>Maintenance</Link>
                 </div>
               </div>
               <Link to="/start-project" className="ia-menu-cta" onClick={() => setOpen(false)}>
