@@ -1,3 +1,4 @@
+/* Stage 4B: public client onboarding only. No document editor or owner login. */
 /* Stage 4B — browser-only client questionnaire and document workspace.
    Scoped to the existing portfolio identity; no homepage layout changes. */
 .portfolio-shell .ia-4b-page{min-height:100vh;background:#f6f7fa;color:#242b38}
@@ -28,160 +29,6 @@
 .portfolio-shell .ia-4b-privacy{display:flex;align-items:flex-start;gap:12px;padding:16px 18px;background:#f4f5f8;border-radius:12px;border:1px solid #e6e8ef}
 .portfolio-shell .ia-4b-privacy svg{flex-shrink:0;color:#cb515c;margin-top:3px}
 .portfolio-shell .ia-4b-privacy p{color:#647184;font-size:12px;line-height:1.7}
-.portfolio-shell .ia-4b-doc-hero{padding-bottom:79px}
-.portfolio-shell .ia-4b-private-note{background:#fff0f1;border-bottom:1px solid #f0d7dc}
-.portfolio-shell .ia-4b-private-note>.p-container{display:flex;align-items:flex-start;gap:13px;padding-top:18px;padding-bottom:18px}
-.portfolio-shell .ia-4b-private-note svg{color:#c64c58;flex-shrink:0;margin-top:2px}
-.portfolio-shell .ia-4b-private-note p{font-size:12px;line-height:1.7;color:#684951;max-width:1080px}
-.portfolio-shell .ia-4b-private-note strong{color:#993f4c}
-.portfolio-shell .ia-4b-doc-workspace{background:#f5f6f9;padding:65px 0 100px}
-.portfolio-shell .ia-4b-doc-topbar{display:flex;align-items:end;justify-content:space-between;gap:25px;margin-bottom:29px}
-.portfolio-shell .ia-4b-doc-topbar h2{font-size:clamp(32px,3.8vw,53px);margin:12px 0 0}
-.portfolio-shell .ia-4b-clear{display:flex;align-items:center;gap:8px;border:1px solid #dce0e8;background:white;color:#545f70;font-size:12px;font-weight:800;border-radius:99px;padding:13px 16px;white-space:nowrap}
-.portfolio-shell .ia-4b-clear:hover{border-color:#ce636c;color:#cc4e59}
-.portfolio-shell .ia-4b-doc-picker{display:flex;gap:9px;overflow-x:auto;overscroll-behavior-inline:contain;padding:2px 2px 18px;scrollbar-width:thin}
-.portfolio-shell .ia-4b-doc-picker button{display:flex;align-items:center;justify-content:center;gap:8px;min-height:47px;padding:12px 16px;border:1px solid #e0e3ea;border-radius:999px;background:#fff;color:#566274;font-size:12px;font-weight:800;white-space:nowrap;flex-shrink:0}
-.portfolio-shell .ia-4b-doc-picker button.ia-4b-doc-active{background:linear-gradient(115deg,#e66c67,#c34456);color:#fff;border-color:transparent;box-shadow:0 6px 18px #c448562b}
-.portfolio-shell .ia-4b-builder-grid{display:grid;grid-template-columns:minmax(0,.93fr) minmax(0,1.07fr);gap:21px;align-items:start}
-.portfolio-shell .ia-4b-edit-panel{background:#fff;border:1px solid #e3e5ed;border-radius:20px;overflow:hidden;min-width:0;box-shadow:0 13px 32px #32415d0a}
-.portfolio-shell .ia-4b-panel-head{display:grid;gap:6px;padding:26px;background:linear-gradient(120deg,#fae8e9,#fff);border-bottom:1px solid #ebdde0}
-.portfolio-shell .ia-4b-panel-head>span{font-size:11px;letter-spacing:.08em;font-weight:850;text-transform:uppercase;color:#cd5963}
-.portfolio-shell .ia-4b-panel-head>strong{font-size:13px;line-height:1.5;color:#333b4a}
-.portfolio-shell .ia-4b-edit-section{border-bottom:1px solid #e3e7ed}
-.portfolio-shell .ia-4b-edit-section summary{cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:12px;padding:21px 25px;font-size:15px;font-weight:800;color:#303746}
-.portfolio-shell .ia-4b-edit-section summary::-webkit-details-marker{display:none}
-.portfolio-shell .ia-4b-edit-section summary>span:last-child{display:grid;place-items:center;width:29px;height:29px;border:1px solid #dee1e9;border-radius:50%;color:#d15a67;font-size:11px;flex-shrink:0}
-.portfolio-shell .ia-4b-edit-section[open] summary{color:#c64e5b}
-.portfolio-shell .ia-4b-input-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:17px 13px;padding:0 25px 24px}
-.portfolio-shell .ia-4b-field{display:grid;align-content:start;gap:7px;min-width:0}
-.portfolio-shell .ia-4b-field-wide{grid-column:1 / -1}
-.portfolio-shell .ia-4b-field>span,.portfolio-shell .ia-4b-fee-item label>span{font-size:11px;color:#555e6b;font-weight:800}
-.portfolio-shell .ia-4b-field :is(input,select,textarea),.portfolio-shell .ia-4b-fee-item input{
-  width:100%;min-width:0;border:1px solid #d9dee7;border-radius:9px;background:#fcfcfe;
-  color:#273142;padding:12px 12px;min-height:44px;outline:none;
-  font-family:inherit;font-size:16px;line-height:1.45
-}
-.portfolio-shell .ia-4b-field textarea{min-height:100px;resize:vertical}
-.portfolio-shell .ia-4b-field :is(input,select,textarea):focus,.portfolio-shell .ia-4b-fee-item input:focus{border-color:#cb6068;box-shadow:0 0 0 3px #e65f6719}
-.portfolio-shell .ia-4b-field small{font-size:10px;line-height:1.5;color:#7c8596}
-.portfolio-shell .ia-4b-fee-rows{display:grid;gap:12px;padding:0 25px 13px}
-.portfolio-shell .ia-4b-fee-item{padding:16px;border:1px solid #e3e5ec;background:#f9f9fc;border-radius:12px}
-.portfolio-shell .ia-4b-fee-index{display:block;color:#cb525c;font-size:10px;font-weight:850;letter-spacing:.09em;margin-bottom:12px}
-.portfolio-shell .ia-4b-fee-item label{display:grid;gap:6px;flex:1;min-width:0}
-.portfolio-shell .ia-4b-fee-numbers{display:flex;gap:10px;margin-top:11px;align-items:end}
-.portfolio-shell .ia-4b-fee-numbers label:first-child{flex:0 0 25%}
-.portfolio-shell .ia-4b-fee-numbers>button{width:43px;height:43px;display:grid;place-items:center;border-radius:9px;border:1px solid #e6d5d7;color:#c2525a;background:#fff;flex-shrink:0}
-.portfolio-shell .ia-4b-fee-numbers>button:disabled{opacity:.35;cursor:not-allowed}
-.portfolio-shell .ia-4b-add-line{display:flex;align-items:center;gap:10px;color:#ca4f5b;font-size:12px;font-weight:800;padding:11px 25px 22px}
-.portfolio-shell .ia-4b-add-line>span{color:#8a939f}
-.portfolio-shell .ia-4b-add-line:disabled{opacity:.45}
-.portfolio-shell .ia-4b-total-preview{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:19px 25px;background:#fcebed;color:#7d4f57}
-.portfolio-shell .ia-4b-total-preview span{font-size:12px;font-weight:800}
-.portfolio-shell .ia-4b-total-preview strong{font-size:19px;font-weight:850;color:#b64351}
-.portfolio-shell .ia-4b-preview-panel{position:sticky;top:20px;min-width:0;background:#f3f4f8;border:1px solid #e2e5ec;border-radius:20px;padding:23px;box-shadow:0 18px 45px #36465f0e}
-.portfolio-shell .ia-4b-preview-toolbar{display:flex;justify-content:space-between;align-items:flex-start;gap:15px}
-.portfolio-shell .ia-4b-preview-toolbar>div{display:grid;gap:5px}
-.portfolio-shell .ia-4b-preview-toolbar>div>span{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#b74c58;font-weight:850}
-.portfolio-shell .ia-4b-preview-toolbar strong{font-size:23px;color:#2a3241;letter-spacing:-.055em}
-.portfolio-shell .ia-4b-preview-toolbar small{font-size:12px;color:#7b8495}
-.portfolio-shell .ia-4b-draft-badge{font-size:10px;font-weight:850;text-transform:uppercase;letter-spacing:.08em;color:#aa4b55;background:#fbe3e7;border:1px solid #f0cbd0;border-radius:99px;padding:8px 10px;flex-shrink:0}
-.portfolio-shell .ia-4b-preview-controls{display:flex;gap:8px;margin-top:22px;flex-wrap:wrap}
-.portfolio-shell .ia-4b-preview-controls>button{display:inline-flex;align-items:center;gap:8px;padding:12px 13px;border-radius:9px;background:white;border:1px solid #dce0e8;color:#485368;font-weight:800;font-size:12px}
-.portfolio-shell .ia-4b-preview-controls>button:hover{color:#c74f5b;border-color:#ce888f}
-.portfolio-shell .ia-4b-preview-controls-secondary{margin-top:14px}
-.portfolio-shell .ia-4b-preview-controls-secondary>button{background:#fff5f6;border-color:#f1d0d5;color:#ad4653}
-.portfolio-shell .ia-4b-import-input{display:none!important}
-
-.portfolio-shell .ia-4b-utility-status{font-size:11px;line-height:1.6;color:#737e8e;margin:10px 0 17px;min-height:19px}
-.portfolio-shell .ia-4b-paper{min-width:0;padding:clamp(22px,3vw,45px);background:#fff;border:1px solid #e5e7ec;box-shadow:0 18px 34px #232d4020;min-height:620px}
-.portfolio-shell .ia-4b-paper>header{display:flex;align-items:center;justify-content:space-between;gap:10px;padding-bottom:18px;border-bottom:3px solid #de6067;flex-wrap:wrap}
-.portfolio-shell .ia-4b-paper>header strong{font-size:13px;font-weight:850;letter-spacing:.06em;color:#232b39}
-.portfolio-shell .ia-4b-paper>header strong span{color:#d1515f;font-size:24px;letter-spacing:-.09em;padding-right:8px}
-.portfolio-shell .ia-4b-paper>header small{font-size:8px;color:#9098a5;font-weight:800;letter-spacing:.07em}
-.portfolio-shell .ia-4b-paper pre{white-space:pre-wrap;overflow-wrap:anywhere;font:400 12px/1.85 "DM Sans",Arial,sans-serif;color:#2f3744;margin:26px 0 0}
-.portfolio-shell .ia-4b-legal-note{display:flex;align-items:flex-start;gap:11px;background:#fff;border:1px solid #e0e4eb;padding:16px;margin-top:15px;border-radius:12px}
-.portfolio-shell .ia-4b-legal-note svg{color:#cd5662;flex-shrink:0}
-.portfolio-shell .ia-4b-legal-note p{color:#6e7a8d;font-size:11px;line-height:1.75}
-@media(max-width:950px){
- .portfolio-shell .ia-4b-onboarding-grid{gap:4%}
- .portfolio-shell .ia-4b-builder-grid{grid-template-columns:1fr}
- .portfolio-shell .ia-4b-preview-panel{position:static}
-}
-@media(max-width:760px){
- .portfolio-shell .ia-4b-hero,.portfolio-shell .ia-4b-doc-hero{padding-bottom:55px}
- .portfolio-shell .ia-4b-onboarding{padding:52px 0 65px}
- .portfolio-shell .ia-4b-onboarding-grid{grid-template-columns:1fr;gap:22px}
- .portfolio-shell .ia-4b-aside{position:static;padding:6px 0}
- .portfolio-shell .ia-4b-aside h2{font-size:clamp(32px,8vw,46px)}
- .portfolio-shell .ia-4b-check-row{padding:14px 4px}
- .portfolio-shell .ia-4b-form-column .ia-enquiry-card-heading h2{font-size:30px}
- .portfolio-shell .ia-4b-doc-workspace{padding:45px 0 65px}
- .portfolio-shell .ia-4b-doc-topbar{align-items:flex-start;flex-direction:column}
- .portfolio-shell .ia-4b-doc-topbar h2{font-size:clamp(31px,7.4vw,43px)}
- .portfolio-shell .ia-4b-doc-picker{margin-right:-14px}
- .portfolio-shell .ia-4b-input-grid{padding:0 17px 22px;gap:13px;grid-template-columns:minmax(0,1fr)}
- .portfolio-shell .ia-4b-edit-section summary{padding:19px 17px}
- .portfolio-shell .ia-4b-fee-rows{padding:0 17px 13px}
- .portfolio-shell .ia-4b-add-line{padding-left:17px}
- .portfolio-shell .ia-4b-panel-head{padding:23px 17px}
- .portfolio-shell .ia-4b-total-preview{padding:17px}
- .portfolio-shell .ia-4b-preview-panel{padding:15px}
- .portfolio-shell .ia-4b-paper{padding:20px;min-height:350px}
- .portfolio-shell .ia-4b-paper pre{font-size:11px;line-height:1.8}
-}
-@media(prefers-color-scheme:dark){
- .portfolio-shell .ia-4b-page,.portfolio-shell .ia-4b-doc-workspace,.portfolio-shell .ia-4b-onboarding{background:#1b1b1b;color:#e9e9e9}
- .portfolio-shell .ia-4b-page h2{color:#f4f4f4}
- .portfolio-shell .ia-4b-page h2 em{color:#ff9aa2}
- .portfolio-shell .ia-4b-aside>p:not(.p-label),.portfolio-shell .ia-4b-check-row small{color:#ccc}
- .portfolio-shell .ia-4b-check-progress>div{background:#484848}
- .portfolio-shell .ia-4b-checklist,.portfolio-shell .ia-4b-check-row{border-color:#4c4c4c}
- .portfolio-shell .ia-4b-check-row strong{color:#f0f0f0}
- .portfolio-shell .ia-4b-check-mark{border-color:#8c8c8c}
- .portfolio-shell .ia-4b-privacy{background:#303030;border-color:#515151}
- .portfolio-shell .ia-4b-privacy p{color:#dadada}
- .portfolio-shell .ia-4b-private-note{background:#38292c;border-color:#66474d}
- .portfolio-shell .ia-4b-private-note p{color:#e4c5c8}
- .portfolio-shell .ia-4b-private-note strong{color:#ffacb2}
- .portfolio-shell .ia-4b-private-note svg{color:#ff9ea4}
- .portfolio-shell .ia-4b-clear,.portfolio-shell .ia-4b-edit-panel,.portfolio-shell .ia-4b-doc-picker button,.portfolio-shell .ia-4b-preview-panel{background:#292929;border-color:#515151;color:#f1f1f1}
- .portfolio-shell .ia-4b-doc-picker button.ia-4b-doc-active{color:#fff;background:linear-gradient(115deg,#e46c65,#be4356)}
- .portfolio-shell .ia-4b-panel-head{background:linear-gradient(120deg,#3a292e,#292929);border-color:#515151}
- .portfolio-shell .ia-4b-panel-head>strong,.portfolio-shell .ia-4b-edit-section summary,.portfolio-shell .ia-4b-preview-toolbar strong{color:#f4f4f4}
- .portfolio-shell .ia-4b-edit-section{border-color:#4c4c4c}
- .portfolio-shell .ia-4b-edit-section summary>span:last-child{border-color:#545454}
- .portfolio-shell .ia-4b-field>span,.portfolio-shell .ia-4b-fee-item label>span{color:#dedede}
- .portfolio-shell .ia-4b-field :is(input,select,textarea),.portfolio-shell .ia-4b-fee-item input{color:#f4f4f4;background:#222;border-color:#595959}
- .portfolio-shell .ia-4b-fee-item{background:#303030;border-color:#515151}
- .portfolio-shell .ia-4b-fee-numbers>button{background:#292929;border-color:#5a4549;color:#ff9da5}
- .portfolio-shell .ia-4b-total-preview{background:#392b2f}
- .portfolio-shell .ia-4b-total-preview span{color:#e4c6cb}
- .portfolio-shell .ia-4b-total-preview strong{color:#ffadb3}
- .portfolio-shell .ia-4b-preview-controls>button,.portfolio-shell .ia-4b-legal-note{background:#343434;border-color:#525252;color:#ddd}
- .portfolio-shell .ia-4b-preview-controls-secondary>button{background:#433137;border-color:#76515b;color:#ffbec4}
-
- .portfolio-shell .ia-4b-preview-toolbar small,.portfolio-shell .ia-4b-utility-status,.portfolio-shell .ia-4b-legal-note p{color:#d0d0d0}
- .portfolio-shell .ia-4b-paper{background:#fff;border-color:#ccc;color:#222}
- .portfolio-shell .ia-4b-paper pre{color:#2e3744}
- .portfolio-shell .ia-4b-draft-badge{background:#473237;color:#ffc6ca;border-color:#6b4950}
-}
-@media print{
- @page{size:A4;margin:17mm}
- body,html{background:#fff!important;color:#111!important}
- .portfolio-shell .p-header,.portfolio-shell .p-footer,.portfolio-shell .p-skip,
- .portfolio-shell .ia-4b-doc-hero,.portfolio-shell .ia-4b-private-note,
- .portfolio-shell .ia-4b-doc-topbar,.portfolio-shell .ia-4b-doc-picker,
- .portfolio-shell .ia-4b-edit-panel,.portfolio-shell .ia-4b-preview-toolbar,
- .portfolio-shell .ia-4b-preview-controls,.portfolio-shell .ia-4b-utility-status,
- .portfolio-shell .ia-4b-legal-note{display:none!important}
- .portfolio-shell .ia-4b-docs-page,.portfolio-shell .ia-4b-doc-workspace,
- .portfolio-shell .ia-4b-preview-panel{padding:0!important;margin:0!important;background:#fff!important;border:0!important;box-shadow:none!important;min-height:0!important}
- .portfolio-shell .ia-4b-doc-workspace>.p-container{max-width:none!important;width:100%!important;padding:0!important}
- .portfolio-shell .ia-4b-builder-grid{display:block!important}
- .portfolio-shell .ia-4b-paper{padding:0!important;margin:0!important;border:0!important;box-shadow:none!important;min-height:0!important;background:#fff!important}
- .portfolio-shell .ia-4b-paper pre{font:11pt/1.65 Arial,sans-serif!important;color:#111!important;white-space:pre-wrap!important;overflow-wrap:anywhere!important}
- .portfolio-shell .ia-4b-paper>header strong{color:#111!important}
-}
 
 /* Compact onboarding entry on Services; homepage remains untouched. */
 .portfolio-shell .ia-4b-service-bridge{padding:12px 0 65px;background:#f8f8fa}
@@ -204,110 +51,28 @@
 }
 
 
-/* Direct navigation to Document Studio from Services and Client Onboarding. */
-.portfolio-shell .ia-4b-bridge-actions{
-  display:grid;
-  justify-items:stretch;
-  flex-shrink:0;
-  gap:12px;
-  width:min(100%,315px)
-}
-.portfolio-shell .ia-4b-bridge-actions .ia-stage-primary{
-  justify-content:space-between;
-  white-space:normal;
-  width:100%;
-  text-align:left
-}
-.portfolio-shell .ia-4b-studio-link{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:12px;
-  min-height:51px;
-  padding:13px 22px;
-  border:1px solid #d9a3aa;
-  border-radius:99px;
-  color:#b64755;
-  background:#fff;
-  font-size:13px;
-  font-weight:850;
-}
-.portfolio-shell .ia-4b-studio-link:hover{
-  background:#fff4f5;
-  border-color:#cf6b76;
-}
-.portfolio-shell .ia-4b-onboarding-resources{
-  display:grid;
-  gap:19px;
-  justify-items:start;
-  margin-top:23px;
-}
-.portfolio-shell .ia-4b-onboarding-studio{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:16px;
-  width:100%;
-  border:1px solid #e9c4c9;
-  border-radius:15px;
-  padding:17px 19px;
-  background:linear-gradient(115deg,#fff0f2,#fff 90%);
-  color:#bb4d5b;
-}
-.portfolio-shell .ia-4b-onboarding-studio>span{display:grid;gap:5px}
-.portfolio-shell .ia-4b-onboarding-studio strong{font-size:16px;font-weight:850;letter-spacing:-.03em}
-.portfolio-shell .ia-4b-onboarding-studio small{font-size:12px;line-height:1.55;color:#667285}
-.portfolio-shell .ia-4b-onboarding-studio>svg{flex-shrink:0}
+
 @media(max-width:760px){
-  .portfolio-shell .ia-4b-bridge-actions{width:100%}
-  .portfolio-shell .ia-4b-studio-link{width:100%}
+  .portfolio-shell .ia-4b-hero{padding-bottom:55px}
+  .portfolio-shell .ia-4b-onboarding{padding:52px 0 65px}
+  .portfolio-shell .ia-4b-onboarding-grid{grid-template-columns:minmax(0,1fr);gap:22px}
+  .portfolio-shell .ia-4b-aside{position:static;padding:6px 0}
+  .portfolio-shell .ia-4b-aside h2{font-size:clamp(32px,8vw,46px)}
+  .portfolio-shell .ia-4b-check-row{padding:14px 4px}
+  .portfolio-shell .ia-4b-form-column .ia-enquiry-card-heading h2{font-size:30px}
 }
 @media(prefers-color-scheme:dark){
-  .portfolio-shell .ia-4b-studio-link{
-    background:#352b2d;
-    border-color:#81535b;
-    color:#ffc1c5;
-  }
-  .portfolio-shell .ia-4b-studio-link:hover{background:#413034}
-  .portfolio-shell .ia-4b-onboarding-studio{
-    background:linear-gradient(115deg,#382a2e,#292929 90%);
-    border-color:#68444b;
-    color:#ffb5bc;
-  }
-  .portfolio-shell .ia-4b-onboarding-studio small{color:#d4d4d4}
+  .portfolio-shell .ia-4b-page,.portfolio-shell .ia-4b-onboarding{background:#1b1b1b;color:#e9e9e9}
+  .portfolio-shell .ia-4b-page h2{color:#f4f4f4}
+  .portfolio-shell .ia-4b-page h2 em{color:#ff9aa2}
+  .portfolio-shell .ia-4b-aside>p:not(.p-label),.portfolio-shell .ia-4b-check-row small{color:#ccc}
+  .portfolio-shell .ia-4b-check-progress>div{background:#484848}
+  .portfolio-shell .ia-4b-checklist,.portfolio-shell .ia-4b-check-row{border-color:#4c4c4c}
+  .portfolio-shell .ia-4b-check-row strong{color:#f0f0f0}
+  .portfolio-shell .ia-4b-check-mark{border-color:#8c8c8c}
+  .portfolio-shell .ia-4b-privacy{background:#303030;border-color:#515151}
+  .portfolio-shell .ia-4b-privacy p{color:#dadada}
 }
-
-
-/* Owner-only access screen for local document studio */
-.portfolio-shell .ia-studio-auth-page{min-height:100vh}
-.portfolio-shell .ia-studio-login-wrap{padding:145px 0 90px;background:#f2f4f8;min-height:calc(100vh - 160px)}
-.portfolio-shell .ia-studio-login-wrap>.p-container{max-width:780px}
-.portfolio-shell .ia-studio-login-card{margin:31px auto 0;padding:clamp(27px,5vw,58px);max-width:620px;background:#fff;border:1px solid #e3e6ed;border-radius:25px;box-shadow:0 25px 70px #36425915}
-.portfolio-shell .ia-studio-lock-icon{display:grid;place-items:center;width:54px;height:54px;background:linear-gradient(135deg,#fbd6da,#fff1f1);border:1px solid #edc7ce;color:#c8475b;border-radius:16px;margin-bottom:24px}
-.portfolio-shell .ia-studio-login-card h1{font:850 clamp(35px,6vw,57px)/1.1 Manrope,"DM Sans",sans-serif;color:#252a38;letter-spacing:-.065em;margin:17px 0 20px}
-.portfolio-shell .ia-studio-login-card h1 em{color:#d65864}
-.portfolio-shell .ia-studio-login-desc{font-size:14px;line-height:1.8;color:#687487;max-width:470px}
-.portfolio-shell .ia-studio-login-form{margin-top:29px;display:grid;gap:12px}
-.portfolio-shell .ia-studio-login-form>label{font-size:13px;font-weight:850;color:#2c3544}
-.portfolio-shell .ia-studio-login-form>input{width:100%;min-height:52px;padding:12px 17px;border:1px solid #d6dce6;background:#fcfcfe;border-radius:11px;color:#293344;font-size:16px}
-.portfolio-shell .ia-studio-login-primary{margin-top:9px;min-height:52px;justify-content:space-between!important;width:100%}
-.portfolio-shell .ia-studio-auth-error{background:#fff0f0;color:#b73b49;padding:13px;border:1px solid #efbec3;border-radius:10px;font-size:13px;line-height:1.6}
-.portfolio-shell .ia-studio-login-note{display:flex;align-items:flex-start;gap:10px;margin-top:24px;padding-top:22px;border-top:1px solid #e4e6ee;font-size:12px;line-height:1.75;color:#7e8897}
-.portfolio-shell .ia-studio-login-note svg{flex-shrink:0;color:#ca5662;margin-top:2px}
-.portfolio-shell .ia-studio-owner-controls{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
-@media(max-width:760px){
- .portfolio-shell .ia-studio-login-wrap{padding:105px 0 50px}
- .portfolio-shell .ia-studio-login-card{margin-top:25px}
-}
-@media(prefers-color-scheme:dark){
- .portfolio-shell .ia-studio-login-wrap{background:#191919}
- .portfolio-shell .ia-studio-login-card{background:#292929;border-color:#505050;box-shadow:0 25px 70px #0005}
- .portfolio-shell .ia-studio-login-card h1{color:#f8f8f8}
- .portfolio-shell .ia-studio-login-card h1 em{color:#ff9fa6}
- .portfolio-shell .ia-studio-login-desc,.portfolio-shell .ia-studio-login-note{color:#d3d3d3}
- .portfolio-shell .ia-studio-lock-icon{background:#442d34;border-color:#6d464e;color:#ff99a4}
- .portfolio-shell .ia-studio-login-form>label{color:#f2f2f2}
- .portfolio-shell .ia-studio-login-form>input{background:#222;color:#fff;border-color:#555}
- .portfolio-shell .ia-studio-auth-error{background:#492c30;border-color:#714147;color:#ffc3c9}
- .portfolio-shell .ia-studio-login-note{border-color:#515151}
+@media(prefers-reduced-motion:reduce){
+  .portfolio-shell .ia-4b-check-progress>div>span{transition:none}
 }
