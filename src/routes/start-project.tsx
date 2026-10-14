@@ -3,6 +3,7 @@ import { track } from "@vercel/analytics";
 import { useRef, type FormEvent } from "react";
 import { ArrowLeft, ArrowRight, ArrowUpRight, CheckCircle2, Mail, MessageCircle, ShieldCheck, Sparkles } from "lucide-react";
 import { services } from "@/lib/freelance-services";
+import {industryPages,isIndustrySlug} from "@/lib/industry-pages";
 
 const DESTINATION_EMAIL = "alliibrahim3@gmail.com";
 const WHATSAPP_NUMBER = "905488534011";
@@ -20,6 +21,7 @@ export const Route = createFileRoute("/start-project")({
   validateSearch: (search: Record<string, unknown>) => ({
     service: typeof search.service === "string" ? search.service : "",
     plan: typeof search.plan === "string" ? search.plan.slice(0,60) : "",
+    industry: typeof search.industry === "string" && isIndustrySlug(search.industry) ? search.industry : "",
   }),
   head: () => ({
     meta: [
@@ -35,7 +37,7 @@ export const Route = createFileRoute("/start-project")({
 });
 
 function StartProjectPage() {
-  const { service, plan } = Route.useSearch();
+  const { service, plan, industry } = Route.useSearch();
   const formRef = useRef<HTMLFormElement>(null);
   const selectedService = Object.prototype.hasOwnProperty.call(serviceLabels, service) ? service : "not-sure";
 
@@ -54,6 +56,7 @@ function StartProjectPage() {
       `Email: ${get("email")}`,
       `Business / brand: ${get("business") || "Not provided"}`,
       `Project type: ${serviceName}`,
+      ...(industry && isIndustrySlug(industry) ? [`Website context: ${industryPages[industry].label}`] : []),
       ...(get("plan") ? [`Support option: ${get("plan")}`] : []),
       `Budget range: ${get("budget") || "To be discussed"}`,
       `Target timeline: ${get("timeline") || "Flexible"}`,
@@ -72,6 +75,8 @@ function StartProjectPage() {
     if (!payload) return;
     // Records only a click to open the chosen app, never a completed enquiry or personal details.
     track("portfolio_enquiry_handoff", { channel: method, service: payload.serviceName });
+    // Only predefined industry codes are tracked; never capture names, URLs or free text.
+    if (isIndustrySlug(industry)) track("portfolio_industry_enquiry_handoff", {channel:method, industry});
     if (method === "email") {
       const subject = encodeURIComponent(`Project enquiry — ${payload.serviceName}`);
       window.location.href = `mailto:${DESTINATION_EMAIL}?subject=${subject}&body=${encodeURIComponent(payload.brief)}`;
@@ -104,6 +109,7 @@ function StartProjectPage() {
             <p className="p-label">01 / Your idea</p>
             <h2>Tell me about<br /><em>your project.</em></h2>
             <p>I'll use these answers as a starting point for understanding your goals, not as an automatic quote or a commitment to a fixed price.</p>
+            {isIndustrySlug(industry) && <div className="ia-4c-form-industry"><span>For your industry:</span><strong>{industryPages[industry].label}</strong></div>}
             <div className="ia-enquiry-support">
               <div><CheckCircle2 size={19} aria-hidden="true" /><span>Clear project scope before pricing</span></div>
               <div><CheckCircle2 size={19} aria-hidden="true" /><span>Mobile-friendly design as a priority</span></div>
