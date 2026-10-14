@@ -144,7 +144,7 @@ export const projects: Project[] = [
     type: "E-commerce Website",
     image: jisImage,
     summary:
-      "A brand-led online store for beauty and fragrance shoppers, with mobile product browsing and a clear path from discovery to checkout.",
+      "A brand-led beauty and fragrance storefront developed for JIS, with mobile product browsing and an ordering experience prepared ahead of commercial launch.",
     tags: [
       "E-commerce",
       "Responsive design",
@@ -158,7 +158,7 @@ export const projects: Project[] = [
     build:
       "A responsive storefront with product categories, product detail pages, cart/checkout experience, brand presentation and supporting editorial content.",
     result:
-      "A live storefront where customers can explore products and follow a shopping flow. Sales growth and checkout conversion are not represented as measured outcomes.",
+      "A developed, browseable storefront experience prepared for the brand. JIS has not begun using it for customer sales, so no orders or sales results are claimed.",
     tools: [
       "Website design",
       "E-commerce",
@@ -173,8 +173,8 @@ export const projects: Project[] = [
       "Shopping-cart and checkout experience",
       "Brand content and editorial section",
     ],
-    evidenceNote: "Live business website. Results describe shipped functionality, not invented business metrics.",
-    engagementContext: "A real, family-operated beauty and fragrance business. I designed its online storefront and continue improving its digital experience.",
+    evidenceNote: "Real family-business website developed and available to review; the brand is not yet operating online sales through it.",
+    engagementContext: "A real family-operated beauty and fragrance brand. I designed its storefront in preparation for launch; it is not yet being used to sell to customers.",
     walkthrough: [
       {
         label: "01 / Discover",
@@ -191,7 +191,7 @@ export const projects: Project[] = [
       {
         label: "03 / Order",
         title: "Keep the shopping path understandable.",
-        detail: "A cart and checkout journey helps customers organise selections and proceed with the store's available ordering and payment methods.",
+        detail: "The designed cart and checkout flow demonstrates the intended ordering experience; it should not be confused with a commercially launched store.",
         value: "A guided order flow aligned with the store",
       },
     ],
