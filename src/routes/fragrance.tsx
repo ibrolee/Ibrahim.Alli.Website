@@ -72,8 +72,11 @@ export const Route=createFileRoute("/fragrance")({
     {title:"Scent Cabinet — Ibrahim Alli's Fragrance Journal"},
     {name:"description",content:"A personal fragrance collection and wishlist by Ibrahim Alli."},
     {name:"robots",content:"noindex,nofollow"},
-    {name:"theme-color",content:"#f5f0e6"}
-  ],links:[{rel:"stylesheet",href:css},{rel:"canonical",href:"https://ibrahimalli.com/fragrance"}]}),
+    {name:"theme-color",content:"#f5f0e6"},
+    {name:"apple-mobile-web-app-capable",content:"yes"},
+    {name:"apple-mobile-web-app-title",content:"Scent Cabinet"},
+    {name:"apple-mobile-web-app-status-bar-style",content:"default"}
+  ],links:[{rel:"stylesheet",href:css},{rel:"manifest",href:"/fragrance.webmanifest"},{rel:"apple-touch-icon",href:"/fragrance-icon.svg"},{rel:"canonical",href:"https://ibrahimalli.com/fragrance"}]}),
   component:Fragrance
 });
 function Fragrance(){
