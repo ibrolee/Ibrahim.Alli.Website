@@ -293,12 +293,14 @@ function RootComponent() {
   const isSafiyyrConcept = pathname.startsWith("/safiyyr");
   const isSallysConcept = pathname.startsWith("/sallys-apparel");
   const isSuperPlusStudios = pathname.startsWith("/super-plus-studios");
+  const isFragrance = pathname === "/fragrance" || pathname.startsWith("/fragrance/");
   const isStandaloneConcept =
     pathname === "/mims" || pathname.startsWith("/mims/") ||
     isDayyahConcept ||
     isSafiyyrConcept ||
     isSallysConcept ||
-    isSuperPlusStudios;
+    isSuperPlusStudios ||
+    isFragrance;
 
   return (
     <QueryClientProvider client={queryClient}>
