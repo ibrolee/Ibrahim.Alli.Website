@@ -5,14 +5,14 @@ import css from "../fragrance.css?url";
 
 type Currency = "NGN" | "USD";
 type Page = "collection" | "discover" | "wishlist" | "journal" | "layer";
-type Perfume = { id: string; name: string; brand: string; image?: string; year?: string; family?: string; description?: string; notes: string[]; top: string[]; heart: string[]; base: string[]; accords: string[] };
+type Perfume = { id: string; name: string; brand: string; image?: string | undefined; year?: string | undefined; family?: string | undefined; description?: string | undefined; notes: string[]; top: string[]; heart: string[]; base: string[]; accords: string[] };
 type Owned = { perfume: Perfume; amount: number; currency: Currency; added: string; favorite?: boolean };
 type Wear = { id: string; perfumeId: string; date: string };
 type Mix = { id: string; left: string; right: string; date: string };
 type State = { collection: Owned[]; wishlist: Perfume[]; wears: Wear[]; mixes: Mix[]; currency: Currency };
 const STORAGE = "ia-scent-cabinet-v1";
 const initial: State = { collection: [], wishlist: [], wears: [], mixes: [], currency: "NGN" };
-const API = "https://api.thepreservationnetwork.org/v1/fragrances";
+const API = "/api/fragrance";
 
 function bits(value: unknown): string[] {
   if (!value) return [];
@@ -165,8 +165,8 @@ function Fragrance(){
   };
   const allMyPerfumes=store.collection.map(x=>x.perfume);
   const left=allMyPerfumes.find(x=>x.id===layerA),right=allMyPerfumes.find(x=>x.id===layerB);
-  const aAcc=new Set([...left?.notes||[],...left?.accords||[]].map(s=>s.toLowerCase()));
-  const match=[...right?.notes||[],...right?.accords||[]].filter(n=>aAcc.has(n.toLowerCase()));
+  const aAcc=new Set([...(left?.notes||[]),...(left?.accords||[])].map(s=>s.toLowerCase()));
+  const match=[...(right?.notes||[]),...(right?.accords||[])].filter(n=>aAcc.has(n.toLowerCase()));
   return <main id="main-content" className="sc-app">
     <header className="sc-topbar"><a href="/" className="sc-back"><ArrowLeft size={17}/> IBRAHIM ALLI</a><a href="/fragrance" className="sc-wordmark" aria-label="Scent Cabinet home">SCENT<span> / </span>CABINET</a><button className="sc-top-action" onClick={()=>setBackupOpen(true)}><Download size={17}/><span>My data</span></button></header>
     <div className="sc-inner">
