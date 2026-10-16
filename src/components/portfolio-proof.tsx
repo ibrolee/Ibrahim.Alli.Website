@@ -1,3 +1,4 @@
+import { SuperplusProjectVisual } from "@/components/superplus-project-visual";
 import { Link } from "@tanstack/react-router";
 import { ArrowRight, ArrowUpRight, BadgeCheck, FileText } from "lucide-react";
 import { projects } from "@/lib/portfolio-content";
@@ -15,7 +16,7 @@ export function PortfolioProof() {
           {projects.map((project) => (
             <article className="ia-proof-card" key={project.slug}>
               <div className="ia-proof-thumb">
-                {project.slug === "jis-beauty-fashion" ? <JisProjectVisual className="jis-portfolio-fill" /> :
+                {project.slug === "jis-beauty-fashion" ? <JisProjectVisual className="jis-portfolio-fill" /> : project.slug === "super-plus-fitness" ? <SuperplusProjectVisual /> :
                 <img src={project.image} alt={`${project.name} project visual presentation`} loading="lazy" decoding="async" width={1600} height={1000}/>}
                 <span><BadgeCheck size={16} aria-hidden="true"/> Live business project</span>
               </div>

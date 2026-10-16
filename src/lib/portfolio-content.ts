@@ -90,8 +90,8 @@ export const projects: Project[] = [
     type: "Business Website & Digital Systems",
     image: superplusImage,
     summary:
-      "A live fitness website supported by digital membership, payment, QR attendance and team-management workflows for a Lagos gym.",
-    tags: ["Website", "Memberships", "Business systems"],
+      "A connected gym experience: public website, memberships and payments, QR attendance, team portals and a member app.",
+    tags: ["Website", "Team portals", "Member app"],
     url: "https://www.superplusfitness.com",
     challenge:
       "Move beyond a simple brochure site so members can explore plans and the team can manage registrations, payments and check-ins with less disconnected manual work.",
@@ -104,8 +104,9 @@ export const projects: Project[] = [
     tools: [
       "React",
       "TanStack",
-      "Vercel",
+      "Cloudflare Workers",
       "Supabase",
+      "Expo / React Native",
       "Payment integration",
     ],
     deliverables: [
@@ -113,6 +114,8 @@ export const projects: Project[] = [
       "Digital membership registration and payments",
       "QR check-in and member account experience",
       "Reception, coach and staff operating tools",
+      "Member app with SP Points, rewards and challenges",
+      "Spa and recovery service booking journey",
     ],
     evidenceNote: "Live website and functional workflows. No unverified revenue or conversion statistics.",
     engagementContext: "An ongoing digital project for a family-operated fitness and wellness business I help manage — not an unrelated external agency commission.",

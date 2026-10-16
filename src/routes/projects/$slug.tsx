@@ -1,3 +1,5 @@
+import { SuperplusScreenGallery } from "@/components/superplus-screen-gallery";
+import { SuperplusProjectVisual } from "@/components/superplus-project-visual";
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { ArrowLeft, ArrowRight, ExternalLink, Check, Smartphone, Users, QrCode, CreditCard } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -69,14 +71,16 @@ function ProjectPage() {
         <figure className="mx-auto max-w-[1480px] overflow-hidden">
           {project.slug === "jis-beauty-fashion" ? (
             <JisProjectVisual className="jis-portfolio-case-hero" />
+          ) : isFitness ? (
+            <SuperplusProjectVisual className="spf-project-case-hero" />
           ) : (
             <img src={project.image} alt={`${project.name} project presentation`} width={1600} height={1000} decoding="async" className="block h-auto w-full" />
           )}
-          {isFitness && <figcaption className="border-b border-border py-4 text-xs leading-5 text-muted-foreground">Project presentation · Explore the live website for the current customer experience.</figcaption>}
+          {isFitness && <figcaption className="border-b border-border py-4 text-xs leading-5 text-muted-foreground">Live website captures · Memberships, team portals and the official app presentation. Explore each screen below.</figcaption>}
         </figure>
       </div>
 
-      {!isConcept && <ProjectWalkthrough project={project} />}
+      {isFitness ? <SuperplusScreenGallery /> : !isConcept && <ProjectWalkthrough project={project} />}
 
       {decision && (
         <section className="ia-4d-case-notes" aria-labelledby="design-decisions-heading">

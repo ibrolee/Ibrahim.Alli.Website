@@ -1,3 +1,4 @@
+import { SuperplusProjectVisual } from "@/components/superplus-project-visual";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { track } from "@vercel/analytics";
 import { ArrowDown, ArrowRight, MoveUpRight, MessageCircle, Monitor, Smartphone, ArrowUpRight } from "lucide-react";
@@ -126,6 +127,8 @@ function Home() {
                 >
                   {project.slug === "jis-beauty-fashion" ? (
                     <JisProjectVisual className="jis-portfolio-fill" />
+                  ) : project.slug === "super-plus-fitness" ? (
+                    <SuperplusProjectVisual />
                   ) : (
                     <img
                       src={project.image}
