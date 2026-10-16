@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ArrowLeft, ArrowRight, Bookmark, Check, ChevronDown, CloudOff, Download, FlaskConical, Heart, Layers, Plus, Search, ShoppingBag, Sparkles, Trash2, Upload, Wallet, X } from "lucide-react";
-import { seedSearch, SCENT_SEED } from "@/lib/scent-catalog-seed";
+import { seedSearch } from "@/lib/scent-catalog-seed";
 import css from "../fragrance.css?url";
 
 type Currency = "NGN" | "USD";
@@ -39,9 +39,9 @@ function normalize(row: any): Perfume | null {
   const rawBrand = d.Brand || d.brand || d.house || d.brand_name || "";
   const brand = typeof rawBrand === "object" ? String(rawBrand?.name || "Unknown house") : String(rawBrand || "Unknown house");
   if (!name) return null;
-  const top = bits(d.top_notes || d["Top Notes"] || d.Top);
-  const heart = bits(d.middle_notes || d.heart_notes || d["Middle Notes"] || d.Heart);
-  const base = bits(d.base_notes || d["Base Notes"] || d.Base);
+  const top = bits(d.top_notes || d.top || d["Top Notes"] || d.Top);
+  const heart = bits(d.middle_notes || d.heart_notes || d.heart || d["Middle Notes"] || d.Heart);
+  const base = bits(d.base_notes || d.base || d["Base Notes"] || d.Base);
   return {
     id: "db:" + String(row.id || d.id || brand + ":" + name),
     name, brand, image: imageFrom(d), top, heart, base,
@@ -62,7 +62,7 @@ function sanitize(source: any): State {
     currency: source.currency==="USD"?"USD":"NGN"
   };
 }
-function money(value:number,c:Currency) { return new Intl.NumberFormat("en-US",{style:"currency",currency:c,maximumFractionDigits:0}).format(value).replace("NGN","₦"); }
+function money(value:number,c:Currency) { return new Intl.NumberFormat("en-US",{style:"currency",currency:c,minimumFractionDigits:0,maximumFractionDigits:2}).format(value).replace("NGN","₦"); }
 function pic(p:Perfume,size="card"){return p.image ? <img loading="lazy" src={p.image} alt={p.brand+" "+p.name+" perfume bottle"} onError={e=>{e.currentTarget.style.display="none";e.currentTarget.parentElement?.classList.add("sc-image-missing")}}/> : <FlaskConical aria-hidden="true" size={size==="hero"?70:42} strokeWidth={1} />;}
 function today(){return new Date().toISOString().slice(0,10);}
 function id(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7);}
