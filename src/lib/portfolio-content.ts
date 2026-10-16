@@ -147,11 +147,11 @@ export const projects: Project[] = [
     type: "E-commerce Website",
     image: jisImage,
     summary:
-      "A brand-led beauty and fragrance storefront developed for JIS, with mobile product browsing and an ordering experience prepared ahead of commercial launch.",
+      "A fragrance storefront connecting brand presentation, a filterable catalogue, scent options, shopping bag and checkout.",
     tags: [
       "E-commerce",
-      "Responsive design",
-      "Brand presentation",
+      "Product options",
+      "Shopping journey",
     ],
     url: "https://jisbeautyfashion.com",
     challenge:
@@ -172,7 +172,8 @@ export const projects: Project[] = [
     ],
     deliverables: [
       "Mobile-first store layout and product discovery",
-      "Fragrance categories and product presentation",
+      "Fragrance catalogue with filters and sorting",
+      "Product photography, scent options and stock display",
       "Shopping-cart and checkout experience",
       "Brand content and editorial section",
     ],

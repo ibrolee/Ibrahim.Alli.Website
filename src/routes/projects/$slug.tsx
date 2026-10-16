@@ -1,3 +1,4 @@
+import { JisScreenGallery } from "@/components/jis-screen-gallery";
 import { SuperplusScreenGallery } from "@/components/superplus-screen-gallery";
 import { SuperplusProjectVisual } from "@/components/superplus-project-visual";
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
@@ -76,11 +77,12 @@ function ProjectPage() {
           ) : (
             <img src={project.image} alt={`${project.name} project presentation`} width={1600} height={1000} decoding="async" className="block h-auto w-full" />
           )}
+          {project.slug === "jis-beauty-fashion" && <figcaption className="border-b border-border py-4 text-xs leading-5 text-muted-foreground">Current storefront captures · Product discovery, scent options, shopping bag and checkout. Bag and checkout show a sample item.</figcaption>}
           {isFitness && <figcaption className="border-b border-border py-4 text-xs leading-5 text-muted-foreground">Live website captures · Memberships, team portals and the official app presentation. Explore each screen below.</figcaption>}
         </figure>
       </div>
 
-      {isFitness ? <SuperplusScreenGallery /> : !isConcept && <ProjectWalkthrough project={project} />}
+      {isFitness ? <SuperplusScreenGallery /> : project.slug === "jis-beauty-fashion" ? <JisScreenGallery /> : !isConcept && <ProjectWalkthrough project={project} />}
 
       {decision && (
         <section className="ia-4d-case-notes" aria-labelledby="design-decisions-heading">
