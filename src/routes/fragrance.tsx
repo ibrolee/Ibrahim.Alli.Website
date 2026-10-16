@@ -19,13 +19,13 @@ function bits(value: unknown): string[] {
   if (Array.isArray(value)) return value.flatMap(bits).slice(0, 35);
   if (typeof value === "object") {
     const o = value as Record<string, unknown>;
-    if (o.name || o.note || o.label) return bits(o.name || o.note || o.label);
+    if (o["name"] || o["note"] || o["label"]) return bits(o["name"] || o["note"] || o["label"]);
     return Object.values(o).flatMap(bits).slice(0, 35);
   }
   return String(value).split(/[,;|]/).map(s => s.trim()).filter(Boolean).slice(0, 35);
 }
 function imageFrom(d: Record<string, any>): string | undefined {
-  const candidates = [d["Image URL Transparent"],d["Image URL"],d.image_url,d.image,d.imageUrl,d.photo,d.thumbnail,d.images];
+  const candidates = [d["Image URL Transparent"],d["Image URL"],d["image_url"],d["image"],d["imageUrl"],d["photo"],d["thumbnail"],d["images"]];
   for (const c of candidates) {
     const val = typeof c === "string" ? c : Array.isArray(c) ? c[0] : c?.url || c?.src;
     if (typeof val === "string" && /^https:\/\//i.test(val)) return val;
