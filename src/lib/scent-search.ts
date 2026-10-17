@@ -33,6 +33,7 @@ export function fragranceMatchScore(item:SearchableScent,query:string):number {
   if(qJoined.length>=4 && labelJoined===qJoined)return 990;
   if(qJoined.length>=4 && nameJoined.startsWith(qJoined))return 920;
   if(qJoined.length>=4 && labelJoined.includes(qJoined))return 850;
+  if(qJoined.length>=7 && (near(qJoined,nameJoined)||near(qJoined,labelJoined)))return 700;
   const tokens=words(q);
   const available=words(label);
   if(!tokens.length)return 0;
@@ -51,6 +52,6 @@ export function fragranceMatchScore(item:SearchableScent,query:string):number {
 export function broaderSearchTerm(value:string):string|undefined {
   const q=cleanQuery(value),tokens=words(q).filter(w=>w.length>=4);
   if(!q || !tokens.length)return undefined;
-  const wider=tokens.length>1?tokens[0]!:tokens[0]!.slice(0,tokens[0]!.length>=8?5:4);
+  const wider=tokens.length>1?[...tokens].sort((a,b)=>b.length-a.length)[0]!:tokens[0]!.slice(0,tokens[0]!.length>=8?5:4);
   return wider && wider!==q?wider:undefined;
 }
