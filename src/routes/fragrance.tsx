@@ -621,8 +621,8 @@ function Fragrance(){
     <div><span>My ₦ price</span><strong>{store.insights[selected.id]?.priceNGN!==undefined?money(store.insights[selected.id].priceNGN!,"NGN"):ownedMap.get(selected.id)?.currency==="NGN"?money(ownedMap.get(selected.id)!.amount,"NGN"):"Not added"}</strong></div>
   </div>
   <p className="sc-fact-disclaimer">Performance figures are community perceptions when supplied by a catalogue, or your own entries. Price is only what you saved in ₦. Actual wear and Nigerian shop prices vary.</p>
-  {selected.bestSeasons?.length>0&&<p className="sc-fact-hint">Best seasons: {selected.bestSeasons.join(" · ")}</p>}
-  {selected.bestOccasions?.length>0&&<p className="sc-fact-hint">Occasions: {selected.bestOccasions.join(" · ")}</p>}
+  {Boolean(selected.bestSeasons?.length)&&<p className="sc-fact-hint">Best seasons: {selected.bestSeasons?.join(" · ")}</p>}
+  {Boolean(selected.bestOccasions?.length)&&<p className="sc-fact-hint">Occasions: {selected.bestOccasions?.join(" · ")}</p>}
   {insightEdit==="open"?<form className="sc-insight-form" onSubmit={saveMyInsight}>
     <label>My ₦ price estimate / target <input type="number" inputMode="decimal" min="0" max="100000000" step="0.01" value={insightPrice} onChange={e=>setInsightPrice(e.target.value)} placeholder="e.g. 35000"/></label>
     <label>My longevity rating<select value={insightLongevity} onChange={e=>setInsightLongevity(e.target.value)}><option value="">Use catalogue / not rated</option>{["Poor","Weak","Moderate","Long Lasting","Very Long Lasting"].map(x=><option key={x}>{x}</option>)}</select></label>
