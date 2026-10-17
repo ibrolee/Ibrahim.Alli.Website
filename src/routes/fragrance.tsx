@@ -88,6 +88,7 @@ function Fragrance(){
   const [store,setStore]=useState<State>(initial);
   const [ready,setReady]=useState(false);
   const [query,setQuery]=useState("");
+  const [draftQuery,setDraftQuery]=useState("");
   const [results,setResults]=useState<Perfume[]>([]);
   const [catalogPage,setCatalogPage]=useState(1);
   const [hasMore,setHasMore]=useState(false);
@@ -164,7 +165,7 @@ function Fragrance(){
         setResults(old=>catalogPage===1?local:[...old,...local]);
         setHasMore(false);
       }finally{if(n===searchId.current)setSearching(false);}
-    },query?480:60);
+    },40);
     return()=>{clearTimeout(delay);ctrl.abort()};
   },[page,query,catalogPage,refreshKey]);
   const item=(p:Perfume,context:Page)=>{
@@ -201,8 +202,8 @@ function Fragrance(){
       </section>}
       {page==="discover"&&<section className="sc-section">
         <div className="sc-section-head"><div><h2>Discover</h2></div></div>
-        <div className="sc-search"><Search size={20}/><input autoFocus={false} value={query} onChange={e=>{setQuery(e.target.value);setCatalogPage(1)}} placeholder="Search perfume or brand..." aria-label="Search perfumes"/>{query&&<button onClick={()=>{setQuery("");setCatalogPage(1)}} aria-label="Clear search"><X size={19}/></button>}</div>
-        <div className="sc-chips">{["Qasida","Bakhur","Lattafa","Afnan","Dior","Tom Ford"].map(t=><button key={t} onClick={()=>{setQuery(t);setCatalogPage(1)}}>{t}</button>)}</div>
+        <form className="sc-search" onSubmit={e=>{e.preventDefault();const v=draftQuery.trim();if(v.length<3)return;setCatalogPage(1);if(v===query)setRefreshKey(k=>k+1);else setQuery(v)}}><Search size={20}/><input autoFocus={false} value={draftQuery} onChange={e=>setDraftQuery(e.target.value)} placeholder="Search perfume or brand..." aria-label="Search perfumes"/>{draftQuery&&<button type="button" onClick={()=>{setDraftQuery("");setQuery("");setCatalogPage(1)}} aria-label="Clear search"><X size={19}/></button>}<button className="sc-search-submit" type="submit" disabled={draftQuery.trim().length<3||searching}>Search</button></form>
+        <div className="sc-chips">{["Qasida","Bakhur","Lattafa","Afnan","Dior","Tom Ford"].map(t=><button key={t} onClick={()=>{setDraftQuery(t);setCatalogPage(1);if(query===t)setRefreshKey(k=>k+1);else setQuery(t)}}>{t}</button>)}</div>
         <button className="sc-add-missing" onClick={()=>setManualOpen(true)}><Plus size={14}/> Not listed? Add it</button>
 
         {error&&<div className="sc-warning"><CloudOff size={19}/><span>{error}</span><button onClick={()=>setRefreshKey(k=>k+1)}>Retry</button></div>}
