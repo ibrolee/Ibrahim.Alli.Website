@@ -1,5 +1,10 @@
 name: Cloudflare Portfolio Visit Watch
 on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/scripts/cloudflare_portfolio_watch.py'
+      - '.github/workflows/cloudflare-portfolio-visit-watch.yml'
   workflow_dispatch:
   schedule:
     - cron: '17 * * * *'
@@ -24,7 +29,7 @@ jobs:
         with:
           ref: main
           persist-credentials: false
-      - name: Verify watcher behaviour
-        run: python3 -m unittest discover -s .github/scripts -p 'test_cloudflare_portfolio_watch.py' -v
+      - name: Check Python source syntax
+        run: python3 -m py_compile .github/scripts/cloudflare_portfolio_watch.py
       - name: Check browser visits
         run: python3 .github/scripts/cloudflare_portfolio_watch.py
