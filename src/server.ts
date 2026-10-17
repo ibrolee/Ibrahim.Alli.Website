@@ -89,7 +89,7 @@ async function fragranceSearch(request: Request): Promise<Response> {
       ...x,
       id:"fragella:"+String(x["_id"]||x["id"]||x["Brand"]+":"+x["Name"])
     }));
-    const hasNext=parsed.pagination?.hasNextPage??(page===1&&records.length===10);
+    const hasNext=parsed.pagination?.has_more??parsed.pagination?.hasNextPage??(page===1&&records.length===10);
     // One server request = one provider call, with same-origin caching to conserve quota.
     return Response.json({
       results,total:Number(parsed.pagination?.total||0)||results.length,
