@@ -3,6 +3,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { ArrowRight, Bookmark, Check, ChevronDown, CloudOff, Download, FlaskConical, Heart, ImageOff, Layers, Plus, Search, ShoppingBag, Sparkles, Trash2, Upload, Wallet, X } from "lucide-react";
 import { compressScentPhoto, saveScentPhoto, getScentPhoto, removeScentPhoto, blobAsDataUrl, dataUrlAsBlob } from "@/lib/scent-photos";
 import css from "../fragrance.css?url";
+import { filterAndSortDiscover, type DiscoverFilters, DEFAULT_DISCOVER_FILTERS, valueForLongevity, valueForProjection } from "@/lib/scent-filters";
 
 type Currency = "NGN" | "USD";
 type Page = "collection" | "discover" | "wishlist" | "worth" | "layer";
@@ -14,13 +15,15 @@ const SOURCES:{id:CatalogSource;name:string}[]=[
   {id:"noteboxd",name:"Noteboxd · uses quota"},
   {id:"fragella",name:"Fragella · uses quota"}
 ];
-type Perfume = { id: string; name: string; brand: string; image?: string | undefined; year?: string | undefined; family?: string | undefined; description?: string | undefined; notes: string[]; top: string[]; heart: string[]; base: string[]; accords: string[] };
+type Perfume = { id: string; name: string; brand: string; image?: string | undefined; year?: string | undefined; family?: string | undefined; description?: string | undefined; notes: string[]; top: string[]; heart: string[]; base: string[]; accords: string[];
+ longevity?:string;projection?:string;rating?:number;gender?:string;popularity?:string;bestSeasons?:string[];bestOccasions?:string[] };
 type Owned = { perfume: Perfume; amount: number; currency: Currency; added: string; favorite?: boolean };
 type Mix = { id: string; left: string; right: string; date: string };
 type Combo = { id:string; name:string; perfumes:Perfume[]; target:"collection"|"wishlist"; amount?:number; added:string };
-type State = { collection: Owned[]; wishlist: Perfume[]; mixes: Mix[]; combos: Combo[] };
+type MyInsight={priceNGN?:number;longevity?:string;projection?:string};
+type State = { collection: Owned[]; wishlist: Perfume[]; mixes: Mix[]; combos: Combo[]; insights:Record<string,MyInsight> };
 const STORAGE = "ia-scent-cabinet-v1";
-const initial: State = { collection: [], wishlist: [], mixes: [], combos: [] };
+const initial: State = { collection: [], wishlist: [], mixes: [], combos: [], insights:{} };
 const API = "/api/fragrance";
 
 function bits(value: unknown): string[] {
@@ -57,13 +60,27 @@ function normalize(row: any): Perfume | null {
     notes: [...new Set([...bits(d.notes || d.Notes || d.note_pyramid),...top,...heart,...base])],
     accords: bits(d["Main Accords"] || d.accords || d.Accords || d.main_accords),
     year: String(d.year || d.Year || d.release_year || ""), family: String(d.family || d.Family || d.fragrance_family || ""),
-    description: String(d.description || d.Description || "").slice(0, 900)
+    description: String(d.description || d.Description || "").slice(0, 900),
+    longevity:typeof d.longevity==="string"?d.longevity:typeof d.Longevity==="string"?d.Longevity:undefined,
+    projection:typeof d.projection==="string"?d.projection:typeof d.Sillage==="string"?d.Sillage:undefined,
+    rating:Number.isFinite(Number(d.rating))&&Number(d.rating)>0&&Number(d.rating)<=5?Number(d.rating):undefined,
+    gender:typeof d.gender==="string"?d.gender:typeof d.Gender==="string"?d.Gender:undefined,
+    popularity:typeof d.popularity==="string"?d.popularity:typeof d.Popularity==="string"?d.Popularity:undefined,
+    bestSeasons:bits(d.bestSeasons||d["Season Ranking"]),
+    bestOccasions:bits(d.bestOccasions||d["Occasion Ranking"])
   };
 }
 function sanitize(source: any): State {
   if (!source || typeof source !== "object") return initial;
   const valid = (p: any) => p && typeof p.id === "string" && typeof p.name === "string" && typeof p.brand === "string";
-  const perfume = (p: any): Perfume => ({ id:p.id, name:p.name, brand:p.brand, image:typeof p.image==="string" ? p.image : undefined, year:p.year, family:p.family, description:p.description, notes:bits(p.notes), top:bits(p.top),heart:bits(p.heart),base:bits(p.base),accords:bits(p.accords) });
+  const perfume = (p: any): Perfume => ({ id:p.id, name:p.name, brand:p.brand, image:typeof p.image==="string" ? p.image : undefined, year:p.year, family:p.family, description:p.description, notes:bits(p.notes), top:bits(p.top),heart:bits(p.heart),base:bits(p.base),accords:bits(p.accords),
+    longevity:typeof p.longevity==="string"?p.longevity.slice(0,45):undefined,
+    projection:typeof p.projection==="string"?p.projection.slice(0,45):undefined,
+    rating:typeof p.rating==="number"&&p.rating>=0&&p.rating<=5?p.rating:undefined,
+    gender:typeof p.gender==="string"?p.gender.slice(0,40):undefined,
+    popularity:typeof p.popularity==="string"?p.popularity.slice(0,35):undefined,
+    bestSeasons:bits(p.bestSeasons),bestOccasions:bits(p.bestOccasions)
+  });
   return {
     collection: (Array.isArray(source.collection)?source.collection:[]).filter((x:any)=>valid(x?.perfume)).slice(0,5000).map((x:any)=>({perfume:perfume(x.perfume), amount:Math.max(0,Number(x.amount)||0),currency:x.currency==="USD"?"USD":"NGN",added:String(x.added||new Date().toISOString()),favorite:Boolean(x.favorite)})),
     wishlist: (Array.isArray(source.wishlist)?source.wishlist:[]).filter(valid).slice(0,5000).map(perfume),
@@ -74,7 +91,16 @@ function sanitize(source: any): State {
       amount:c.target==="collection"&&Number.isFinite(Number(c.amount))&&Number(c.amount)>=0?Number(c.amount):undefined,
       added:String(c.added||new Date().toISOString()),
       perfumes:c.perfumes.filter(valid).slice(0,12).map(perfume)
-    })).filter((c:Combo)=>c.perfumes.length>=2)
+    })).filter((c:Combo)=>c.perfumes.length>=2),
+    insights:Object.fromEntries(Object.entries(source.insights&&typeof source.insights==="object"&&!Array.isArray(source.insights)?source.insights:{}).slice(0,1200).filter(([key])=>typeof key==="string"&&key.length<300).map(([key,value])=>{
+      const x=value&&typeof value==="object"?value as Record<string,unknown>:{};
+      const number=typeof x.priceNGN==="number"?x.priceNGN:NaN;
+      const entry:MyInsight={};
+      if(Number.isFinite(number)&&number>=0&&number<=100_000_000)entry.priceNGN=number;
+      if(typeof x.longevity==="string")entry.longevity=x.longevity.slice(0,45);
+      if(typeof x.projection==="string")entry.projection=x.projection.slice(0,45);
+      return [key,entry];
+    }))
   };
 }
 function money(value:number,c:Currency) { return new Intl.NumberFormat("en-US",{style:"currency",currency:c,minimumFractionDigits:0,maximumFractionDigits:2}).format(value).replace("NGN","₦"); }
@@ -125,6 +151,12 @@ function Fragrance(){
   const [layerB,setLayerB]=useState("");
   const [sort,setSort]=useState("newest");
   const [filter,setFilter]=useState("");
+  const [showDiscoverFilters,setShowDiscoverFilters]=useState(false);
+  const [discoverFilters,setDiscoverFilters]=useState<DiscoverFilters>(DEFAULT_DISCOVER_FILTERS);
+  const [insightEdit,setInsightEdit]=useState<"closed"|"open">("closed");
+  const [insightPrice,setInsightPrice]=useState("");
+  const [insightLongevity,setInsightLongevity]=useState("");
+  const [insightProjection,setInsightProjection]=useState("");
   const [backupOpen,setBackupOpen]=useState(false);
   const [comboOpen,setComboOpen]=useState(false);
   const [comboId,setComboId]=useState<string|null>(null);
@@ -344,7 +376,7 @@ function Fragrance(){
       ].filter(k=>k.startsWith("manual:")||k.startsWith("combo:")))];
       const ownerPhotos:Record<string,string>={};
       for(const key of allIds){const photo=await getScentPhoto(key);if(photo)ownerPhotos[key]=await blobAsDataUrl(photo);}
-      const contents=JSON.stringify({app:"Scent Cabinet",version:3,exportedAt:new Date().toISOString(),...store,ownerPhotos},null,2);
+      const contents=JSON.stringify({app:"Scent Cabinet",version:4,exportedAt:new Date().toISOString(),...store,ownerPhotos},null,2);
       const blob=new Blob([contents],{type:"application/json"});
       const href=URL.createObjectURL(blob);const a=document.createElement("a");
       a.href=href;a.download="scent-cabinet-backup-"+today()+".json";
