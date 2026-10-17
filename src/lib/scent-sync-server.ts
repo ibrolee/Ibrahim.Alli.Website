@@ -67,9 +67,9 @@ async function input(request:Request):Promise<Record<string,unknown>>{
 function stateShape(state:unknown):boolean{
   if(!state||typeof state!=="object"||Array.isArray(state))return false;
   const s=state as Record<string,unknown>;
-  return Array.isArray(s.collection)&&Array.isArray(s.wishlist)&&Array.isArray(s.combos)&&
-    Array.isArray(s.mixes)&&s.insights!==null&&typeof s.insights==="object"&&!Array.isArray(s.insights)&&
-    s.collection.length<=5000&&s.wishlist.length<=5000&&s.combos.length<=400&&s.mixes.length<=1000;
+  return Array.isArray(s['collection'])&&Array.isArray(s['wishlist'])&&Array.isArray(s['combos'])&&
+    Array.isArray(s['mixes'])&&s['insights']!==null&&typeof s['insights']==="object"&&!Array.isArray(s['insights'])&&
+    s['collection'].length<=5000&&s['wishlist'].length<=5000&&s['combos'].length<=400&&s['mixes'].length<=1000;
 }
 export async function scentSyncApi(request:Request,env:unknown):Promise<Response>{
   const url=new URL(request.url),prefix="/api/fragrance/sync/";
@@ -87,7 +87,7 @@ export async function scentSyncApi(request:Request,env:unknown):Promise<Response
       return json({enabled:true,initialized:Boolean(account),authenticated:Boolean(account&&await authed(db,request))});
     }
     if(path==="setup"&&method==="POST"){
-      const body=await input(request),pass=body.password,code=body.setupCode,key=setupKey(env);
+      const body=await input(request),pass=body['password'],code=body['setupCode'],key=setupKey(env);
       if(!key||key.length<24)return json({error:"Set a long SCENT_SYNC_SETUP_KEY secret in Cloudflare first"},503);
       if(typeof code!=="string"||!constantEqual(code,key))return json({error:"Incorrect setup code"},403);
       if(typeof pass!=="string"||pass.length<12||pass.length>200)return json({error:"Choose a password with at least 12 characters"},400);
@@ -98,7 +98,7 @@ export async function scentSyncApi(request:Request,env:unknown):Promise<Response
       return json({ok:true},201);
     }
     if(path==="login"&&method==="POST"){
-      const body=await input(request),pw=body.password;
+      const body=await input(request),pw=body['password'];
       if(typeof pw!=="string"||pw.length>200)return json({error:"Incorrect password"},401);
       const now=Date.now(),throttle=await db.prepare("SELECT attempts,window_start,lock_until FROM scent_login_limit WHERE id='owner'").first<{attempts:number;window_start:number;lock_until:number}>();
       if(throttle&&throttle.lock_until>now)return json({error:"Too many attempts. Try again later."},429);
@@ -125,7 +125,7 @@ export async function scentSyncApi(request:Request,env:unknown):Promise<Response
       const existing=await db.prepare("SELECT version,payload,updated_at FROM scent_snapshot WHERE id='owner'").first<{version:number;payload:string;updated_at:number}>();
       if(method==="GET")return json({version:existing?.version||0,data:existing?JSON.parse(existing.payload):null,updatedAt:existing?.updated_at||null});
       const body=await input(request);
-      const expected=body.expectedVersion,data=body.data;
+      const expected=body['expectedVersion'],data=body['data'];
       if(!Number.isSafeInteger(expected)||Number(expected)<0||!stateShape(data))return json({error:"Invalid sync data"},400);
       const payload=JSON.stringify(data);
       if(new TextEncoder().encode(payload).length>MAX_BODY_BYTES)return json({error:"Collection too large for sync"},413);
