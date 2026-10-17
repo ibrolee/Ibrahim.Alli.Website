@@ -286,3 +286,8 @@
  .sc-combo-selected{max-height:140px}
  .sc-combo-options{max-height:150px}
 }
+
+.sc-combo-members{display:flex;flex-wrap:wrap;gap:4px;max-height:76px;overflow:hidden}
+.sc-combo-members button{background:#f1f4eb;color:#42604d;border:1px solid #d8e1d5;padding:4px 6px;font-size:10px;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer}
+.sc-combo-members button:hover{border-color:#779b80}
+.sc-combo-members span{color:#738274;font-size:10px;padding:4px}
