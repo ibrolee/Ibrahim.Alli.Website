@@ -360,3 +360,5 @@
 .sc-catalogue-summary summary{cursor:pointer;min-height:25px}
 .sc-catalogue-summary p{margin:5px 0;line-height:1.55;max-width:520px}
 .sc-catalogue-summary a{color:#3f6749;text-decoration:underline}
+
+.sc-search .sc-search-submit{color:#fff}
