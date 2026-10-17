@@ -1,8 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { ArrowRight, Bookmark, Check, ChevronDown, CloudOff, Download, FlaskConical, Heart, ImageOff, LoaderCircle, Layers, Plus, Search, ShoppingBag, Sparkles, Trash2, Upload, Wallet, X } from "lucide-react";
+import { ArrowRight, Bookmark, Check, ChevronDown, Cloud, CloudOff, Download, FlaskConical, Heart, ImageOff, LoaderCircle, Layers, Plus, Search, ShoppingBag, Sparkles, Trash2, Upload, Wallet, X } from "lucide-react";
 import { compressScentPhoto, saveScentPhoto, getScentPhoto, removeScentPhoto, blobAsDataUrl, dataUrlAsBlob } from "@/lib/scent-photos";
 import css from "../fragrance.css?url";
+import {useCabinetSync} from "@/lib/scent-sync-client";
 import { comboBottleCost, restoreBottleLife, savedFinishDate, setBottleFinished, setComboBottleFinished, shelfTotals } from "@/lib/scent-shelf";
 import { sameScent } from "@/lib/scent-identity";
 import type { CatalogSource } from "@/lib/scent-catalogue";
@@ -209,6 +210,20 @@ function Fragrance(){
   const [photoError,setPhotoError]=useState("");
   const fileRef=useRef<HTMLInputElement>(null);
   const searchId=useRef(0);
+  const [syncOpen,setSyncOpen]=useState(false);
+  const [syncPassword,setSyncPassword]=useState("");
+  const [syncSetupCode,setSyncSetupCode]=useState("");
+  const [syncSubmitting,setSyncSubmitting]=useState(false);
+  const [syncFormError,setSyncFormError]=useState("");
+  const sync=useCabinetSync(store,ready,value=>setStore(sanitize(value)));
+  async function submitSync(e:React.FormEvent){
+    e.preventDefault();setSyncSubmitting(true);setSyncFormError("");
+    try{
+      await sync.connect(syncPassword,sync.isSetUp?undefined:syncSetupCode);
+      setSyncPassword("");setSyncSetupCode("");
+    }catch(err){setSyncFormError(err instanceof Error?err.message:"Couldn't connect. Please try again.");}
+    finally{setSyncSubmitting(false);}
+  }
   function showStoredPhoto(key:string,blob:Blob){
     const url=URL.createObjectURL(blob);
     const prior=storedUrls.current.get(key);
@@ -619,7 +634,7 @@ function Fragrance(){
   const aAcc=new Set([...(left?.notes||[]),...(left?.accords||[])].map(s=>s.toLowerCase()));
   const match=[...(right?.notes||[]),...(right?.accords||[])].filter(n=>aAcc.has(n.toLowerCase()));
   return <main id="main-content" className="sc-app">
-    <header className="sc-topbar"><button type="button" className="sc-wordmark" onClick={()=>go("collection")} aria-label="Ibrahim Alli home">IBRAHIM ALLI</button><button type="button" className="sc-top-action" onClick={()=>setBackupOpen(true)} aria-label="Backup and restore my collection" title="Backup and restore"><Download size={19}/><span>Backup</span></button></header>
+    <header className="sc-topbar"><button type="button" className="sc-wordmark" onClick={()=>go("collection")} aria-label="Ibrahim Alli home">IBRAHIM ALLI</button><div className="sc-top-controls"><button type="button" className={"sc-top-action sc-sync-trigger"+(sync.status==="synced"?" sc-sync-ok":"")} onClick={()=>setSyncOpen(true)} aria-label={"Cloud sync: "+sync.status} title="Private cloud sync">{sync.status==="offline"||sync.status==="unavailable"?<CloudOff size={18}/>:<Cloud size={18}/>}<span>Sync</span></button><button type="button" className="sc-top-action" onClick={()=>setBackupOpen(true)} aria-label="Backup and restore my collection" title="Backup and restore"><Download size={19}/><span>Backup</span></button></div></header>
     <div className="sc-inner">
       {storageError&&<div className="sc-storage-alert" role="alert"><span>{storageError==="corrupt"?"Your saved collection could not be read. Restore an earlier backup.":"Changes couldn't be saved in this browser. Export a backup now."}</span><button type="button" onClick={()=>setBackupOpen(true)}>{storageError==="corrupt"?"Restore":"Backup"}</button></div>}
       {(page==="collection"||page==="worth")&&<div className={"sc-stats sc-stats-naira"+(page==="collection"?" sc-collection-stats":"")}><div><span>BOTTLES</span><strong>{bottleCount}</strong></div><div><span>WISHLIST</span><strong>{wishCount}</strong></div><div><span>COST ON SHELF</span><strong>{money(totals.shelfCost,"NGN")}</strong></div><div><span>TOTAL SPENT</span><strong>{money(totals.totalSpent,"NGN")}</strong></div></div>}
@@ -743,6 +758,33 @@ function Fragrance(){
     </section></div>}
     {manualOpen&&<div className="sc-overlay" onMouseDown={e=>{if(e.target===e.currentTarget)setManualOpen(false)}}><section className="sc-price-dialog" role="dialog" aria-modal="true" aria-label="Add perfume manually"><button className="sc-modal-close" onClick={()=>setManualOpen(false)} aria-label="Close"><X size={22}/></button><h2>Add manually</h2><form className="sc-manual-form" onSubmit={addUnlisted}><label>BRAND</label><input value={manualBrand} autoFocus onChange={e=>setManualBrand(e.target.value)} maxLength={80} placeholder="e.g. Lattafa" required/><label>PERFUME</label><input value={manualName} onChange={e=>setManualName(e.target.value)} maxLength={100} placeholder="Fragrance name" required/><label>PHOTO (OPTIONAL)</label><label className="sc-photo-picker"><input type="file" accept="image/*" onChange={chooseManualPhoto} disabled={photoBusy}/>{manualPreview?<img src={manualPreview} alt="Your selected perfume photo"/>:<span><Upload size={20}/> Upload bottle photo</span>}</label>{manualPhoto&&<button type="button" className="sc-photo-clear" onClick={()=>{setManualPhoto(null);setManualPreview(null)}}>Remove selected photo</button>}{photoError&&<p className="sc-form-error">{photoError}</p>}<div className="sc-manual-target"><label><input type="radio" checked={manualTarget==="collection"} onChange={()=>setManualTarget("collection")}/> Collection</label><label><input type="radio" checked={manualTarget==="wishlist"} onChange={()=>setManualTarget("wishlist")}/> Wishlist</label></div><button className="sc-primary" type="submit" disabled={photoBusy}>{photoBusy?"Saving photo...":manualTarget==="collection"?"Next: Enter ₦ price":"Save to wishlist"} <ArrowRight size={16}/></button></form></section></div>}
     {priceOpen&&<div className="sc-overlay" onMouseDown={e=>{if(e.target===e.currentTarget)setPriceOpen(null)}}><section className="sc-price-dialog" role="dialog" aria-modal="true" aria-label="Save perfume price"><button className="sc-modal-close" onClick={()=>setPriceOpen(null)} aria-label="Close"><X size={22}/></button><h2>{priceBottleId?"Update purchase price":"Add a new bottle"}</h2><p>{priceOpen.brand} · <strong>{priceOpen.name}</strong></p>{!priceBottleId&&<p className="sc-combo-hint">This saves a new purchase. Your earlier bottles and spending stay in your history.</p>}<form onSubmit={savePrice}><label>HOW MUCH DID YOU PAY?</label><div className="sc-money-input"><span className="sc-money-prefix">₦</span><input autoFocus type="number" inputMode="decimal" min="0" step="0.01" required value={price} onChange={e=>setPrice(e.target.value)} placeholder="0.00" /></div><button className="sc-primary" type="submit"><Check size={18}/> Save perfume</button></form></section></div>}
-    {backupOpen&&<div className="sc-overlay" onMouseDown={e=>{if(e.target===e.currentTarget)setBackupOpen(false)}}><section className="sc-price-dialog" role="dialog" aria-modal="true" aria-label="Backup your collection"><button className="sc-modal-close" onClick={()=>setBackupOpen(false)} aria-label="Close"><X size={22}/></button><h2>Backup & <em>restore.</em></h2><p>Your collection is saved in this browser. Export a backup before changing devices.</p><button className="sc-primary sc-block" onClick={exportBackup}><Download size={18}/> Download backup</button><button className="sc-secondary sc-block" onClick={()=>fileRef.current?.click()}><Upload size={18}/> Restore from JSON</button><input hidden ref={fileRef} type="file" accept="application/json,.json" onChange={importBackup}/><div className="sc-privacy-note"><CloudOff size={19}/><span>No automatic sync between devices.</span></div></section></div>}
+    {syncOpen&&<div className="sc-overlay" onMouseDown={e=>{if(e.target===e.currentTarget)setSyncOpen(false)}}><section className="sc-price-dialog sc-sync-dialog" role="dialog" aria-modal="true" aria-label="Private cloud sync">
+      <button type="button" className="sc-modal-close" onClick={()=>setSyncOpen(false)} aria-label="Close cloud sync"><X size={22}/></button>
+      <Cloud size={27}/><h2>Private <em>sync.</em></h2>
+      <p className="sc-sync-intro">Keep your wishlist, shelf, spending history and combos in sync between Safari and your Home Screen app.</p>
+      <div className="sc-sync-state"><span className={"sc-sync-dot sc-sync-"+sync.status}/><strong>{({"loading":"Checking cloud connection","unavailable":"Cloud setup needed","setup":"Create your private account","signed-out":"Sign in to sync","synced":"Everything is synced","syncing":"Syncing your fragrances","offline":"Offline — local copy saved","conflict":"Choose which collection to keep","error":"Sync needs attention"} as Record<string,string>)[sync.status]}</strong></div>
+      {sync.message&&<p className="sc-sync-message">{sync.message}</p>}
+      {(sync.status==="signed-out"||sync.status==="setup")&&<form onSubmit={submitSync} className="sc-sync-form">
+        {sync.status==="setup"&&<><label htmlFor="sc-sync-setup">YOUR CLOUDFLARE SETUP CODE</label><input id="sc-sync-setup" value={syncSetupCode} onChange={e=>setSyncSetupCode(e.target.value)} type="password" autoComplete="off" placeholder="Code saved in Cloudflare" required/></>}
+        <label htmlFor="sc-sync-password">{sync.status==="setup"?"CREATE A PRIVATE PASSWORD":"YOUR PRIVATE PASSWORD"}</label>
+        <input id="sc-sync-password" value={syncPassword} onChange={e=>setSyncPassword(e.target.value)} type="password" autoComplete={sync.status==="setup"?"new-password":"current-password"} minLength={sync.status==="setup"?12:1} placeholder="Enter password" required/>
+        {sync.status==="setup"&&<p>Use 12 or more characters. Save the password somewhere safe; it cannot be recovered from the site.</p>}
+        {syncFormError&&<p role="alert" className="sc-form-error">{syncFormError}</p>}
+        <button className="sc-primary sc-block" type="submit" disabled={syncSubmitting}>{syncSubmitting?"Connecting…":sync.status==="setup"?"Create & connect":"Sign in & sync"}</button>
+      </form>}
+      {sync.status==="conflict"&&<div className="sc-sync-conflict">
+        <p>Both copies contain different data. To protect your existing perfumes, choose one. The cloud version is never overwritten without your permission.</p>
+        <button type="button" className="sc-primary sc-block" onClick={()=>void sync.resolveConflict("device")}>Keep this device's collection</button>
+        <button type="button" className="sc-secondary sc-block" onClick={()=>void sync.resolveConflict("cloud")}>Use the cloud collection instead</button>
+        <small>A recovery copy of this device's data is saved before a cloud copy replaces it. Download a full backup first if you're unsure.</small>
+      </div>}
+      {(sync.status==="synced"||sync.status==="offline"||sync.status==="error")&&<div className="sc-sync-actions">
+        <button type="button" className="sc-secondary" onClick={()=>void sync.syncNow()}><Cloud size={16}/> Sync now</button>
+        <button type="button" className="sc-secondary" onClick={()=>void sync.disconnect()}>Sign out</button>
+      </div>}
+      {(sync.status==="unavailable"||sync.status==="error"||sync.status==="loading")&&<button type="button" className="sc-secondary sc-block" onClick={()=>void sync.refresh()}>Check connection</button>}
+      <p className="sc-sync-footnote">Your collection also stays saved on this device. Uploaded personal photos currently remain device-only; use Backup for a copy containing your photos.</p>
+    </section></div>}
+    {backupOpen&&<div className="sc-overlay" onMouseDown={e=>{if(e.target===e.currentTarget)setBackupOpen(false)}}><section className="sc-price-dialog" role="dialog" aria-modal="true" aria-label="Backup your collection"><button className="sc-modal-close" onClick={()=>setBackupOpen(false)} aria-label="Close"><X size={22}/></button><h2>Backup & <em>restore.</em></h2><p>Your collection is saved in this browser. Export a backup before changing devices.</p><button className="sc-primary sc-block" onClick={exportBackup}><Download size={18}/> Download backup</button><button className="sc-secondary sc-block" onClick={()=>fileRef.current?.click()}><Upload size={18}/> Restore from JSON</button><input hidden ref={fileRef} type="file" accept="application/json,.json" onChange={importBackup}/><div className="sc-privacy-note"><Cloud size={19}/><span>Manual backups remain available. Cloud sync only starts after you connect your private account.</span></div></section></div>}
   </main>;
 }
