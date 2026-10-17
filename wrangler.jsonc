@@ -20,5 +20,11 @@
       "database_name": "scent-cabinet-sync",
       "database_id": "feeeef20-205c-43a7-9d80-f6dd538bc557"
     }
+  ],
+  "r2_buckets": [
+    {
+      "binding": "SCENT_PHOTOS_R2",
+      "bucket_name": "scent-cabinet-photos"
+    }
   ]
 }

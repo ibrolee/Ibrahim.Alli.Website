@@ -283,7 +283,7 @@ function Fragrance(){
   useEffect(()=>{
     if(!ready||sync.status!=="synced"){setPhotoCloudStatus("idle");return;}
     void syncOwnerPhotos();
-    const check=setInterval(()=>{if(document.visibilityState==="visible")void syncOwnerPhotos();},90000);
+    const check=setInterval(()=>{if(document.visibilityState==="visible")void syncOwnerPhotos();},600000);
     const onFocus=()=>{if(document.visibilityState==="visible")void syncOwnerPhotos();};
     document.addEventListener("visibilitychange",onFocus);
     return()=>{clearInterval(check);document.removeEventListener("visibilitychange",onFocus);};

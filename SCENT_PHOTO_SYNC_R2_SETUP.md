@@ -3,7 +3,7 @@
 Photo sync is deliberately **disabled until an R2 bucket is bound**. Existing local IndexedDB images, the seven saved wishlist items, and D1 sync must continue working even if R2 is missing.
 
 ## Cloudflare account setup (one-time)
-1. Cloudflare Dashboard → R2 object storage → Overview → Create bucket.
+1. Cloudflare Dashboard → R2 object storage → Overview → Create bucket. Select **Standard**, not Infrequent Access.
 2. Bucket name: `scent-cabinet-photos`, with the default private settings. **Do not turn on public access, R2.dev, or custom public domains.**
 3. Open Workers & Pages → `ibrahimalli-portfolio-preview` → Settings → Bindings → Add binding → R2 bucket.
 4. Binding variable: `SCENT_PHOTOS_R2`; Bucket: `scent-cabinet-photos`. Save and deploy if requested.
@@ -19,9 +19,9 @@ Photo sync is deliberately **disabled until an R2 bucket is bound**. Existing lo
 ## Protections
 
 - R2 bucket is private; same-origin, authenticated API only. No anonymous photos.
-- Accept JPEG, PNG, WebP uploads up to 500 kB only; existing client compresses imported photos to under 450 kB.
+- Accept JPEG, PNG, WebP uploads up to 450 kB only; existing client compresses imported photos to under 450 kB.
 - Manual fragrance and combo images are supported. Identity keys are validated; no arbitrary paths.
-- Local photo changes are queued even when offline and retried when the user opens the app, refocuses or every 90 seconds.
+- Local photo changes are queued even when offline and retried when the user opens the app, refocuses or every 10 minutes.
 - Photo deletion writes a tombstone, preventing an outdated picture on another browser being reuploaded during reconciliation.
 - A new browser downloads the image from R2 to its local IndexedDB copy; removing the R2 binding does not delete local copies.
 - Conflicting, independently saved photos stay preserved locally until the owner deliberately replaces one. Replacements are explicit.
@@ -37,3 +37,12 @@ After binding R2:
 - On Safari, manually uploaded photos should be present in Wishlist, Shelf and combos.
 
 No additional R2 API tokens or access keys are needed. The Worker binding is the only runtime credential.
+
+## Free-tier cost protection
+
+- The R2 Standard free tier currently includes 10 GB-month of stored data, 1 million Class A operations/month and 10 million Class B operations/month. Verify current pricing at https://developers.cloudflare.com/r2/pricing/.
+- The Scent Cabinet server enforces a **200 image ceiling** and **450,000 byte maximum per image** — at most ~90 MB of app-created photo content (less than 1% of the 10 GB free storage allowance). Extra photos are rejected safely with `PHOTO_QUOTA`; existing photos are not deleted.
+- Background photo syncing is limited to every 10 minutes while the app is visible; it also runs on initial sign-in, explicit photo changes and when the browser regains focus.
+- **This is an application-level safeguard, not a Cloudflare billing guarantee:** R2 request counts, other connected projects and other Cloudflare products share account-level usage. If an actor or other Cloudflare project makes excessive requests, charges are still possible.
+- In Cloudflare **Manage Account → Billing → Billable Usage → Create budget alert**, add an account-wide low-threshold alert (e.g. US$1 or the smallest threshold Cloudflare allows). Alerts are informational and do not stop charges.
+- For stricter isolation, use a dedicated Cloudflare account only for Scent Cabinet and monitor R2 metrics and bills. Never rely on an alert as an enforceable spending cap.
