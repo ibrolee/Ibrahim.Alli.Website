@@ -5,8 +5,19 @@
 export type CatalogRecord={
  id:string;name:string;brand:string;image?:string;year?:string;family?:string;
  description?:string;top:string[];heart:string[];base:string[];notes:string[];accords:string[];
+ longevity?:string;projection?:string;rating?:number;gender?:string;popularity?:string;bestSeasons?:string[];bestOccasions?:string[];
+ aliases?:string[];sources?:string[];
+ imageCredit?:string;imageSource?:string;imageLicense?:string;imageLicenseUrl?:string;
 };
-export type SearchResult={results:CatalogRecord[];hasMore:boolean;source:"noteboxd"|"fragella";total:number};
+export type SearchResult={results:CatalogRecord[];hasMore:boolean;source:"noteboxd"|"fragella"|"beautyfacts"|"productsfacts"|"wikidata";total:number;nextCursor?:string};
+export class CatalogueHttpError extends Error {
+ constructor(public status:number,public retryAfter:number=300){super("Catalogue HTTP "+status);}
+}
+function httpError(response:Response):CatalogueHttpError {
+ const raw=response.headers.get("retry-after");
+ const seconds=raw?(Number(raw)||Math.ceil((Date.parse(raw)-Date.now())/1000)):300;
+ return new CatalogueHttpError(response.status,Math.min(3600,Math.max(60,seconds||300)));
+}
 function str(value:unknown):string{return typeof value==="string"?value.trim():"";}
 function maybeObj(value:unknown):Record<string,unknown>{
  return value&&typeof value==="object"&&!Array.isArray(value)?value as Record<string,unknown>:{};
@@ -74,6 +85,17 @@ export function normalizeProviderRecord(raw:unknown,source:"noteboxd"|"fragella"
  const family=text(x["family"]||x["fragrance_family"]||x["scent_family"]||x["concentration"]||x["OilType"]);
  const description=text(x["description"]||x["Description"]||x["summary"]);
  const record:CatalogRecord={id:source+":"+uniqueID,brand,name,top,heart,base,notes:[...new Set([...general,...top,...heart,...base])],accords};
+ const longevity=text(x["Longevity"]||x["longevity"]);if(longevity)record.longevity=longevity.slice(0,45);
+ const projection=text(x["Sillage"]||x["sillage"]||x["projection"]);if(projection)record.projection=projection.slice(0,45);
+ const rating=Number(x["rating"]??x["Rating"]??x["average_rating"]);
+ if(Number.isFinite(rating)&&rating>0&&rating<=5)record.rating=rating;
+ const gender=text(x["Gender"]||x["gender"]);if(gender)record.gender=gender.slice(0,40);
+ const popularity=text(x["Popularity"]||x["popularity"]);if(popularity)record.popularity=popularity.slice(0,35);
+ const ranking=(raw:unknown):string[]=>Array.isArray(raw)?raw.slice(0,4).map(v=>text(v)).filter(Boolean):[];
+ const seasons=ranking(x["Season Ranking"]||x["season_ranking"]||x["seasons"]);
+ const occasions=ranking(x["Occasion Ranking"]||x["occasion_ranking"]||x["occasions"]);
+ if(seasons.length)record.bestSeasons=seasons;
+ if(occasions.length)record.bestOccasions=occasions;
  const url=selectImage(x);
  if(url)record.image=url;
  if(year)record.year=year;
@@ -96,15 +118,16 @@ function getRecords(payload:unknown):unknown[]{
  }
  return [];
 }
-export async function searchNoteboxd(q:string,key:string):Promise<SearchResult>{
+export async function searchNoteboxd(q:string,key:string,cursor?:string):Promise<SearchResult>{
  const url=new URL("https://api.noteboxd.com/v1/fragrances");
  url.searchParams.set("q",q);
  url.searchParams.set("limit","40");
+ if(cursor)url.searchParams.set("cursor",cursor);
  const response=await fetch(url.toString(),{
   headers:{"Authorization":"Bearer "+key,"Accept":"application/json"},
   signal:AbortSignal.timeout(10000)
  });
- if(!response.ok)throw new Error("Noteboxd HTTP "+response.status);
+ if(!response.ok)throw httpError(response);
  if(!(response.headers.get("content-type")||"").includes("json"))throw new Error("Noteboxd returned non-JSON");
  const body=await response.text();
  if(body.length>2_000_000)throw new Error("Noteboxd response too large");
@@ -112,13 +135,15 @@ export async function searchNoteboxd(q:string,key:string):Promise<SearchResult>{
  const records=getRecords(parsed);
  if(!records.length && !Array.isArray(parsed)&&!["results","data","items","fragrances"].some(k=>k in maybeObj(parsed)))throw new Error("Unexpected Noteboxd response");
  const result=records.map(r=>normalizeProviderRecord(r,"noteboxd")).filter((r):r is CatalogRecord=>r!==null);
- return {results:result,total:result.length,hasMore:false,source:"noteboxd"};
+ const root=maybeObj(parsed),pagination=maybeObj(root["pagination"]||root["meta"]);
+ const nextCursor=str(root["nextCursor"]||root["next_cursor"]||pagination["nextCursor"]||pagination["next_cursor"]);
+ return {results:result,total:result.length,hasMore:Boolean(nextCursor),source:"noteboxd",...(nextCursor?{nextCursor}:{})};
 }
 export async function searchFragella(q:string,key:string,page:number):Promise<SearchResult>{
  const url=new URL("https://api.fragella.com/api/v1/fragrances");
  url.searchParams.set("search",q);url.searchParams.set("page",String(page));url.searchParams.set("limit","10");
  const response=await fetch(url.toString(),{headers:{"x-api-key":key,Accept:"application/json"},signal:AbortSignal.timeout(8500)});
- if(!response.ok)throw new Error("Fragella HTTP "+response.status);
+ if(!response.ok)throw httpError(response);
  if(!(response.headers.get("content-type")||"").includes("json"))throw new Error("Fragella returned non-JSON");
  const body=await response.text();
  if(body.length>1_000_000)throw new Error("Fragella response too large");
@@ -128,4 +153,63 @@ export async function searchFragella(q:string,key:string,page:number):Promise<Se
  const pagination=maybeObj(wrapper["pagination"]);
  const next=pagination["has_more"]??pagination["hasNextPage"]??(page===1&&list.length===10);
  return {results,total:Number(pagination["total"]||0)||results.length,hasMore:Boolean(next)&&page<2,source:"fragella"};
+}
+
+/** Public product catalogues: these do not use limited private fragrance API keys.
+ * Open Beauty Facts / Open Products Facts catalogue data © contributors, ODbL.
+ * Bottles are user-supplied product images; attribution is shown in Discover.
+ * Text search uses the legacy CGI endpoint, since v2 product search is filter-only.
+ */
+export type OpenCatalogSource="beautyfacts"|"productsfacts";
+export async function searchOpenFacts(q:string,page:number,source:OpenCatalogSource):Promise<SearchResult & {source:OpenCatalogSource}>{
+ const host=source==="beautyfacts"?"world.openbeautyfacts.org":"world.openproductsfacts.org";
+ const url=new URL("https://"+host+"/cgi/search.pl");
+ url.searchParams.set("search_terms",q);
+ url.searchParams.set("search_simple","1");
+ url.searchParams.set("action","process");
+ url.searchParams.set("json","1");
+ url.searchParams.set("page_size","40");
+ url.searchParams.set("page",String(page));
+ url.searchParams.set("fields","code,product_name,product_name_en,brands,image_front_url,image_url,categories_tags,quantity");
+ const response=await fetch(url.toString(),{
+  headers:{"Accept":"application/json","User-Agent":"ScentCabinet/1.0 (https://ibrahimalli.com; personal fragrance catalogue)"},
+  signal:AbortSignal.timeout(8500)
+ });
+ if(!response.ok)throw httpError(response);
+ if(!(response.headers.get("content-type")||"").includes("json"))throw new Error(source+" returned non-JSON");
+ const body=await response.text();if(body.length>1_500_000)throw new Error(source+" response too large");
+ const payload:unknown=JSON.parse(body);
+ const x=maybeObj(payload);
+ if(!Array.isArray(x["products"]))throw new Error(source+" invalid product results");
+ const products=x["products"] as unknown[];
+ const seen=new Set<string>();
+ const results:CatalogRecord[]=[];
+ const normalizedQuery=q.toLowerCase().trim();
+ const terms=normalizedQuery.split(/\s+/).filter(Boolean);
+ for(const product of products){
+   const row=maybeObj(product);
+   const rawName=text(row["product_name_en"]||row["product_name"]);
+   const brand=text(row["brands"]).split(",")[0]?.trim()||"Unknown brand";
+   const urlImage=image(row["image_front_url"]||row["image_url"]);
+   const cat=Array.isArray(row["categories_tags"])?row["categories_tags"].map(text).join(" ").toLowerCase():"";
+   const label=(brand+" "+rawName).toLowerCase();
+   // Reject deodorants, cosmetics and unrelated products even when the brand matches.
+   const excluded=/deodorant|roll.on|aftershave balm|body lotion|shower gel|soap|candle|diffuser|room spray|hair mist|anti.perspirant|body wash|bleach|javel|chlor|disinfect|desinfect|detergent|laundry|lessive|cleaner|nettoyant|menager|household|fabric softener|adoucissant|dishwash|vaisselle|incense|encens|lipstick|mascara|foundation|make.up|shampoo|shampoing/i;
+   const fragrance=/\b(?:perfumes?|parfums?|fragrances?|colognes?|toilette|attar|extrait|elixir)\b/i;
+   const searchable=(label+" "+cat).normalize("NFKD").replace(/[\u0300-\u036f]/g,"");
+   if(!rawName||!urlImage||excluded.test(searchable))continue;
+   // Brand matching alone is not perfume evidence: a Dior foundation is not a
+   // Dior fragrance, and "parfum citron" on bleach is not a personal perfume.
+   if(!fragrance.test(searchable))continue;
+   if(!terms.some(t=>t.length>=3 && label.includes(t)))continue;
+   const barcode=text(row["code"]);const identity=barcode||[brand,rawName].join(":").toLowerCase().replace(/[^a-z0-9]+/g,"-");
+   if(seen.has(identity))continue;seen.add(identity);
+   results.push({
+     id:source+":"+identity,brand,name:rawName,image:urlImage,
+     notes:[],top:[],heart:[],base:[],accords:[],
+     family:cat.includes("eau-de-parfum")?"Eau de Parfum":cat.includes("eau-de-toilette")?"Eau de Toilette":"Fragrance"
+   });
+ }
+ const total=Number(x["count"])||0;
+ return {results,total,source,hasMore:page<10&&total>page*40&&products.length>0};
 }

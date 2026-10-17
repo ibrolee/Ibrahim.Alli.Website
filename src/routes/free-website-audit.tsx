@@ -1,5 +1,4 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { track } from "@vercel/analytics";
 import { useRef, type FormEvent } from "react";
 import { ArrowLeft, ArrowRight, ArrowUpRight, Check, ClipboardCheck, Eye, Globe2, Mail, MessageCircle, SearchCheck, ShieldCheck, Smartphone, Sparkles } from "lucide-react";
 
@@ -54,7 +53,6 @@ function AuditPage(){
     const brief=getBrief();
     if(!brief)return;
     // Analytics records a handoff choice, not personal information or a submitted request.
-    track("portfolio_audit_handoff",{channel});
     if(channel==="email"){
       window.location.href=`mailto:${EMAIL}?subject=${encodeURIComponent("Free initial website audit request")}&body=${encodeURIComponent(brief)}`;
     }else{

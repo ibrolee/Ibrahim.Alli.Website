@@ -2,8 +2,8 @@ import "./lib/error-capture";
 
 import { consumeLastCapturedError } from "./lib/error-capture";
 import { renderErrorPage } from "./lib/error-page";
-import { SCENT_SEED, seedSearch } from "./lib/scent-catalog-seed";
-import { searchNoteboxd, searchFragella } from "./lib/scent-providers";
+import { fragranceSearch } from "./lib/scent-gateway";
+import { scentSyncApi } from "./lib/scent-sync-server";
 
 type ServerEntry = {
   fetch: (request: Request, env: unknown, ctx: unknown) => Promise<Response> | Response;
@@ -46,55 +46,26 @@ function isH3SwallowedErrorBody(body: string): boolean {
   }
 }
 
-/** Search order: Noteboxd (if configured) → Fragella → curated fallback.
- * Browser never receives provider keys, and only one provider is called when the first succeeds.
- * Browse does not consume remote quotas; only explicit submitted searches do.
- */
-async function fragranceSearch(request: Request): Promise<Response> {
- if(request.method!=="GET")return new Response("Method not allowed",{status:405});
- const url=new URL(request.url);
- const mode=url.pathname.endsWith("/search")?"search":url.pathname.endsWith("/browse")?"browse":null;
- if(!mode)return Response.json({error:"Not found"},{status:404});
- const q=(url.searchParams.get("q")||"").trim().slice(0,90);
- const page=Math.min(2,Math.max(1,Math.floor(Number(url.searchParams.get("page"))||1)));
- const fallback=mode==="browse"||q.length<3 ? SCENT_SEED.slice((page-1)*20,page*20):seedSearch(q,page,20);
- const noteboxd=process.env.NOTEBOXD_API_KEY?.trim();
- const fragella=process.env.FRAGELLA_API_KEY?.trim();
- if(mode==="browse"||q.length<3){
-   return Response.json({results:fallback,total:SCENT_SEED.length,source:"starter",connected:!!(noteboxd||fragella)},{
-     headers:{"cache-control":"public, max-age=300"}
-   });
- }
- if(noteboxd && page===1){
-   try{
-     const found=await searchNoteboxd(q,noteboxd);
-     return Response.json({...found,connected:true},{
-       headers:{"cache-control":"public, s-maxage=86400, stale-while-revalidate=86400"}
-     });
-   }catch(err){
-     console.warn("Noteboxd search fallback:",err instanceof Error?err.message:"unknown");
-   }
- }
- if(fragella){
-   try{
-     const found=await searchFragella(q,fragella,page);
-     return Response.json({...found,connected:true},{
-       headers:{"cache-control":"public, s-maxage=86400, stale-while-revalidate=86400"}
-     });
-   }catch(err){
-     console.warn("Fragella search fallback:",err instanceof Error?err.message:"unknown");
-   }
- }
- return Response.json({
-    results:fallback,total:fallback.length,hasMore:false,source:"starter",connected:!!(noteboxd||fragella),
-    providerWarning:noteboxd||fragella?"The online catalogue is unavailable; showing the starter selection.":"Connect a perfume catalogue to unlock more fragrances."
- },{headers:{"cache-control":"private, max-age=60"}});
-}
 
 export default {
   async fetch(request: Request, env: unknown, ctx: unknown) {
     try {
-      if (new URL(request.url).pathname.startsWith("/api/fragrance/")) return await fragranceSearch(request);
+      if (new URL(request.url).pathname.startsWith("/api/fragrance/sync/")) {
+        // Nitro may invoke this nested server entry with an empty/adapter env instead
+        // of the Worker fetch bindings. Use Cloudflare's documented importable env
+        // when the D1 binding is not present on the provided object.
+        let runtimeEnv = env;
+        if (!runtimeEnv || typeof runtimeEnv !== "object" || !("SCENT_SYNC_DB" in runtimeEnv)) {
+          try {
+            const cloudflare = await import("cloudflare:workers");
+            runtimeEnv = cloudflare.env;
+          } catch {
+            // Non-Cloudflare tests and local dev can still show setup-needed.
+          }
+        }
+        return await scentSyncApi(request, runtimeEnv);
+      }
+      if (new URL(request.url).pathname.startsWith("/api/fragrance/")) return await fragranceSearch(request, env, ctx && typeof ctx === "object" ? ctx : undefined);
       const handler = await getServerEntry();
       const response = await handler.fetch(request, env, ctx);
       return await normalizeCatastrophicSsrResponse(response);

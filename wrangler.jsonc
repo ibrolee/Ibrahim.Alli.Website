@@ -1,0 +1,30 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "ibrahimalli-portfolio-preview",
+  "main": ".output/server/index.mjs",
+  "compatibility_date": "2026-09-25",
+  "compatibility_flags": [
+    "nodejs_compat"
+  ],
+  "assets": {
+    "directory": ".output/public",
+    "binding": "ASSETS"
+  },
+  "observability": {
+    "enabled": true
+  },
+  "previews": {},
+  "d1_databases": [
+    {
+      "binding": "SCENT_SYNC_DB",
+      "database_name": "scent-cabinet-sync",
+      "database_id": "feeeef20-205c-43a7-9d80-f6dd538bc557"
+    }
+  ],
+  "r2_buckets": [
+    {
+      "binding": "SCENT_PHOTOS_R2",
+      "bucket_name": "scent-cabinet-photos"
+    }
+  ]
+}

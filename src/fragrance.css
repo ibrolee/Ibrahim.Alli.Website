@@ -291,3 +291,363 @@
 .sc-combo-members button{background:#f1f4eb;color:#42604d;border:1px solid #d8e1d5;padding:4px 6px;font-size:10px;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer}
 .sc-combo-members button:hover{border-color:#779b80}
 .sc-combo-members span{color:#738274;font-size:10px;padding:4px}
+
+/* Scent Cabinet Cloudflare search sources: source selection applies to Discover + combo search. */
+.sc-source-picker{display:flex;align-items:center;flex-wrap:wrap;column-gap:9px;row-gap:5px;margin:8px 0 12px;font-size:12px;color:#65776b}
+.sc-source-picker label{font-weight:700;color:#36533f}
+.sc-source-picker select,.sc-combo-source select{min-height:37px;min-width:0;max-width:100%;font-size:13px;padding:7px 24px 7px 9px;background:#f8f9f3;color:#284835;border:1px solid #cbd8c9;border-radius:3px;cursor:pointer}
+.sc-source-picker span{font-size:10px;color:#829183}
+.sc-source-credit{font-size:10px;color:#78877b;line-height:1.5;margin:9px 0 14px}
+.sc-source-credit a{color:#4a7654;text-decoration:underline;text-underline-offset:2px}
+.sc-combo-source{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.sc-combo-source label{font-weight:700;color:#586d5e;font-size:10px}
+@media(max-width:660px){
+  .sc-source-picker{gap:6px;margin:4px 0 9px}
+  .sc-source-picker label{font-size:11px}
+  .sc-source-picker select,.sc-combo-source select{font-size:16px;min-height:40px;flex:1}
+  .sc-source-picker span{width:100%;font-size:10px}
+  .sc-source-credit{font-size:10px}
+}
+
+/* Discover performance browsing: collapse on mobile; applies to already-loaded cards. */
+.sc-discover-tools{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin:8px 0 12px}
+.sc-filter-trigger{display:inline-flex;align-items:center;gap:7px;min-height:40px;padding:9px 12px;background:#edf1e8;color:#31573d;border:1px solid #bbcdbb;font-size:12px;font-weight:700;cursor:pointer}
+.sc-filter-trigger>span{background:#31573d;color:#fff;border-radius:30px;padding:2px 6px;min-width:20px;font-size:10px}
+.sc-filter-trigger svg:last-child{transition:transform .16s}
+.sc-filter-trigger .sc-rotate{transform:rotate(180deg)}
+.sc-filter-result-count{color:#809084;font-size:10px}
+.sc-discover-filter-panel{border:1px solid #cbd8c6;background:#f8f8f2;padding:13px 14px 12px;margin:0 0 14px}
+.sc-filter-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.sc-filter-grid label{display:flex;flex-direction:column;gap:5px;color:#46604e;font-size:10px;font-weight:700;letter-spacing:.02em}
+.sc-filter-grid select{width:100%;min-width:0;min-height:40px;padding:8px 8px;color:#32513d;background:white;border:1px solid #cbd8c6;font-size:12px;font-weight:500;border-radius:2px}
+.sc-filter-foot{display:flex;gap:14px;align-items:center;justify-content:space-between;margin-top:10px}
+.sc-filter-foot p{font-size:10px;line-height:1.55;color:#7b887d;max-width:770px;margin:0}
+.sc-filter-foot button{font-size:11px;color:#365f45;flex-shrink:0;white-space:nowrap;background:none;border:0;text-decoration:underline;cursor:pointer}
+.sc-performance-tags{display:flex;flex-wrap:wrap;gap:3px;margin-top:3px}
+.sc-performance-tags span{background:#e8ede6;padding:4px 6px;color:#536d5b;font-size:10px;line-height:1.3}
+.sc-performance-tags strong{font-weight:800;color:#34533d}
+.sc-fact-box{padding:13px;background:#f5f6ef;border:1px solid #d4dfd1;margin:16px 0}
+.sc-fact-box h3{font-size:14px;margin:0 0 10px;color:#244a35}
+.sc-fact-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
+.sc-fact-list>div{padding:9px;background:#fff;border:1px solid #e1e8dc;display:flex;flex-direction:column;gap:2px}
+.sc-fact-list span{font-size:10px;color:#778b78}
+.sc-fact-list strong{font-size:12px;color:#284633}
+.sc-fact-disclaimer,.sc-fact-hint{font-size:10px!important;line-height:1.5;color:#7c887b;margin:10px 0!important}
+.sc-insight-open{font-size:12px;background:#2b523a;color:#fff;border:0;padding:9px 11px;cursor:pointer;min-height:40px}
+.sc-insight-form{display:flex;flex-direction:column;gap:9px}
+.sc-insight-form label{display:flex;flex-direction:column;gap:4px;font-size:11px;color:#526d59;font-weight:700}
+.sc-insight-form input,.sc-insight-form select{width:100%;font-size:14px;padding:10px 11px;border:1px solid #cad6c9;background:white;color:#2d5239;min-height:43px}
+.sc-insight-actions{display:flex;justify-content:flex-end;gap:7px}
+.sc-insight-actions button{padding:9px 12px;border:1px solid #bccbb9;background:#fff;color:#365b43;font-size:12px}
+.sc-insight-actions button[type=submit]{background:#2b523a;border-color:#2b523a;color:white}
+@media(max-width:900px){.sc-filter-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:660px){
+ .sc-filter-trigger{font-size:12px;min-height:42px}
+ .sc-filter-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+ .sc-discover-filter-panel{padding:10px;margin-bottom:10px}
+ .sc-filter-grid select,.sc-insight-form input,.sc-insight-form select{font-size:16px}
+ .sc-filter-foot{align-items:flex-start;flex-direction:column;gap:7px}
+ .sc-filter-result-count{font-size:10px}
+ .sc-performance-tags span{font-size:9px}
+}
+
+/* Source controls stay out of the main beginner search flow. */
+.sc-source-options{margin:10px 0;color:#526b59;font-size:12px}
+.sc-source-options>summary{cursor:pointer;min-height:30px;line-height:30px}
+.sc-source-options .sc-source-picker{padding:6px 0 9px}
+.sc-catalogue-summary{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap;font-size:11px;color:#637568;margin:10px 0 16px}
+.sc-catalogue-summary details{max-width:100%;font-size:10px}
+.sc-catalogue-summary summary{cursor:pointer;min-height:25px}
+.sc-catalogue-summary p{margin:5px 0;line-height:1.55;max-width:520px}
+.sc-catalogue-summary a{color:#3f6749;text-decoration:underline}
+
+.sc-search .sc-search-submit{color:#fff}
+/* Make the Search action unmissable: override the older transparent button rule. */
+.sc-search .sc-search-submit{
+  flex:0 0 auto;display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  min-height:40px;min-width:110px;padding:9px 13px;border:1px solid #1c402d;
+  border-radius:6px;background:#254f35;color:#fff;font-weight:800;
+  box-shadow:0 2px 6px #173c251c;white-space:nowrap;
+}
+.sc-search .sc-search-submit:hover:not(:disabled){background:#366747;color:#fff}
+.sc-search .sc-search-submit:disabled{opacity:.65;background:#627767;border-color:#627767}
+.sc-search .sc-search-submit svg{color:currentColor;flex-shrink:0}
+.sc-search .sc-search-clear{flex:0 0 auto;display:inline-flex;align-items:center;justify-content:center;min-width:26px;min-height:38px}
+.sc-search-progress{display:flex;align-items:center;gap:11px;padding:12px 13px;margin:10px 0 13px;
+  border:1px solid #b9d3b5;background:#eff6ed;color:#28513b;border-radius:8px}
+.sc-search-progress>svg{flex:none;color:#39774f}
+.sc-search-progress strong{display:block;font-size:12px;font-weight:800;line-height:1.5}
+.sc-search-progress span{display:block;font-size:11px;line-height:1.5;color:#526c5d}
+.sc-search-hint{font-size:11px;line-height:1.5;color:#46674f;margin:9px 0 13px}
+.sc-spin{animation:sc-search-spin 1s linear infinite}
+@keyframes sc-search-spin{to{transform:rotate(360deg)}}
+@media(prefers-reduced-motion:reduce){.sc-spin{animation:none}}
+@media(max-width:660px){
+ .sc-search{min-height:51px;height:auto;padding:6px 7px;gap:6px;border-radius:7px}
+ .sc-search>svg{width:16px;height:16px;flex-shrink:0}
+ .sc-search input{flex:1;min-width:0;font-size:16px}
+ .sc-search .sc-search-submit{min-width:93px;min-height:38px;padding:7px 8px;font-size:11px;gap:5px}
+ .sc-search .sc-search-submit svg{width:14px;height:14px}
+ .sc-search-progress{padding:10px}
+}
+
+.sc-stats.sc-stats-naira{grid-template-columns:.7fr .7fr 1.3fr 1.3fr}
+.sc-shelf-switch{display:flex;gap:6px;border-bottom:1px solid var(--sc-line);padding-bottom:12px;margin-bottom:12px}
+.sc-shelf-switch button{border:1px solid #c5d0c1;background:transparent;color:#3c5944;padding:11px 16px;font-size:12px;font-weight:700;min-height:43px;border-radius:3px}
+.sc-shelf-switch button[aria-pressed=true]{background:#294e38;border-color:#294e38;color:#fff}
+.sc-shelf-explain{font-size:12px;line-height:1.65;color:#637568;margin:0 0 20px}
+.sc-bottle-date{display:block;font-size:10px;color:#697b6c;line-height:1.5;margin:5px 0}
+.sc-shelf-notice{display:flex;gap:12px;align-items:center;background:#e7eedf;border:1px solid #b4c5a9;padding:12px 14px;margin:15px 0;color:#294e38;font-size:12px}
+.sc-shelf-notice span{flex:1;overflow-wrap:anywhere}
+.sc-shelf-notice button{background:transparent;border:0;color:#294e38;min-height:32px;font-weight:700;cursor:pointer}
+.sc-shelf-notice button:first-of-type{text-decoration:underline}
+.sc-combo-bottle-list{display:flex;flex-direction:column;gap:5px;margin:12px 0}
+.sc-combo-bottle-list>div{display:flex;align-items:center;gap:8px;border-bottom:1px solid #dce1d4;padding:6px 0}
+.sc-combo-bottle-list button{font-size:11px;min-height:38px;color:#35543e;background:transparent;border:1px solid #c3cfba;padding:6px 9px}
+.sc-combo-bottle-list .sc-combo-bottle-name{border:0;flex:1;text-align:left;padding-left:0;font-weight:700}
+.sc-combo-bottle-name small{display:block;font-size:10px;font-weight:400;color:#6b7e6b;margin-top:3px}
+.sc-detail-actions .sc-purchase-status{flex-basis:100%;font-size:12px;color:#637568;margin:6px 0}
+.sc-worth-list small{line-height:1.6}
+@media(max-width:660px){.sc-stats.sc-stats-naira{grid-template-columns:1fr 1fr}.sc-stats.sc-stats-naira>div{min-height:76px;padding:13px}.sc-stats.sc-stats-naira>div:nth-child(2){border-bottom:1px solid #426152}.sc-shelf-switch button{flex:1;padding:10px 7px;font-size:11px}.sc-shelf-explain{font-size:11px}.sc-worth-list>div{gap:8px}.sc-worth-list>div>strong{font-size:12px}.sc-worth-list>div>button{padding:7px}.sc-combo-bottle-list>div{gap:5px}}
+
+@media(max-width:660px){.sc-stats.sc-stats-naira>div:nth-child(n+3) strong{font-size:clamp(20px,5.5vw,29px)!important}}
+
+
+/* Compact cabinet browsing: preserve two comfortably wide columns and full-size
+   controls, but avoid tall square artwork, redundant metadata and deep gaps.
+   Discover's detailed catalogue tiles and Spending remain unchanged. */
+@media(max-width:660px){
+  .sc-cabinet-section{padding-top:10px}
+  .sc-cabinet-section .sc-section-head{margin-bottom:10px}
+  .sc-cabinet-section .sc-section-head h2{font-size:clamp(27px,7.2vw,33px)}
+  .sc-cabinet-section .sc-combo-header-actions{flex-wrap:nowrap}
+  .sc-cabinet-section .sc-combo-header-actions .sc-primary,
+  .sc-cabinet-section .sc-combo-header-actions .sc-secondary{min-height:34px;padding:6px 8px;font-size:10px}
+  .sc-cabinet-section .sc-combo-header-actions svg{width:13px;height:13px}
+  .sc-cabinet-section .sc-shelf-switch{gap:5px;padding-bottom:6px;margin-bottom:5px}
+  .sc-cabinet-section .sc-shelf-switch button{min-height:36px;padding:7px 6px}
+  .sc-cabinet-section .sc-shelf-explain{margin:0 0 8px;font-size:10px;line-height:1.35}
+  .sc-cabinet-section .sc-filters{margin-bottom:10px;gap:7px}
+  .sc-cabinet-section .sc-filters label,.sc-cabinet-section .sc-filters select{height:38px}
+  .sc-cabinet-grid{grid-template-columns:repeat(2,minmax(0,1fr));column-gap:11px;row-gap:11px}
+  .sc-cabinet-grid .sc-perfume{display:flex;flex-direction:column;min-width:0}
+  .sc-cabinet-grid .sc-perfume-image{
+    aspect-ratio:1.7;min-height:88px;max-height:106px;border-radius:5px;
+  }
+  .sc-cabinet-grid .sc-perfume-image img{width:83%;height:88%;object-fit:contain}
+  .sc-cabinet-grid .sc-perfume-info{display:flex;flex-direction:column;flex:1;min-width:0;padding:5px 1px 0}
+  .sc-cabinet-grid .sc-perfume-brand{margin-bottom:2px;font-size:9px;line-height:1.1;letter-spacing:.035em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .sc-cabinet-grid .sc-perfume .sc-name{
+    display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;
+    overflow:hidden;text-overflow:ellipsis;font-size:18px;line-height:1.07;
+    max-height:39px;min-height:0;margin-bottom:0;
+  }
+  .sc-cabinet-grid .sc-perfume-meta,.sc-cabinet-grid .sc-bottle-date{display:none}
+  .sc-cabinet-grid .sc-price{font-size:12px;line-height:1.25;margin:4px 0 2px}
+  .sc-cabinet-grid .sc-perfume-actions{display:flex;gap:4px;margin-top:auto;padding-top:5px}
+  .sc-cabinet-grid .sc-perfume-actions button{
+    min-height:35px;padding:5px 4px;font-size:10px;line-height:1.1;min-width:0;
+    border-radius:4px;
+  }
+  .sc-cabinet-grid .sc-perfume-actions button:first-child{flex:1}
+  .sc-cabinet-grid .sc-perfume-actions button:not(:first-child){min-width:35px}
+  .sc-cabinet-grid .sc-perfume-actions svg{width:15px;height:15px}
+  .sc-collection-stats.sc-stats.sc-stats-naira{
+    display:flex;flex-wrap:nowrap;overflow-x:auto;overflow-y:hidden;
+    gap:0;scrollbar-width:none;overscroll-behavior-x:contain;
+    margin:7px -18px 0;padding:7px 12px;border-radius:0;
+  }
+  .sc-collection-stats.sc-stats.sc-stats-naira::-webkit-scrollbar{display:none}
+  .sc-collection-stats.sc-stats.sc-stats-naira>div{
+    flex:0 0 auto;min-height:0;min-width:85px;padding:2px 12px;
+    border-bottom:0!important;border-right:1px solid #426152!important;
+  }
+  .sc-collection-stats.sc-stats.sc-stats-naira>div:nth-child(n+3){min-width:118px}
+  .sc-collection-stats.sc-stats.sc-stats-naira>div:last-child{border-right:0!important}
+  .sc-collection-stats.sc-stats.sc-stats-naira span{
+    font-size:8px;letter-spacing:.035em;line-height:1.15
+  }
+  .sc-collection-stats.sc-stats.sc-stats-naira strong,
+  .sc-collection-stats.sc-stats.sc-stats-naira>div:nth-child(n+3) strong{
+    font-size:clamp(13px,3.8vw,17px)!important;line-height:1.2;margin:2px 0 0
+  }
+  /* Grouped perfume combos stay full-width so their controls aren't crushed. */
+  .sc-cabinet-section .sc-combo-grid{gap:8px;margin-bottom:11px}
+  .sc-cabinet-section .sc-combo-visual,.sc-cabinet-section .sc-combo-collage{min-height:133px}
+  .sc-cabinet-section .sc-combo-info{padding:8px;gap:3px}
+  .sc-cabinet-section .sc-combo-info h3{font-size:19px}
+  .sc-cabinet-section .sc-combo-bottle-list{margin:3px 0;gap:2px;max-height:76px;overflow-y:auto}
+  .sc-cabinet-section .sc-combo-bottle-list>div{padding:2px 0}
+  .sc-cabinet-section .sc-combo-bottle-list button{min-height:36px;padding:4px 5px}
+  .sc-cabinet-section .sc-combo-actions{padding-top:0}
+  .sc-cabinet-section .sc-combo-actions button{padding:5px}
+}
+@media(max-width:359px){
+  .sc-cabinet-section .sc-section-head h2{font-size:26px}
+  .sc-cabinet-section .sc-combo-header-actions .sc-primary,
+  .sc-cabinet-section .sc-combo-header-actions .sc-secondary{font-size:9px;padding:6px}
+  .sc-cabinet-grid{column-gap:8px}
+  .sc-cabinet-grid .sc-perfume .sc-name{font-size:17px}
+  .sc-cabinet-grid .sc-perfume-actions button{font-size:9px}
+}
+
+/* Private Scent Cabinet cloud sync, using the existing site design. */
+.sc-top-controls{display:flex;align-items:center;gap:15px}
+.sc-topbar .sc-sync-trigger{display:inline-flex;align-items:center;gap:5px;min-height:39px}
+.sc-topbar .sc-sync-ok{color:#326d45}
+.sc-sync-dialog{max-height:min(92dvh,760px);overflow-y:auto}
+.sc-sync-dialog>svg{color:#41654c}
+.sc-sync-dialog h2{margin:5px 0 12px}
+.sc-sync-intro,.sc-sync-message{font-size:13px;line-height:1.6;color:#637568;margin:8px 0 17px}
+.sc-sync-state{display:flex;align-items:center;gap:9px;padding:11px 12px;background:#edf2ea;border:1px solid #d7e2d5;font-size:12px;color:#294b35;margin-bottom:12px}
+.sc-sync-dot{height:9px;width:9px;display:block;flex:none;border-radius:100%;background:#8b9d89}
+.sc-sync-synced{background:#2c8b4c}.sc-sync-syncing{background:#dc9a35}.sc-sync-error,.sc-sync-conflict{background:#ca7757}
+.sc-sync-form{display:flex;flex-direction:column;gap:8px;margin-top:16px}
+.sc-sync-form label{font-size:10px;color:#586f59;letter-spacing:.09em;font-weight:800}
+.sc-sync-form input{width:100%;min-height:46px;border:1px solid #cbd6c9;background:white;color:#213c2e;padding:10px 12px;font-size:16px}
+.sc-sync-form p,.sc-sync-conflict p{color:#68796a;font-size:12px;line-height:1.6}
+.sc-sync-form .sc-primary{margin-top:8px}
+.sc-sync-actions{display:flex;flex-wrap:wrap;gap:8px}
+.sc-sync-actions button{flex:1}
+.sc-sync-conflict{display:flex;flex-direction:column;gap:9px}
+.sc-sync-conflict small{color:#647466;font-size:11px;line-height:1.5}
+.sc-sync-footnote{color:#7a897d;font-size:11px;line-height:1.6;margin-top:18px;border-top:1px solid #e1e6df;padding-top:10px}
+@media(max-width:660px){.sc-top-controls{gap:12px}.sc-topbar .sc-sync-trigger{min-width:39px;justify-content:center}.sc-sync-dialog{padding-top:34px!important}}
+
+/* Owner-photo sync status: do not let photo setup masquerade as a full sync. */
+.sc-photo-cloud-box{background:#f2f5ed;border:1px solid #d3dfd1;margin-top:16px;padding:12px 13px;color:#31543d}
+.sc-photo-cloud-box>span{display:flex;align-items:center;gap:7px;font-size:12px}
+.sc-photo-cloud-box p{font-size:12px;line-height:1.55;margin:7px 0;color:#526e5c}
+.sc-photo-cloud-box button{font-size:11px;padding:7px 12px;min-height:36px}
+
+/* Spending relies on the single existing stats strip above. Keep history close
+   to the heading and avoid the old summary/footer's excessive empty space. */
+.sc-spending-section{min-height:0;padding:28px 0 80px}
+.sc-spending-section .sc-section-head{margin-bottom:10px}
+.sc-spending-section .sc-section-head h2{font-size:clamp(30px,4.5vw,54px);line-height:1.1;white-space:normal}
+.sc-spending-section .sc-worth-list{margin-top:16px}
+@media(max-width:660px){
+  .sc-spending-section{min-height:0;padding:22px 0 calc(env(safe-area-inset-bottom,0px) + 105px)}
+  .sc-spending-section .sc-section-head{margin-bottom:9px}
+  .sc-spending-section .sc-section-head h2{font-size:clamp(29px,7.5vw,37px);white-space:normal;line-height:1.04}
+  .sc-spending-section .sc-worth-list{margin-top:16px}
+}
+
+
+/* Finance dashboard — an editorial ledger, not a duplicate of Shelf statistics. */
+.sc-finance-section{min-height:0;padding:37px 0 75px}
+.sc-finance-heading{display:flex;align-items:end;justify-content:space-between;gap:22px;margin-bottom:25px}
+.sc-finance-heading>div{min-width:0}
+.sc-finance-kicker{font-family:"DM Sans",system-ui,sans-serif;display:flex;align-items:center;gap:9px;color:#856f51;font-size:10px;font-weight:800;letter-spacing:.17em}
+.sc-finance-kicker>span{display:inline-block;width:21px;height:1px;background:#ad8b5f;flex:none}
+.sc-finance-heading h2{font-size:clamp(43px,5vw,69px);letter-spacing:-.035em;line-height:1.01;margin:12px 0 9px}
+.sc-finance-heading h2 em{color:#a17e50}
+.sc-finance-heading p{font-size:13px;line-height:1.6;color:#718073;max-width:510px}
+.sc-finance-add,.sc-finance-empty-action{border:0;border-radius:7px;background:#263f32;color:#fff;display:inline-flex;align-items:center;justify-content:center;gap:9px;min-height:43px;padding:11px 17px;font-size:12px;font-weight:700;white-space:nowrap;transition:background .2s,transform .2s}
+.sc-finance-add:hover,.sc-finance-empty-action:hover{background:#365c46;transform:translateY(-1px)}
+.sc-finance-overview{display:flex;flex-direction:column;gap:13px}
+.sc-finance-hero{isolation:isolate;position:relative;overflow:hidden;border-radius:15px;border:1px solid #2d5140;background:linear-gradient(118deg,#162e24 3%,#294c3b 100%);color:#f6f3e9;padding:28px 32px 23px;box-shadow:0 8px 22px #1f422315}
+.sc-finance-hero:before{content:"";position:absolute;z-index:-1;right:-72px;top:-190px;width:415px;height:415px;border:1px solid #ffffff16;border-radius:50%;box-shadow:0 0 0 65px #ffffff05,0 0 0 132px #ffffff04;pointer-events:none}
+.sc-finance-hero:after{content:"";position:absolute;z-index:-1;right:-46px;bottom:-160px;width:340px;height:340px;border:1px solid #f0dcaf14;border-radius:50%;pointer-events:none}
+.sc-finance-hero-top{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.sc-finance-hero-top>span:first-child{font-size:10px;font-weight:750;letter-spacing:.16em;color:#c5d5c6}
+.sc-finance-hero-symbol{display:grid;place-items:center;width:37px;height:37px;border:1px solid #ffffff35;border-radius:50%;color:#d9c59d}
+.sc-finance-main-amount{font-family:"Instrument Serif",Georgia,serif;display:block;font-weight:400;font-size:clamp(54px,7vw,86px);letter-spacing:-.052em;line-height:.98;margin:10px 0 6px;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.sc-finance-hero>p{font-size:12px;color:#aebfb0;margin-bottom:24px}
+.sc-finance-hero-bottom{border-top:1px solid #ffffff32;padding-top:16px}
+.sc-finance-balance{display:flex;align-items:center;justify-content:space-between;gap:15px;margin-bottom:11px}
+.sc-finance-balance>span{color:#e6e9dc;font-size:12px}
+.sc-finance-balance>span small{font-size:10px;color:#b0bbac}
+.sc-finance-balance>strong{font-family:"DM Sans",sans-serif;font-size:17px;font-weight:750;letter-spacing:-.025em;white-space:nowrap;font-variant-numeric:tabular-nums}
+.sc-finance-track{height:5px;border-radius:20px;overflow:hidden;background:#a4c2ae45}
+.sc-finance-track>span{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,#d5b57a,#f1d6a4);transition:width .3s ease}
+.sc-finance-hero-caption{display:block;margin-top:9px;font-size:10px;color:#b6c5b8}
+.sc-finance-mini-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:11px}
+.sc-finance-mini{min-width:0;position:relative;background:#fcfaf3;border:1px solid #dedfcf;border-radius:12px;display:flex;flex-direction:column;padding:17px 21px 16px;min-height:147px}
+.sc-finance-mini-icon{display:grid;place-items:center;width:31px;height:31px;border-radius:9px;background:#e6eadd;color:#48634b;margin-bottom:14px}
+.sc-finance-mini:nth-child(2) .sc-finance-mini-icon{background:#f1eadb;color:#997f56}
+.sc-finance-mini:nth-child(3) .sc-finance-mini-icon{background:#f0e6e3;color:#955f62}
+.sc-finance-mini-label{font-size:9px;font-weight:800;letter-spacing:.1em;color:#687766}
+.sc-finance-mini strong{font-size:31px;line-height:1.15;font-weight:750;letter-spacing:-.045em;color:#254333;font-variant-numeric:tabular-nums;margin-top:5px}
+.sc-finance-mini small{font-size:11px;color:#829082}
+.sc-finance-history{background:#fcfaf4;border:1px solid #dedfd3;border-radius:15px;margin-top:25px;overflow:hidden}
+.sc-finance-history-heading{display:flex;align-items:center;justify-content:space-between;gap:15px;padding:23px 27px;border-bottom:1px solid #e3e3d8}
+.sc-finance-history-heading>div>span{font-family:"DM Sans",sans-serif;font-size:9px;font-weight:800;letter-spacing:.16em;color:#98805c}
+.sc-finance-history-heading h3{font-size:clamp(29px,3vw,40px);letter-spacing:-.025em;color:#263d2d;line-height:1.15;margin:4px 0 5px}
+.sc-finance-history-heading p{font-size:11px;color:#829183;line-height:1.45}
+.sc-finance-record-count{flex:none;border:1px solid #d4d9cc;background:#edf1e8;border-radius:100px;padding:7px 10px;font-size:10px;font-weight:750;color:#47644c}
+.sc-finance-transaction{display:flex;align-items:center;gap:14px;padding:18px 25px;border-bottom:1px solid #e6e5db}
+.sc-finance-transaction:last-child{border-bottom:0}
+.sc-finance-tx-icon{width:37px;height:37px;border:1px solid #d4dbd0;border-radius:10px;background:#edf1e9;display:grid;place-items:center;flex:none;color:#55715b}
+.sc-finance-tx-detail{min-width:0;display:flex;flex:1;flex-direction:column;gap:3px}
+.sc-finance-tx-detail small{font-size:10px;color:#977e59;font-weight:700;letter-spacing:.035em}
+.sc-finance-tx-detail strong{font-size:14px;color:#223d2e;line-height:1.25;overflow-wrap:anywhere}
+.sc-finance-tx-detail>span{font-size:11px;color:#7c8c7c;line-height:1.4}
+.sc-finance-tx-right{display:flex;align-items:flex-end;flex-direction:column;gap:6px;flex:none}
+.sc-finance-tx-right>strong{font-size:14px;color:#244734;font-weight:800;white-space:nowrap;font-variant-numeric:tabular-nums}
+.sc-finance-tx-right>button{display:inline-flex;align-items:center;gap:4px;background:transparent;color:#59745d;border:0;padding:3px 0;font-size:11px;font-weight:700}
+.sc-finance-tx-right>button:hover{text-decoration:underline}
+.sc-finance-empty{text-align:center;display:flex;flex-direction:column;align-items:center;padding:31px 24px 32px}
+.sc-finance-empty-art{position:relative;display:grid;place-items:center;border-radius:19px;width:62px;height:62px;color:#547459;background:#e9eee3;margin-bottom:15px}
+.sc-finance-empty-art:after{content:"";position:absolute;inset:-7px;border:1px dashed #cbd6c6;border-radius:24px}
+.sc-finance-empty-tag{font-size:9px;font-weight:800;letter-spacing:.17em;color:#a68a62}
+.sc-finance-empty h4{font-family:"Instrument Serif",Georgia,serif;font-size:clamp(29px,3vw,39px);font-weight:400;letter-spacing:-.02em;margin:7px 0}
+.sc-finance-empty>p{font-size:12px;line-height:1.65;color:#768574;max-width:390px}
+.sc-finance-empty-action{margin-top:16px;min-height:42px}
+.sc-finance-section .sc-legacy-note{margin:13px 24px}
+@media(max-width:660px){
+ .sc-finance-section{min-height:0;padding:18px 0 calc(env(safe-area-inset-bottom,0px) + 104px)}
+ .sc-finance-heading{align-items:start;gap:11px;margin-bottom:18px}
+ .sc-finance-kicker{font-size:8px;letter-spacing:.13em}
+ .sc-finance-kicker>span{width:16px}
+ .sc-finance-heading h2{font-size:clamp(35px,9vw,43px);line-height:.98;letter-spacing:-.035em;margin:10px 0 9px}
+ .sc-finance-heading p{font-size:11px;max-width:275px}
+ .sc-finance-add{flex:none;min-width:39px;min-height:39px;padding:7px 9px;font-size:0;gap:0;border-radius:10px}
+ .sc-finance-add svg{width:19px;height:19px}
+ .sc-finance-overview{gap:10px}
+ .sc-finance-hero{padding:19px 19px 18px;border-radius:13px}
+ .sc-finance-hero:before{width:270px;height:270px;top:-130px;right:-65px;box-shadow:0 0 0 35px #ffffff05,0 0 0 70px #ffffff04}
+ .sc-finance-hero-top>span:first-child{font-size:9px;letter-spacing:.12em}
+ .sc-finance-hero-symbol{width:29px;height:29px}
+ .sc-finance-hero-symbol svg{width:16px;height:16px}
+ .sc-finance-main-amount{font-size:clamp(53px,14vw,69px);margin:9px 0 2px}
+ .sc-finance-hero>p{font-size:11px;margin-bottom:18px}
+ .sc-finance-hero-bottom{padding-top:13px}
+ .sc-finance-balance{gap:6px;margin-bottom:10px}
+ .sc-finance-balance>span{font-size:11px}
+ .sc-finance-balance>span small{display:none}
+ .sc-finance-balance>strong{font-size:14px}
+ .sc-finance-hero-caption{font-size:9px}
+ .sc-finance-mini-grid{gap:7px}
+ .sc-finance-mini{padding:12px 10px 11px;min-height:113px;border-radius:10px}
+ .sc-finance-mini-icon{width:27px;height:27px;border-radius:8px;margin-bottom:10px}
+ .sc-finance-mini-icon svg{width:15px;height:15px}
+ .sc-finance-mini-label{font-size:8px;letter-spacing:.025em;white-space:nowrap}
+ .sc-finance-mini strong{font-size:27px;margin-top:4px}
+ .sc-finance-mini small{font-size:9px;line-height:1.25}
+ .sc-finance-history{border-radius:12px;margin-top:16px}
+ .sc-finance-history-heading{padding:17px 16px}
+ .sc-finance-history-heading h3{font-size:29px;margin:3px 0}
+ .sc-finance-history-heading p{font-size:10px}
+ .sc-finance-record-count{padding:5px 7px;font-size:9px}
+ .sc-finance-transaction{padding:13px 12px;gap:9px}
+ .sc-finance-tx-icon{width:30px;height:30px;border-radius:8px}
+ .sc-finance-tx-icon svg{width:14px}
+ .sc-finance-tx-detail strong{font-size:12px}
+ .sc-finance-tx-detail small,.sc-finance-tx-detail>span{font-size:9px}
+ .sc-finance-tx-right>strong{font-size:12px}
+ .sc-finance-empty{padding:25px 17px 27px}
+ .sc-finance-empty-art{width:49px;height:49px;border-radius:15px;margin-bottom:13px}
+ .sc-finance-empty-art svg{width:26px}
+ .sc-finance-empty-art:after{border-radius:19px}
+ .sc-finance-empty h4{font-size:29px}
+ .sc-finance-empty>p{font-size:11px;line-height:1.55}
+ .sc-finance-empty-action{min-height:39px;padding:9px 15px}
+}
+@media(max-width:360px){
+ .sc-finance-heading h2{font-size:33px}
+ .sc-finance-mini{padding:11px 7px}
+ .sc-finance-mini-label{font-size:7px}
+ .sc-finance-main-amount{font-size:49px}
+}
+@media(prefers-reduced-motion:reduce){.sc-finance-track>span,.sc-finance-add,.sc-finance-empty-action{transition:none}}

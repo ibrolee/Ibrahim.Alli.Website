@@ -1,5 +1,4 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { track } from "@vercel/analytics";
 import { ArrowLeft, ArrowRight, ArrowUpRight, Check, CircleHelp, ExternalLink, Lightbulb, ShieldCheck } from "lucide-react";
 import { industryPages,industrySlugs,isIndustrySlug } from "@/lib/industry-pages";
 
@@ -39,10 +38,6 @@ function IndustryPage(){
     to:"/start-project" as const,
     search:{service:d.service,industry:d.slug},
   };
-  const trackClick=(place:"hero"|"footer")=>{
-    // Tracks a navigation intention only; this is not proof of an actual enquiry.
-    track("portfolio_industry_cta_click",{industry:d.slug,placement:place,action:"open_project_form"});
-  };
   return <main id="main-content" className="ia-stage-page ia-4c-page">
     <section className="ia-stage-hero ia-4c-hero ia-4c-industry-hero">
       <div className="p-container ia-stage-hero-inner">
@@ -51,7 +46,7 @@ function IndustryPage(){
         <h1>{d.title}<br/><em>{d.accent}</em></h1>
         <div className="ia-stage-lead-row">
           <p>{d.lead}</p>
-          <Link {...bookLink} onClick={()=>trackClick("hero")} className="ia-stage-primary">Discuss your website <ArrowUpRight size={18} aria-hidden="true"/></Link>
+          <Link {...bookLink} className="ia-stage-primary">Discuss your website <ArrowUpRight size={18} aria-hidden="true"/></Link>
         </div>
         <div className="ia-stage-statline"><span>Built around your workflow</span><span>Clear scope before pricing</span><span>Mobile-first approach</span></div>
       </div>
@@ -114,7 +109,7 @@ function IndustryPage(){
       <div className="p-container ia-stage-end-inner">
         <div><p className="p-label">Ready to explore?</p><h2>{d.takeaway}<br/><em>Let's talk about your business.</em></h2></div>
         <div className="ia-4c-end-links">
-          <Link {...bookLink} onClick={()=>trackClick("footer")} className="ia-stage-primary">Get a tailored proposal <ArrowUpRight size={18} aria-hidden="true"/></Link>
+          <Link {...bookLink} className="ia-stage-primary">Get a tailored proposal <ArrowUpRight size={18} aria-hidden="true"/></Link>
           <Link to="/industries" className="ia-4c-text-link">Browse other industries <ArrowRight size={17} aria-hidden="true"/></Link>
         </div>
       </div>

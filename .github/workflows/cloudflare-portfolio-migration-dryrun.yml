@@ -1,0 +1,77 @@
+name: Cloudflare portfolio migration dry run
+
+on:
+  push:
+    branches: [migration/cloudflare-portfolio-2026-10-17]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  dry-run:
+    name: Verify Workers build and package without deployment
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+      - name: Install locked dependencies
+        run: bun install --frozen-lockfile
+      - name: Build TanStack Start/Nitro for Cloudflare
+        run: bun run build
+      - name: Assert expected Cloudflare files exist
+        run: |
+          test -f .output/server/index.mjs
+          test -d .output/public
+          test -f .output/public/index.html || test "$(find .output/public -type f | wc -l)" -gt 0
+          echo "Worker entry exists; static assets were generated."
+      - name: Wrangler packaging dry-run (no credentials or deployment)
+        run: npx --yes wrangler@4.135.0 deploy --dry-run --outdir .cloudflare-dryrun
+      - name: Fragrance providers unit tests (no real API calls)
+        run: bun test src/lib/scent-providers.test.ts src/lib/scent-filters.test.ts src/lib/scent-catalogue.test.ts
+      - name: Local Workers smoke tests (no Cloudflare deployment)
+        run: |
+          set -e
+          npx --yes wrangler@4.135.0 dev --local --ip 127.0.0.1 --port 8787 > worker-preview.log 2>&1 &
+          PID=$!
+          trap 'kill $PID 2>/dev/null || true' EXIT
+          ready=0
+          for i in $(seq 1 35); do
+            if curl -fsS --max-time 2 http://127.0.0.1:8787/ -o /tmp/portfolio-home.html; then
+              ready=1
+              break
+            fi
+            sleep 2
+          done
+          if [ "$ready" -ne 1 ]; then
+            tail -80 worker-preview.log
+            exit 1
+          fi
+          grep -qi 'Ibrahim' /tmp/portfolio-home.html
+          curl -fsS --max-time 20 http://127.0.0.1:8787/fragrance -o /tmp/fragrance-page.html
+          grep -qi 'Scent Cabinet' /tmp/fragrance-page.html
+          echo "Portfolio root and Scent Cabinet SSR responded under local workerd. Fragrance providers are mocked in unit tests."
+      - name: Verify public Cloudflare preview (read-only)
+        env:
+          PREVIEW_URL: https://ibrahimalli-portfolio-preview.alliibrahim3.workers.dev
+        run: |
+          set -euo pipefail
+          echo "Checking external workers.dev URL (no paid API searches)"
+          for path in / /fragrance /fragrance.webmanifest /fragrance-apple-touch.png; do
+            status=$(curl -sS -L --max-time 20 -o /tmp/cloudflare-preview-check -w '%{http_code}' "$PREVIEW_URL$path")
+            echo "Cloudflare $path: HTTP $status"
+            if [ "$status" != "200" ]; then
+              head -c 450 /tmp/cloudflare-preview-check || true
+              exit 1
+            fi
+            if [ "$path" = "/fragrance" ]; then
+              grep -qi 'Scent Cabinet' /tmp/cloudflare-preview-check
+            fi
+          done
+          echo "Public preview smoke checks all passed."
+      - name: Summarize build output
+        if: always()
+        run: |
+          du -sh .output/server .output/public 2>/dev/null || true
+          find .cloudflare-dryrun -maxdepth 2 -type f | head -20 || true
