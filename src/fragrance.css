@@ -173,3 +173,8 @@
 .sc-manual-target input{accent-color:#28523b}
 .sc-manual-form .sc-primary{width:100%;margin-top:4px}
 @media(max-width:660px){.sc-no-photo small{font-size:9px}.sc-add-missing{margin-bottom:12px}.sc-manual-form>input{height:46px}}
+
+.sc-search-submit{background:#254634;color:#fff;border:0;border-radius:2px;font-weight:750;padding:10px 14px;font-size:12px;min-height:36px;white-space:nowrap}
+.sc-search-submit:disabled{opacity:.45;cursor:default}
+.sc-search-submit:not(:disabled):hover{background:#396449}
+@media(max-width:660px){.sc-search-submit{padding:7px 10px;font-size:11px;min-height:32px}}
