@@ -80,7 +80,7 @@ export const Route=createFileRoute("/fragrance")({
     {name:"apple-mobile-web-app-capable",content:"yes"},
     {name:"apple-mobile-web-app-title",content:"Scent Cabinet"},
     {name:"apple-mobile-web-app-status-bar-style",content:"default"}
-  ],links:[{rel:"stylesheet",href:css},{rel:"manifest",href:"/fragrance.webmanifest"},{rel:"apple-touch-icon",href:"/fragrance-icon.svg"},{rel:"canonical",href:"https://ibrahimalli.com/fragrance"}]}),
+  ],links:[{rel:"stylesheet",href:css},{rel:"manifest",href:"/fragrance.webmanifest"},{rel:"apple-touch-icon",href:"/fragrance-apple-touch.png",sizes:"180x180"},{rel:"canonical",href:"https://ibrahimalli.com/fragrance"}]}),
   component:Fragrance
 });
 function Fragrance(){
