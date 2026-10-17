@@ -49,6 +49,57 @@ function isH3SwallowedErrorBody(body: string): boolean {
  * Keeps the UI on its own origin and avoids exposing provider keys.
  * Strictly allows browse/search and bounds request size. No owner data goes upstream.
  */
+/** Optional image discovery. Only an exact perfume/brand match can inherit a public photo. */
+async function fragranceImages(request: Request): Promise<Response> {
+  if (request.method !== "GET") return new Response("Method not allowed",{status:405});
+  const url=new URL(request.url);
+  const raw=url.searchParams.get("items")||"";
+  if(raw.length>3800)return Response.json({images:{}},{status:400});
+  let wanted:Array<{id:string;brand:string;name:string}>=[];
+  try{
+    const value=JSON.parse(raw);
+    if(!Array.isArray(value))throw Error("Not an array");
+    wanted=value.slice(0,12).filter(p=>p&&typeof p.id==="string"&&typeof p.brand==="string"&&typeof p.name==="string").map(p=>({id:p.id.slice(0,120),brand:p.brand.slice(0,70),name:p.name.slice(0,110)}));
+  }catch{return Response.json({images:{}},{status:400})}
+  const uniqueBrands=[...new Set(wanted.map(p=>p.brand.replace(/\(.*?\)/g,"").trim()))].slice(0,3);
+  const normalized=(s:string)=>s.toLowerCase().normalize("NFKD").replace(/[^a-z0-9]+/g,"");
+  const photos:Record<string,string>={};
+  const tasks=uniqueBrands.map(async brand=>{
+    const remote=new URL("https://world.openbeautyfacts.org/cgi/search.pl");
+    remote.searchParams.set("search_terms",brand);
+    remote.searchParams.set("search_simple","1");
+    remote.searchParams.set("action","process");
+    remote.searchParams.set("json","1");
+    remote.searchParams.set("page_size","100");
+    remote.searchParams.set("fields","product_name,product_name_en,brands,image_front_url,image_url,image_front_small_url");
+    try{
+      const res=await fetch(remote,{headers:{Accept:"application/json","User-Agent":"ScentCabinetPersonal/1.0 (https://ibrahimalli.com/fragrance)"},signal:AbortSignal.timeout(4500)});
+      if(!res.ok||!(res.headers.get("content-type")||"").includes("json"))return;
+      const body=await res.text();
+      if(body.length>1_500_000)return;
+      const rows=JSON.parse(body)?.products;
+      if(!Array.isArray(rows))return;
+      const mapped=rows.map((d:Record<string,unknown>)=>({
+        n:normalized(String(d["product_name"]||d["product_name_en"]||"")),
+        b:normalized(String(d["brands"]||"")),
+        image:String(d["image_front_url"]||d["image_url"]||d["image_front_small_url"]||"")
+      })).filter((p:{n:string;b:string;image:string})=>p.n&&p.image.startsWith("https://")&&/^https:\/\/(?:images\.openbeautyfacts\.org|images\.openfoodfacts\.org|static\.openfoodfacts\.org)\//.test(p.image));
+      for(const p of wanted.filter(x=>x.brand.replace(/\(.*?\)/g,"").trim()===brand)){
+        const n=normalized(p.name);
+        const brandKey=normalized(brand.split(" ")[0]||brand);
+        const found=mapped.find((d:{n:string;b:string;image:string})=>{
+          if(!(d.b.includes(brandKey)||d.n.includes(brandKey)))return false;
+          const withoutBrand=d.n.replace(brandKey,"");
+          return d.n===n||withoutBrand===n||(n.length>=7&&withoutBrand.includes(n));
+        });
+        if(found)photos[p.id]=found.image;
+      }
+    }catch{/* image search is optional; stylized bottle fallback remains */}
+  });
+  await Promise.all(tasks);
+  return Response.json({images:photos},{headers:{"cache-control":"public, max-age=3600, stale-while-revalidate=86400"}});
+}
+
 async function fragranceSearch(request: Request): Promise<Response> {
   if (request.method !== "GET") return new Response("Method not allowed", { status: 405 });
   const url = new URL(request.url);
@@ -119,6 +170,7 @@ async function fragranceSearch(request: Request): Promise<Response> {
 export default {
   async fetch(request: Request, env: unknown, ctx: unknown) {
     try {
+      if (new URL(request.url).pathname === "/api/fragrance/images") return await fragranceImages(request);
       if (new URL(request.url).pathname.startsWith("/api/fragrance/")) return await fragranceSearch(request);
       const handler = await getServerEntry();
       const response = await handler.fetch(request, env, ctx);
