@@ -45,132 +45,68 @@ function isH3SwallowedErrorBody(body: string): boolean {
   }
 }
 
-/** Public, read-only fragrance search relay.
- * Keeps the UI on its own origin and avoids exposing provider keys.
- * Strictly allows browse/search and bounds request size. No owner data goes upstream.
+/** Read-only fragrance search. No secret keys are exposed to browsers.
+ * Connect the official Fragella API by configuring FRAGELLA_API_KEY in Vercel.
+ * Free plan: 20 requests per month. All records/images remain provider-owned.
  */
-/** Optional image discovery. Only an exact perfume/brand match can inherit a public photo. */
-async function fragranceImages(request: Request): Promise<Response> {
-  if (request.method !== "GET") return new Response("Method not allowed",{status:405});
-  const url=new URL(request.url);
-  const raw=url.searchParams.get("items")||"";
-  if(raw.length>3800)return Response.json({images:{}},{status:400});
-  let wanted:Array<{id:string;brand:string;name:string}>=[];
-  try{
-    const value=JSON.parse(raw);
-    if(!Array.isArray(value))throw Error("Not an array");
-    wanted=value.slice(0,12).filter(p=>p&&typeof p.id==="string"&&typeof p.brand==="string"&&typeof p.name==="string").map(p=>({id:p.id.slice(0,120),brand:p.brand.slice(0,70),name:p.name.slice(0,110)}));
-  }catch{return Response.json({images:{}},{status:400})}
-  const uniqueBrands=[...new Set(wanted.map(p=>p.brand.replace(/\(.*?\)/g,"").trim()))].slice(0,3);
-  const normalized=(s:string)=>s.toLowerCase().normalize("NFKD").replace(/[^a-z0-9]+/g,"");
-  const photos:Record<string,string>={};
-  const tasks=uniqueBrands.map(async brand=>{
-    const remote=new URL("https://world.openbeautyfacts.org/cgi/search.pl");
-    remote.searchParams.set("search_terms",brand);
-    remote.searchParams.set("search_simple","1");
-    remote.searchParams.set("action","process");
-    remote.searchParams.set("json","1");
-    remote.searchParams.set("page_size","100");
-    remote.searchParams.set("fields","product_name,product_name_en,brands,image_front_url,image_url,image_front_small_url");
-    try{
-      const res=await fetch(remote,{headers:{Accept:"application/json","User-Agent":"ScentCabinetPersonal/1.0 (https://ibrahimalli.com/fragrance)"},signal:AbortSignal.timeout(4500)});
-      if(!res.ok||!(res.headers.get("content-type")||"").includes("json"))return;
-      const body=await res.text();
-      if(body.length>1_500_000)return;
-      const rows=JSON.parse(body)?.products;
-      if(!Array.isArray(rows))return;
-      const mapped=rows.map((d:Record<string,unknown>)=>({
-        n:normalized(String(d["product_name"]||d["product_name_en"]||"")),
-        b:normalized(String(d["brands"]||"")),
-        image:String(d["image_front_url"]||d["image_url"]||d["image_front_small_url"]||"")
-      })).filter((p:{n:string;b:string;image:string})=>p.n&&p.image.startsWith("https://")&&/^https:\/\/(?:images\.openbeautyfacts\.org|images\.openfoodfacts\.org|static\.openfoodfacts\.org)\//.test(p.image));
-      for(const p of wanted.filter(x=>x.brand.replace(/\(.*?\)/g,"").trim()===brand)){
-        const n=normalized(p.name);
-        const brandKey=normalized(brand.split(" ")[0]||brand);
-        const found=mapped.find((d:{n:string;b:string;image:string})=>{
-          if(!(d.b.includes(brandKey)||d.n.includes(brandKey)))return false;
-          const withoutBrand=d.n.replace(brandKey,"");
-          return d.n===n||withoutBrand===n||(n.length>=7&&withoutBrand.includes(n));
-        });
-        if(found)photos[p.id]=found.image;
-      }
-    }catch{/* image search is optional; stylized bottle fallback remains */}
-  });
-  await Promise.all(tasks);
-  return Response.json({images:photos},{headers:{"cache-control":"public, max-age=3600, stale-while-revalidate=86400"}});
-}
-
 async function fragranceSearch(request: Request): Promise<Response> {
-  if (request.method !== "GET") return new Response("Method not allowed", { status: 405 });
-  const url = new URL(request.url);
-  const mode = url.pathname.endsWith("/search") ? "search" : url.pathname.endsWith("/browse") ? "browse" : null;
-  if (!mode) return new Response("Not found", { status: 404 });
-  const q = (url.searchParams.get("q") || "").trim().slice(0, 90);
-  const page = Math.min(100, Math.max(1, Math.floor(Number(url.searchParams.get("page")) || 1)));
-  const curated = (mode === "browse" ? SCENT_SEED.slice((page - 1) * 20, page * 20) : seedSearch(q, page, 20));
-  // A deterministic curated fallback always works even when the external provider is offline.
-  if (mode === "browse" || q.length < 2) {
-    return Response.json({results: curated, total: mode === "browse" ? SCENT_SEED.length : 0, source: "curated", catalogue: "starter"}, {
-      headers: {"cache-control":"public, max-age=300"}
-    });
-  }
-  const remote = new URL("https://world.openbeautyfacts.org/cgi/search.pl");
-  remote.searchParams.set("search_terms", q);
-  remote.searchParams.set("search_simple", "1");
-  remote.searchParams.set("action", "process");
-  remote.searchParams.set("json", "1");
-  remote.searchParams.set("page", String(page));
-  remote.searchParams.set("page_size", "30");
-  remote.searchParams.set("fields", "code,product_name,product_name_en,brands,image_front_url,image_url,image_front_small_url,categories,quantity");
-  try {
-    const response = await fetch(remote, {
-      headers: {
-        Accept: "application/json",
-        "User-Agent": "ScentCabinetPersonal/1.0 (https://ibrahimalli.com/fragrance; personal collection catalogue)"
-      },
-      signal: AbortSignal.timeout(6500)
-    });
-    if (!response.ok) throw new Error("Open Beauty Facts status " + response.status);
-    const text = await response.text();
-    if (text.length > 1_200_000) throw new Error("Catalogue response too large");
-    if (!response.headers.get("content-type")?.toLowerCase().includes("json"))
-      throw new Error("Catalogue did not return JSON");
-    const data = JSON.parse(text) as { products?: Array<Record<string,unknown>>; count?:number };
-    if (!Array.isArray(data.products)) throw new Error("Unexpected product schema");
-    const live = data.products.filter(d => {
-      const name = String(d["product_name"] || d["product_name_en"] || "").trim();
-      const brand = String(d["brands"] || "").trim();
-      return name.length > 1 && brand.length > 1;
-    }).map(d=>({
-      id:"obf:"+String(d["code"]||""),
-      name:String(d["product_name"]||d["product_name_en"]),
-      brand:String(d["brands"]),
-      image:String(d["image_front_url"]||d["image_url"]||d["image_front_small_url"]||""),
-      notes:[],top:[],heart:[],base:[],accords:[],
-      family:String(d["quantity"]||"")
-    }));
-    // Put curated results first so official Qasida and popular brands stay findable.
-    const merged = [...curated];
-    const seen = new Set(merged.map(p=>(p.brand+" "+p.name).toLowerCase().replace(/[^a-z0-9]/g,"")));
-    for (const p of live) {
-      const id = (p.brand+" "+p.name).toLowerCase().replace(/[^a-z0-9]/g,"");
-      if (!seen.has(id) && p.id!=="obf:") {merged.push(p);seen.add(id);}
-    }
-    return Response.json({results:merged, total: Math.max(merged.length,Number(data.count)||0),source:"openbeautyfacts+curated",catalogue:"community-products"},{
+  if(request.method!=="GET")return new Response("Method not allowed",{status:405});
+  const url=new URL(request.url);
+  const mode=url.pathname.endsWith("/search")?"search":url.pathname.endsWith("/browse")?"browse":null;
+  if(!mode)return Response.json({error:"Not found"},{status:404});
+  const q=(url.searchParams.get("q")||"").trim().slice(0,90);
+  const page=Math.min(2,Math.max(1,Math.floor(Number(url.searchParams.get("page"))||1)));
+  const fallback=mode==="browse" || q.length<3 ? SCENT_SEED.slice((page-1)*20,page*20) : seedSearch(q,page,20);
+  const key=process.env.FRAGELLA_API_KEY?.trim();
+  // Do not spend provider quota loading a home screen or on short input.
+  if(mode==="browse" || q.length<3){
+    return Response.json({results:fallback,total:SCENT_SEED.length,source:"starter",connected:!!key},{
       headers:{"cache-control":"public, max-age=300"}
     });
-  } catch (error) {
-    console.warn("Optional Open Beauty Facts catalogue unavailable", error instanceof Error ? error.message : "unknown");
-    return Response.json({ results:curated, total:curated.length,source:"curated", catalogue:"starter", providerWarning: "Community catalogue is temporarily unavailable. Showing built-in fragrances."},{
-      headers:{"cache-control":"public, max-age=120"}
+  }
+  if(!key)return Response.json({
+    results:fallback,total:fallback.length,source:"starter",connected:false,
+    providerWarning:"Full perfume catalogue not connected yet."
+  },{headers:{"cache-control":"public, max-age=300"}});
+  try{
+    const remote=new URL("https://api.fragella.com/api/v1/fragrances");
+    remote.searchParams.set("search",q);
+    remote.searchParams.set("page",String(page));
+    remote.searchParams.set("limit","10");
+    const response=await fetch(remote.toString(),{
+      headers:{"x-api-key":key,Accept:"application/json"},
+      signal:AbortSignal.timeout(8500)
     });
+    if(!response.ok)throw new Error("Fragella returned "+response.status);
+    const ct=response.headers.get("content-type")||"";
+    if(!ct.includes("json"))throw new Error("Catalogue did not return JSON");
+    const raw=await response.text();
+    if(raw.length>1_000_000)throw new Error("Catalogue response too large");
+    const parsed=JSON.parse(raw);
+    const records=Array.isArray(parsed)?parsed:parsed.data;
+    if(!Array.isArray(records))throw new Error("Invalid fragrance response");
+    const results=records.filter((x:unknown)=>x&&typeof x==="object").map((x:Record<string,unknown>)=>({
+      ...x,
+      id:"fragella:"+String(x["_id"]||x["id"]||x["Brand"]+":"+x["Name"])
+    }));
+    const hasNext=parsed.pagination?.hasNextPage??(page===1&&records.length===10);
+    // One server request = one provider call, with same-origin caching to conserve quota.
+    return Response.json({
+      results,total:Number(parsed.pagination?.total||0)||results.length,
+      hasMore:!!hasNext && page<2,source:"fragella",connected:true
+    },{headers:{"cache-control":"public, s-maxage=86400, stale-while-revalidate=86400"}});
+  }catch(error){
+    console.warn("Fragella search error",error instanceof Error?error.message:"unknown");
+    return Response.json({
+      results:fallback,total:fallback.length,source:"starter",connected:true,
+      providerWarning:"Full catalogue temporarily unavailable. Showing saved starter selection."
+    },{headers:{"cache-control":"private, max-age=30"}});
   }
 }
 
 export default {
   async fetch(request: Request, env: unknown, ctx: unknown) {
     try {
-      if (new URL(request.url).pathname === "/api/fragrance/images") return await fragranceImages(request);
       if (new URL(request.url).pathname.startsWith("/api/fragrance/")) return await fragranceSearch(request);
       const handler = await getServerEntry();
       const response = await handler.fetch(request, env, ctx);
