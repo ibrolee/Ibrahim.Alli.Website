@@ -3,7 +3,7 @@ import "./lib/error-capture";
 import { consumeLastCapturedError } from "./lib/error-capture";
 import { renderErrorPage } from "./lib/error-page";
 import { SCENT_SEED, seedSearch } from "./lib/scent-catalog-seed";
-import { searchNoteboxd, searchFragella } from "./lib/scent-providers";
+import { searchNoteboxd, searchFragella, searchOpenFacts, type SearchResult } from "./lib/scent-providers";
 
 type ServerEntry = {
   fetch: (request: Request, env: unknown, ctx: unknown) => Promise<Response> | Response;
@@ -46,59 +46,81 @@ function isH3SwallowedErrorBody(body: string): boolean {
   }
 }
 
-/** Search order: Noteboxd (if configured) → Fragella → curated fallback.
- * Browser never receives provider keys, and only one provider is called when the first succeeds.
- * Browse does not consume remote quotas; only explicit submitted searches do.
+/** Cloudflare perfume catalogues: Open Beauty Facts and Open Products Facts first,
+ * with quota-limited Noteboxd / Fragella reserved for explicit selection or when
+ * free public sources have no usable photos. No provider is called on page load.
  */
-/** Support both Vercel/Node and Cloudflare Worker request-time env bindings.
- * Never serialize runtime env or API tokens in responses.
- */
+type SearchSource="auto"|"beautyfacts"|"productsfacts"|"noteboxd"|"fragella";
 function runtimeSecret(bindings:unknown,key:"NOTEBOXD_API_KEY"|"FRAGELLA_API_KEY"):string|undefined {
- const fromWorker = bindings && typeof bindings==="object" && key in bindings
-   ? (bindings as Record<string,unknown>)[key] : undefined;
- if(typeof fromWorker==="string" && fromWorker.trim())return fromWorker.trim();
+ const fromWorker=bindings&&typeof bindings==="object"&&key in bindings?(bindings as Record<string,unknown>)[key]:undefined;
+ if(typeof fromWorker==="string"&&fromWorker.trim())return fromWorker.trim();
  const fromNode=typeof process!=="undefined"?process.env[key]:undefined;
  return fromNode?.trim()||undefined;
 }
-async function fragranceSearch(request: Request, bindings?: unknown): Promise<Response> {
+function scentPhotoResults(records:SearchResult["results"]){
+ return records.filter(p=>typeof p.image==="string"&&p.image.startsWith("https://"));
+}
+async function fragranceSearch(request:Request,bindings?:unknown):Promise<Response>{
  if(request.method!=="GET")return new Response("Method not allowed",{status:405});
  const url=new URL(request.url);
  const mode=url.pathname.endsWith("/search")?"search":url.pathname.endsWith("/browse")?"browse":null;
  if(!mode)return Response.json({error:"Not found"},{status:404});
- const q=(url.searchParams.get("q")||"").trim().slice(0,90);
+ const q=(url.searchParams.get("q")||"").trim().replace(/\s+/g," ").slice(0,90);
  const page=Math.min(2,Math.max(1,Math.floor(Number(url.searchParams.get("page"))||1)));
- const fallback=mode==="browse"||q.length<3 ? SCENT_SEED.slice((page-1)*20,page*20):seedSearch(q,page,20);
- const noteboxd=runtimeSecret(bindings,"NOTEBOXD_API_KEY");
- const fragella=runtimeSecret(bindings,"FRAGELLA_API_KEY");
+ const rawSource=url.searchParams.get("source");
+ const source:SearchSource=rawSource==="beautyfacts"||rawSource==="productsfacts"||rawSource==="noteboxd"||rawSource==="fragella"?rawSource:"auto";
  if(mode==="browse"||q.length<3){
-   return Response.json({results:fallback,total:SCENT_SEED.length,source:"starter",connected:!!(noteboxd||fragella)},{
+   // Browse deliberately never calls outside APIs, so opening the app uses no quota.
+   const items=SCENT_SEED.slice((page-1)*20,page*20);
+   return Response.json({results:items,total:SCENT_SEED.length,source:"starter",connected:true,hasMore:false},{
      headers:{"cache-control":"public, max-age=300"}
    });
  }
- if(noteboxd && page===1){
+ const cacheKey=new Request(new URL("/api/fragrance/search?source="+source+"&page="+page+"&q="+encodeURIComponent(q.toLowerCase()),url.origin).toString());
+ const cacheStore=(globalThis as typeof globalThis&{caches?:{default?:Cache}}).caches?.default;
+ if(cacheStore){
    try{
-     const found=await searchNoteboxd(q,noteboxd);
-     return Response.json({...found,connected:true},{
-       headers:{"cache-control":"public, s-maxage=86400, stale-while-revalidate=86400"}
-     });
+     const cached=await cacheStore.match(cacheKey);
+     if(cached)return new Response(cached.body,{status:cached.status,headers:{...Object.fromEntries(cached.headers.entries()),"x-scent-cache":"HIT"}});
+   }catch{/* unavailable in local runtime */}
+ }
+ const noteboxd=runtimeSecret(bindings,"NOTEBOXD_API_KEY"),fragella=runtimeSecret(bindings,"FRAGELLA_API_KEY");
+ const plan:SearchSource[]=source==="auto"?["beautyfacts","productsfacts","noteboxd","fragella"]:
+   [source,...(["beautyfacts","productsfacts"] as SearchSource[]).filter(s=>s!==source)];
+ const tried:string[]=[];
+ let answer:SearchResult|null=null;
+ for(const provider of plan){
+   if(provider==="noteboxd"&&!noteboxd)continue;
+   if(provider==="fragella"&&!fragella)continue;
+   tried.push(provider);
+   try{
+     const found=provider==="noteboxd"?await searchNoteboxd(q,noteboxd!):
+       provider==="fragella"?await searchFragella(q,fragella!,page):
+       await searchOpenFacts(q,page,provider as "beautyfacts"|"productsfacts");
+     // "Successful" empty or image-less API responses are not useful. Keep falling back.
+     const eligible=scentPhotoResults(found.results);
+     if(eligible.length){
+       answer={...found,results:eligible,total:eligible.length};
+       break;
+     }
    }catch(err){
-     console.warn("Noteboxd search fallback:",err instanceof Error?err.message:"unknown");
+     console.warn("Fragrance source unavailable:",provider,err instanceof Error?err.message:"request failed");
    }
  }
- if(fragella){
-   try{
-     const found=await searchFragella(q,fragella,page);
-     return Response.json({...found,connected:true},{
-       headers:{"cache-control":"public, s-maxage=86400, stale-while-revalidate=86400"}
-     });
-   }catch(err){
-     console.warn("Fragella search fallback:",err instanceof Error?err.message:"unknown");
-   }
+ const data=answer?{
+   ...answer,connected:true,requestedSource:source,sourcesTried:tried,
+   attribution:answer.source==="beautyfacts"?"Open Beauty Facts contributors":
+     answer.source==="productsfacts"?"Open Products Facts contributors":undefined
+ }:{
+   results:[],total:0,hasMore:false,source:"none",connected:Boolean(noteboxd||fragella),
+   requestedSource:source,sourcesTried:tried,
+   providerWarning:"No matching perfume photos from available sources. Try another source or add manually."
+ };
+ const response=Response.json(data,{headers:{"cache-control":"public, max-age=0, s-maxage="+(answer?86400:300)}});
+ if(cacheStore){
+   try{await cacheStore.put(cacheKey,response.clone());}catch{/* best-effort edge cache */}
  }
- return Response.json({
-    results:fallback,total:fallback.length,hasMore:false,source:"starter",connected:!!(noteboxd||fragella),
-    providerWarning:noteboxd||fragella?"The online catalogue is unavailable; showing the starter selection.":"Connect a perfume catalogue to unlock more fragrances."
- },{headers:{"cache-control":"private, max-age=60"}});
+ return response;
 }
 
 export default {
