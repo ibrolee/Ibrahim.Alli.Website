@@ -6,6 +6,14 @@ import css from "../fragrance.css?url";
 
 type Currency = "NGN" | "USD";
 type Page = "collection" | "discover" | "wishlist" | "worth" | "layer";
+type CatalogSource = "auto" | "beautyfacts" | "productsfacts" | "noteboxd" | "fragella";
+const SOURCES:{id:CatalogSource;name:string}[]=[
+  {id:"auto",name:"Automatic · free first"},
+  {id:"beautyfacts",name:"Open Beauty Facts · free"},
+  {id:"productsfacts",name:"Open Products Facts · free"},
+  {id:"noteboxd",name:"Noteboxd · uses quota"},
+  {id:"fragella",name:"Fragella · uses quota"}
+];
 type Perfume = { id: string; name: string; brand: string; image?: string | undefined; year?: string | undefined; family?: string | undefined; description?: string | undefined; notes: string[]; top: string[]; heart: string[]; base: string[]; accords: string[] };
 type Owned = { perfume: Perfume; amount: number; currency: Currency; added: string; favorite?: boolean };
 type Mix = { id: string; left: string; right: string; date: string };
@@ -71,7 +79,7 @@ function sanitize(source: any): State {
 }
 function money(value:number,c:Currency) { return new Intl.NumberFormat("en-US",{style:"currency",currency:c,minimumFractionDigits:0,maximumFractionDigits:2}).format(value).replace("NGN","₦"); }
 function pic(p:Perfume,size="card",ownerPhoto?:string,onPhotoError?:()=>void){
-  const verifiedImage = ownerPhoto || ((p.id.startsWith("db:fragella:") || p.id.startsWith("db:noteboxd:")) && p.image?.startsWith("https://") ? p.image : undefined);
+  const verifiedImage = ownerPhoto || ((p.id.startsWith("db:fragella:") || p.id.startsWith("db:noteboxd:") || p.id.startsWith("db:beautyfacts:") || p.id.startsWith("db:productsfacts:")) && p.image?.startsWith("https://") ? p.image : undefined);
   return <span className="sc-art sc-photo-only">
     <span className="sc-no-photo"><ImageOff size={size==="hero"?26:19} strokeWidth={1.35}/><small>No bottle photo</small></span>
     {verifiedImage && <img loading={size==="hero"?"eager":"lazy"} decoding="async" src={verifiedImage} alt={p.brand+" "+p.name+" fragrance bottle"} onError={e=>{e.currentTarget.style.display="none";onPhotoError?.();}}/>}
@@ -97,6 +105,10 @@ function Fragrance(){
   const [ready,setReady]=useState(false);
   const [storageError,setStorageError]=useState<""|"corrupt"|"write">("");
   const [query,setQuery]=useState("");
+  const [sourceChoice,setSourceChoice]=useState<CatalogSource>("auto");
+  const [activeSource,setActiveSource]=useState<CatalogSource>("auto");
+  const [resultSource,setResultSource]=useState("");
+  const [comboSource,setComboSource]=useState<CatalogSource>("auto");
   const [draftQuery,setDraftQuery]=useState("");
   const [results,setResults]=useState<Perfume[]>([]);
   const [checkedPhotos,setCheckedPhotos]=useState<Record<string,"ready"|"missing">>({});
@@ -251,13 +263,13 @@ function Fragrance(){
   }
   function startCombo(target:"collection"|"wishlist",first?:Perfume){
     setComboId(null);setComboName("");setComboPerfumes(first?[first]:[]);
-    setComboTarget(target);setComboAmount("");setComboFilter("");setComboManualBrand("");setComboManualName("");
+    setComboTarget(target);setComboSource("auto");setComboAmount("");setComboFilter("");setComboManualBrand("");setComboManualName("");
     setComboPhoto(null);setComboPreview(null);setComboError("");setComboSearchResults([]);
     setSelected(null);setComboOpen(true);
   }
   function editCombo(c:Combo,moveTo?: "collection"|"wishlist"){
     setComboId(c.id);setComboName(c.name);setComboPerfumes(c.perfumes);
-    setComboTarget(moveTo||c.target);setComboAmount(c.amount===undefined?"":String(c.amount));
+    setComboTarget(moveTo||c.target);setComboSource("auto");setComboAmount(c.amount===undefined?"":String(c.amount));
     setComboFilter("");setComboManualBrand("");setComboManualName("");
     setComboPhoto(null);setComboPreview(null);setComboError("");setComboSearchResults([]);
     setComboOpen(true);
@@ -279,7 +291,7 @@ function Fragrance(){
     e?.preventDefault();const search=comboFilter.trim().slice(0,90);if(search.length<3)return;
     setComboSearching(true);setComboError("");
     try{
-      const response=await fetch(API+"/search?q="+encodeURIComponent(search)+"&page=1",{headers:{Accept:"application/json"},signal:AbortSignal.timeout(13000)});
+      const response=await fetch(API+"/search?q="+encodeURIComponent(search)+"&page=1&source="+encodeURIComponent(comboSource),{headers:{Accept:"application/json"},signal:AbortSignal.timeout(16000)});
       if(!response.ok)throw Error("Search failed");
       const payload=await response.json();
       const entries=Array.isArray(payload.results)?payload.results:[];
@@ -369,7 +381,7 @@ function Fragrance(){
     const delay=setTimeout(async()=>{
       setSearching(true);setError("");setCatalogueNotice("");
       try{
-        const params=new URLSearchParams({page:String(catalogPage),per_page:"20"});
+        const params=new URLSearchParams({page:String(catalogPage),per_page:"20",source:activeSource});
         if(query.trim())params.set("q",query.trim());else params.set("sort","year_desc");
         const path=query.trim()?"/search":"/browse";
         const t=setTimeout(()=>ctrl.abort(),14000);
@@ -377,7 +389,9 @@ function Fragrance(){
         try{response=await fetch(API+path+"?"+params,{signal:ctrl.signal,headers:{Accept:"application/json"}});}finally{clearTimeout(t);}
         if(!response.ok)throw Error("The fragrance database responded "+response.status);
         const payload=await response.json();
-        setCatalogueNotice("");
+        const sourceName=String(payload.source||"");
+        setResultSource(sourceName);
+        setCatalogueNotice(typeof payload.providerWarning==="string"?payload.providerWarning:"");
         const rows=Array.isArray(payload)?payload:payload.results||payload.fragrances||payload.items||payload.data?.results;
         if(!Array.isArray(rows))throw Error("Catalogue format not recognised");
         const items=rows.map(normalize).filter((p:Perfume|null):p is Perfume=>Boolean(p));
@@ -394,7 +408,7 @@ function Fragrance(){
       }finally{if(n===searchId.current)setSearching(false);}
     },40);
     return()=>{clearTimeout(delay);ctrl.abort()};
-  },[page,query,catalogPage,refreshKey]);
+  },[page,query,catalogPage,refreshKey,activeSource]);
   // Keep Discover photo-only. Preflight URLs using browser image loading
   // so broken provider photos never create empty product cards.
   useEffect(()=>{
@@ -475,12 +489,17 @@ function Fragrance(){
       </section>}
       {page==="discover"&&<section className="sc-section">
         <div className="sc-section-head"><div><h2>Discover</h2></div><button className="sc-secondary sc-add-combo-discover" onClick={()=>startCombo("wishlist")}><Plus size={16}/> Combo</button></div>
-        <form className="sc-search" onSubmit={e=>{e.preventDefault();const v=draftQuery.trim();if(v.length<3)return;setCatalogPage(1);if(v===query)setRefreshKey(k=>k+1);else setQuery(v)}}><Search size={20}/><input autoFocus={false} value={draftQuery} onChange={e=>setDraftQuery(e.target.value)} placeholder="Search perfume or brand..." aria-label="Search perfumes"/>{draftQuery&&<button type="button" onClick={()=>{setDraftQuery("");setQuery("");setCatalogPage(1)}} aria-label="Clear search"><X size={19}/></button>}<button className="sc-search-submit" type="submit" disabled={draftQuery.trim().length<3||searching}>Search</button></form>
-        <div className="sc-chips">{["Qasida","Bakhur","Lattafa","Afnan","Dior","Tom Ford"].map(t=><button key={t} onClick={()=>{setDraftQuery(t);setCatalogPage(1);if(query===t)setRefreshKey(k=>k+1);else setQuery(t)}}>{t}</button>)}</div>
+        <form className="sc-search" onSubmit={e=>{e.preventDefault();const v=draftQuery.trim();if(v.length<3)return;setCatalogPage(1);setActiveSource(sourceChoice);if(v===query&&sourceChoice===activeSource)setRefreshKey(k=>k+1);else setQuery(v)}}><Search size={20}/><input autoFocus={false} value={draftQuery} onChange={e=>setDraftQuery(e.target.value)} placeholder="Search perfume or brand..." aria-label="Search perfumes"/>{draftQuery&&<button type="button" onClick={()=>{setDraftQuery("");setQuery("");setCatalogPage(1)}} aria-label="Clear search"><X size={19}/></button>}<button className="sc-search-submit" type="submit" disabled={draftQuery.trim().length<3||searching}>Search</button></form>
+        <div className="sc-source-picker"><label htmlFor="sc-search-source">Search database</label><select id="sc-search-source" value={sourceChoice} onChange={e=>setSourceChoice(e.target.value as CatalogSource)}>{SOURCES.map(s=><option key={s.id} value={s.id}>{s.name}</option>)}</select><span>Only searches use API calls. Switching sources needs Search.</span></div>
+        <div className="sc-chips">{["Qasida","Bakhur","Lattafa","Afnan","Dior","Tom Ford"].map(t=><button key={t} onClick={()=>{setDraftQuery(t);setCatalogPage(1);if(query===t&&sourceChoice===activeSource)setRefreshKey(k=>k+1);else{setActiveSource(sourceChoice);setQuery(t)}}}>{t}</button>)}</div>
         <button className="sc-add-missing" onClick={()=>setManualOpen(true)}><Plus size={14}/> Not listed? Add it</button>
 
         {error&&<div className="sc-warning"><CloudOff size={19}/><span>{error}</span><button onClick={()=>setRefreshKey(k=>k+1)}>Retry</button></div>}
         {catalogueNotice&&<p className="sc-source-note">{catalogueNotice}</p>}
+        {photographed.length>0&&resultSource!=="starter"&&resultSource!=="none"&&<p className="sc-source-credit">
+          From {SOURCES.find(x=>x.id===resultSource)?.name.replace(/ · .*/,"")||resultSource}
+          {(resultSource==="beautyfacts"||resultSource==="productsfacts")&&<> · Data © <a href={resultSource==="beautyfacts"?"https://world.openbeautyfacts.org":"https://world.openproductsfacts.org"} target="_blank" rel="noreferrer">Open Facts contributors</a> (<a href="https://opendatacommons.org/licenses/odbl/1-0/" target="_blank" rel="noreferrer">ODbL</a>) · Images credited to their contributors</>}
+        </p>}
         {photographed.length>0?<><div className="sc-grid">{photographed.map(p=>item(p,"discover"))}</div>{hasMore&&<button className="sc-loadmore" disabled={searching} onClick={()=>setCatalogPage(x=>x+1)}>{searching?"Loading...":"Load more"} <ChevronDown size={18}/></button>}</>:searching||checkingPhotos?<div className="sc-loading">Loading photos…</div>:query.trim()?<p className="sc-no-results">No perfumes with verified photos found. Try another search or <button onClick={()=>setManualOpen(true)}>add manually</button>.</p>:<p className="sc-discover-intro">Search a perfume or choose a brand above.</p>}
       </section>}
       {page==="wishlist"&&<section className="sc-section">
@@ -511,6 +530,7 @@ function Fragrance(){
         <div className="sc-manual-target sc-combo-target"><label><input type="radio" checked={comboTarget==="wishlist"} onChange={()=>setComboTarget("wishlist")}/> Wishlist</label><label><input type="radio" checked={comboTarget==="collection"} onChange={()=>setComboTarget("collection")}/> Collection</label></div>
         <label>PERFUMES ({comboPerfumes.length}/12) · MINIMUM 2</label>
         {comboPerfumes.length>0&&<div className="sc-combo-selected">{comboPerfumes.map(p=><div key={p.id}><span>{p.brand} <strong>{p.name}</strong></span><button type="button" title={"Remove "+p.name} onClick={()=>setComboPerfumes(v=>v.filter(x=>x.id!==p.id))}><X size={16}/></button></div>)}</div>}
+        <div className="sc-combo-source"><label htmlFor="sc-combo-provider">Find perfumes using</label><select id="sc-combo-provider" value={comboSource} onChange={e=>setComboSource(e.target.value as CatalogSource)}>{SOURCES.map(s=><option key={s.id} value={s.id}>{s.name}</option>)}</select></div>
         <div className="sc-combo-search"><input value={comboFilter} onChange={e=>setComboFilter(e.target.value)} placeholder="Search or filter perfumes" aria-label="Find perfumes for combo" onKeyDown={e=>{if(e.key==="Enter"){e.preventDefault();void comboSearch()}}}/><button type="button" onClick={()=>void comboSearch()} disabled={comboSearching||comboFilter.trim().length<3}>{comboSearching?"...":"Search"}</button></div>
         {comboCandidates.length>0&&<div className="sc-combo-options">{comboCandidates.map(p=><button key={p.id} type="button" disabled={comboPerfumes.length>=12} onClick={()=>addComboPerfume(p)}><Plus size={14}/><span>{p.brand} <strong>{p.name}</strong></span></button>)}</div>}
         <p className="sc-combo-help">Can't find one? Add its name here—no API needed.</p>
