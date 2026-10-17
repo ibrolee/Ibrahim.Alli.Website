@@ -6,7 +6,7 @@ describe("mobile shelf and wishlist density", () => {
     expect(route).toContain('className="sc-grid sc-cabinet-grid">{list.map(x=>item(x.perfume,"collection",x))}');
     expect(route).toContain('className="sc-grid sc-cabinet-grid">{store.wishlist.map(p=>item(p,"wishlist"))}');
     expect(route).toContain('className="sc-grid">{filteredPhotographed.map(p=>item(p,"discover"))}');
-    expect(route).toContain('page==="collection"?" sc-collection-stats":"")');
+    expect(route).toContain('page==="collection"&&<div className="sc-stats sc-stats-naira sc-collection-stats"');
   });
 
   test("compact cards keep a 2-column mobile grid, wide images, readable names and actions", async () => {
