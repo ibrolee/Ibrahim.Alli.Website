@@ -248,7 +248,7 @@ function Fragrance(){
         await saveScentPhoto(key,blob);
         showStoredPhoto(key,blob);
       }
-      setStore(restored);setBackupOpen(false);
+      setStore(restored);setReady(true);setStorageError("");setBackupOpen(false);
     }catch(err){alert("Could not import backup: "+(err instanceof Error?err.message:String(err)));}
     finally{e.target.value="";}
   }
