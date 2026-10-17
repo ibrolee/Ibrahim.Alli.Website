@@ -7,6 +7,10 @@ on:
       - 'src/routes/fragrance.tsx'
       - 'src/lib/scent-photos.ts'
       - 'src/lib/scent-providers.ts'
+      - 'src/lib/scent-catalogue*'
+      - 'src/lib/scent-identity.ts'
+      - 'src/lib/scent-gateway.ts'
+      - 'src/lib/scent-wikidata.ts'
       - 'src/fragrance.css'
       - 'src/server.ts'
       - 'src/routes/__root.tsx'
@@ -19,10 +23,12 @@ jobs:
       - uses: oven-sh/setup-bun@v2
       - run: bun install --frozen-lockfile
       - run: bun run build
+      - name: Check combined search, duplicate handling and provider outages
+        run: bun test src/lib/scent-providers.test.ts src/lib/scent-filters.test.ts src/lib/scent-catalogue.test.ts
       - name: Check new fragrance code types
         run: |
           bun x tsc --noEmit > type-errors.txt 2>&1 || true
-          if grep -E "src/(routes/fragrance.tsx|lib/scent-photos.ts|lib/scent-providers.ts)\\([0-9]+,[0-9]+\\): error TS" type-errors.txt; then
+          if grep -E "src/(routes/fragrance.tsx|server.ts|lib/scent-(photos|providers|catalogue|identity|gateway|wikidata|filters).ts)\\([0-9]+,[0-9]+\\): error TS" type-errors.txt; then
             exit 1
           fi
           echo "No fragrance page type errors. Existing site type errors are outside this feature."

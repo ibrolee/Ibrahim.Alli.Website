@@ -6,8 +6,18 @@ export type CatalogRecord={
  id:string;name:string;brand:string;image?:string;year?:string;family?:string;
  description?:string;top:string[];heart:string[];base:string[];notes:string[];accords:string[];
  longevity?:string;projection?:string;rating?:number;gender?:string;popularity?:string;bestSeasons?:string[];bestOccasions?:string[];
+ aliases?:string[];sources?:string[];
+ imageCredit?:string;imageSource?:string;imageLicense?:string;imageLicenseUrl?:string;
 };
-export type SearchResult={results:CatalogRecord[];hasMore:boolean;source:"noteboxd"|"fragella"|"beautyfacts"|"productsfacts";total:number};
+export type SearchResult={results:CatalogRecord[];hasMore:boolean;source:"noteboxd"|"fragella"|"beautyfacts"|"productsfacts"|"wikidata";total:number;nextCursor?:string};
+export class CatalogueHttpError extends Error {
+ constructor(public status:number,public retryAfter:number=300){super("Catalogue HTTP "+status);}
+}
+function httpError(response:Response):CatalogueHttpError {
+ const raw=response.headers.get("retry-after");
+ const seconds=raw?(Number(raw)||Math.ceil((Date.parse(raw)-Date.now())/1000)):300;
+ return new CatalogueHttpError(response.status,Math.min(3600,Math.max(60,seconds||300)));
+}
 function str(value:unknown):string{return typeof value==="string"?value.trim():"";}
 function maybeObj(value:unknown):Record<string,unknown>{
  return value&&typeof value==="object"&&!Array.isArray(value)?value as Record<string,unknown>:{};
@@ -108,15 +118,16 @@ function getRecords(payload:unknown):unknown[]{
  }
  return [];
 }
-export async function searchNoteboxd(q:string,key:string):Promise<SearchResult>{
+export async function searchNoteboxd(q:string,key:string,cursor?:string):Promise<SearchResult>{
  const url=new URL("https://api.noteboxd.com/v1/fragrances");
  url.searchParams.set("q",q);
  url.searchParams.set("limit","40");
+ if(cursor)url.searchParams.set("cursor",cursor);
  const response=await fetch(url.toString(),{
   headers:{"Authorization":"Bearer "+key,"Accept":"application/json"},
   signal:AbortSignal.timeout(10000)
  });
- if(!response.ok)throw new Error("Noteboxd HTTP "+response.status);
+ if(!response.ok)throw httpError(response);
  if(!(response.headers.get("content-type")||"").includes("json"))throw new Error("Noteboxd returned non-JSON");
  const body=await response.text();
  if(body.length>2_000_000)throw new Error("Noteboxd response too large");
@@ -124,13 +135,15 @@ export async function searchNoteboxd(q:string,key:string):Promise<SearchResult>{
  const records=getRecords(parsed);
  if(!records.length && !Array.isArray(parsed)&&!["results","data","items","fragrances"].some(k=>k in maybeObj(parsed)))throw new Error("Unexpected Noteboxd response");
  const result=records.map(r=>normalizeProviderRecord(r,"noteboxd")).filter((r):r is CatalogRecord=>r!==null);
- return {results:result,total:result.length,hasMore:false,source:"noteboxd"};
+ const root=maybeObj(parsed),pagination=maybeObj(root["pagination"]||root["meta"]);
+ const nextCursor=str(root["nextCursor"]||root["next_cursor"]||pagination["nextCursor"]||pagination["next_cursor"]);
+ return {results:result,total:result.length,hasMore:Boolean(nextCursor),source:"noteboxd",...(nextCursor?{nextCursor}:{})};
 }
 export async function searchFragella(q:string,key:string,page:number):Promise<SearchResult>{
  const url=new URL("https://api.fragella.com/api/v1/fragrances");
  url.searchParams.set("search",q);url.searchParams.set("page",String(page));url.searchParams.set("limit","10");
  const response=await fetch(url.toString(),{headers:{"x-api-key":key,Accept:"application/json"},signal:AbortSignal.timeout(8500)});
- if(!response.ok)throw new Error("Fragella HTTP "+response.status);
+ if(!response.ok)throw httpError(response);
  if(!(response.headers.get("content-type")||"").includes("json"))throw new Error("Fragella returned non-JSON");
  const body=await response.text();
  if(body.length>1_000_000)throw new Error("Fragella response too large");
@@ -162,7 +175,7 @@ export async function searchOpenFacts(q:string,page:number,source:OpenCatalogSou
   headers:{"Accept":"application/json","User-Agent":"ScentCabinet/1.0 (https://ibrahimalli.com; personal fragrance catalogue)"},
   signal:AbortSignal.timeout(8500)
  });
- if(!response.ok)throw new Error(source+" HTTP "+response.status);
+ if(!response.ok)throw httpError(response);
  if(!(response.headers.get("content-type")||"").includes("json"))throw new Error(source+" returned non-JSON");
  const body=await response.text();if(body.length>1_500_000)throw new Error(source+" response too large");
  const payload:unknown=JSON.parse(body);
@@ -195,5 +208,5 @@ export async function searchOpenFacts(q:string,page:number,source:OpenCatalogSou
    });
  }
  const total=Number(x["count"])||0;
- return {results,total,source,hasMore:page<2&&total>page*40&&products.length>0};
+ return {results,total,source,hasMore:page<10&&total>page*40&&products.length>0};
 }

@@ -350,3 +350,13 @@
  .sc-filter-result-count{font-size:10px}
  .sc-performance-tags span{font-size:9px}
 }
+
+/* Source controls stay out of the main beginner search flow. */
+.sc-source-options{margin:10px 0;color:#526b59;font-size:12px}
+.sc-source-options>summary{cursor:pointer;min-height:30px;line-height:30px}
+.sc-source-options .sc-source-picker{padding:6px 0 9px}
+.sc-catalogue-summary{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap;font-size:11px;color:#637568;margin:10px 0 16px}
+.sc-catalogue-summary details{max-width:100%;font-size:10px}
+.sc-catalogue-summary summary{cursor:pointer;min-height:25px}
+.sc-catalogue-summary p{margin:5px 0;line-height:1.55;max-width:520px}
+.sc-catalogue-summary a{color:#3f6749;text-decoration:underline}
