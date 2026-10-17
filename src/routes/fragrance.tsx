@@ -87,6 +87,7 @@ function Fragrance(){
   const [page,setPage]=useState<Page>("collection");
   const [store,setStore]=useState<State>(initial);
   const [ready,setReady]=useState(false);
+  const [storageError,setStorageError]=useState<""|"corrupt"|"write">("");
   const [query,setQuery]=useState("");
   const [draftQuery,setDraftQuery]=useState("");
   const [results,setResults]=useState<Perfume[]>([]);
@@ -170,8 +171,23 @@ function Fragrance(){
     }catch(err){setPhotoError(err instanceof Error?err.message:"Could not remove photo.");}
   }
 
-  useEffect(()=>{try{const s=localStorage.getItem(STORAGE);if(s)setStore(sanitize(JSON.parse(s)));}catch{}setReady(true)},[]);
-  useEffect(()=>{if(ready)try{localStorage.setItem(STORAGE,JSON.stringify(store));}catch{setError("Your browser storage is full. Export your collection to keep a backup.");}},[store,ready]);
+  useEffect(()=>{
+    try{
+      const previous=localStorage.getItem(STORAGE);
+      if(previous)setStore(sanitize(JSON.parse(previous)));
+      setReady(true);
+    }catch{
+      // Never overwrite unreadable saved data with an empty collection.
+      setStorageError("corrupt");
+    }
+  },[]);
+  useEffect(()=>{
+    if(!ready)return;
+    try{
+      localStorage.setItem(STORAGE,JSON.stringify(store));
+      setStorageError(prev=>prev==="write"?"":prev);
+    }catch{setStorageError("write");}
+  },[store,ready]);
   const ownedMap=useMemo(()=>new Map(store.collection.map(x=>[x.perfume.id,x])),[store.collection]);
   const wishIds=useMemo(()=>new Set(store.wishlist.map(x=>x.id)),[store.wishlist]);
   const moneyNGN=store.collection.filter(x=>x.currency==="NGN").reduce((s,x)=>s+x.amount,0);
@@ -189,7 +205,7 @@ function Fragrance(){
     if(photoBusy)return;
     const name=manualName.trim().slice(0,100),brand=manualBrand.trim().slice(0,80);
     if(!name||!brand)return;
-    const perfume:Perfume={id:"manual:"+[brand,name].map(v=>v.toLowerCase().replace(/[^a-z0-9]/g,"")).join(":"),brand,name,notes:[],top:[],heart:[],base:[],accords:[]};
+    const perfume:Perfume={id:"manual:"+id(),brand,name,notes:[],top:[],heart:[],base:[],accords:[]};
     if(manualPhoto){
       setPhotoBusy(true);
       try{await saveScentPhoto(perfume.id,manualPhoto);showStoredPhoto(perfume.id,manualPhoto);}
@@ -310,8 +326,9 @@ function Fragrance(){
   const aAcc=new Set([...(left?.notes||[]),...(left?.accords||[])].map(s=>s.toLowerCase()));
   const match=[...(right?.notes||[]),...(right?.accords||[])].filter(n=>aAcc.has(n.toLowerCase()));
   return <main id="main-content" className="sc-app">
-    <header className="sc-topbar"><a href="/fragrance" className="sc-wordmark" aria-label="Scent Cabinet home">SCENT<span> / </span>CABINET</a><button className="sc-top-action" onClick={()=>setBackupOpen(true)}><Download size={17}/><span>My data</span></button></header>
+    <header className="sc-topbar"><button type="button" className="sc-wordmark" onClick={()=>go("collection")} aria-label="Scent Cabinet home">SCENT<span> / </span>CABINET</button><button type="button" className="sc-top-action" onClick={()=>setBackupOpen(true)} aria-label="Backup and restore my collection" title="Backup and restore"><Download size={19}/><span>Backup</span></button></header>
     <div className="sc-inner">
+      {storageError&&<div className="sc-storage-alert" role="alert"><span>{storageError==="corrupt"?"Your saved collection could not be read. Restore an earlier backup.":"Changes couldn't be saved in this browser. Export a backup now."}</span><button type="button" onClick={()=>setBackupOpen(true)}>{storageError==="corrupt"?"Restore":"Backup"}</button></div>}
       {(page==="collection"||page==="worth")&&<div className="sc-stats sc-stats-naira"><div><span>BOTTLES</span><strong>{store.collection.length}</strong></div><div><span>WISHLIST</span><strong>{store.wishlist.length}</strong></div><div><span>COLLECTION WORTH</span><strong>{money(moneyNGN,"NGN")}</strong></div></div>}
       <nav className="sc-tabs" aria-label="Fragrance sections">
         {([["collection","My collection",ShoppingBag],["discover","Discover",Search],["wishlist","Wishlist",Heart],["worth","Collection worth",Wallet],["layer","Layer lab",Layers]] as const).map(([key,label,Icon])=><button key={key} className={page===key?"active":""} onClick={()=>go(key)}><Icon size={18}/>{label}</button>)}
