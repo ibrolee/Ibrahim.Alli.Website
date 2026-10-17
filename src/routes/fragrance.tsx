@@ -409,10 +409,11 @@ function Fragrance(){
     },40);
     return()=>{clearTimeout(delay);ctrl.abort()};
   },[page,query,catalogPage,refreshKey,activeSource]);
-  // Keep Discover photo-only. Preflight URLs using browser image loading
+  // Keep both browsing and submitted searches photo-only, including free catalogues.
+  // Preflight URLs using browser image loading
   // so broken provider photos never create empty product cards.
   useEffect(()=>{
-    if(page!=="discover" || !query.trim())return;
+    if(page!=="discover")return;
     const candidates=results.filter(p=>p.image?.startsWith("https://") && checkedPhotos[p.id]===undefined);
     if(!candidates.length)return;
     const pending:HTMLImageElement[]=[];
