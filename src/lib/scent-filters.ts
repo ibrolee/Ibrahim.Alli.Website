@@ -16,11 +16,11 @@ export const DEFAULT_DISCOVER_FILTERS:DiscoverFilters={
 };
 export type FragranceForFilters={
   id:string;name:string;brand:string;image?:string|undefined;year?:string|undefined;
-  family?:string|undefined;notes?:string[];accords?:string[];
+  family?:string|undefined;notes?:string[]|undefined;accords?:string[]|undefined;
   longevity?:string|undefined;projection?:string|undefined;rating?:number|undefined;
-  gender?:string|undefined;bestSeasons?:string[];
+  gender?:string|undefined;bestSeasons?:string[]|undefined;
 };
-export type PersonalInsightForFilters={priceNGN?:number;longevity?:string;projection?:string};
+export type PersonalInsightForFilters={priceNGN?:number|undefined;longevity?:string|undefined;projection?:string|undefined};
 const LONGEVITY=["poor","weak","moderate","long lasting","very long lasting"];
 const PROJECTION=["intimate","soft","moderate","strong","enormous"];
 export function valueForLongevity(value?:string):number{
