@@ -9,9 +9,10 @@ type Page = "collection" | "discover" | "wishlist" | "worth" | "layer";
 type Perfume = { id: string; name: string; brand: string; image?: string | undefined; year?: string | undefined; family?: string | undefined; description?: string | undefined; notes: string[]; top: string[]; heart: string[]; base: string[]; accords: string[] };
 type Owned = { perfume: Perfume; amount: number; currency: Currency; added: string; favorite?: boolean };
 type Mix = { id: string; left: string; right: string; date: string };
-type State = { collection: Owned[]; wishlist: Perfume[]; mixes: Mix[] };
+type Combo = { id:string; name:string; perfumes:Perfume[]; target:"collection"|"wishlist"; amount?:number; added:string };
+type State = { collection: Owned[]; wishlist: Perfume[]; mixes: Mix[]; combos: Combo[] };
 const STORAGE = "ia-scent-cabinet-v1";
-const initial: State = { collection: [], wishlist: [], mixes: [] };
+const initial: State = { collection: [], wishlist: [], mixes: [], combos: [] };
 const API = "/api/fragrance";
 
 function bits(value: unknown): string[] {
@@ -58,7 +59,14 @@ function sanitize(source: any): State {
   return {
     collection: (Array.isArray(source.collection)?source.collection:[]).filter((x:any)=>valid(x?.perfume)).slice(0,5000).map((x:any)=>({perfume:perfume(x.perfume), amount:Math.max(0,Number(x.amount)||0),currency:x.currency==="USD"?"USD":"NGN",added:String(x.added||new Date().toISOString()),favorite:Boolean(x.favorite)})),
     wishlist: (Array.isArray(source.wishlist)?source.wishlist:[]).filter(valid).slice(0,5000).map(perfume),
-    mixes: (Array.isArray(source.mixes)?source.mixes:[]).filter((m:any)=>m&&typeof m.left==="string"&&typeof m.right==="string").slice(0,1000)
+    mixes: (Array.isArray(source.mixes)?source.mixes:[]).filter((m:any)=>m&&typeof m.left==="string"&&typeof m.right==="string").slice(0,1000),
+    combos: (Array.isArray(source.combos)?source.combos:[]).filter((c:any)=>c&&typeof c.id==="string"&&c.id.startsWith("combo:")&&Array.isArray(c.perfumes)&&c.perfumes.length>=2).slice(0,400).map((c:any)=>({
+      id:String(c.id),name:String(c.name||"Perfume combo").slice(0,80),
+      target:c.target==="collection"&&Number.isFinite(Number(c.amount))&&Number(c.amount)>=0?"collection":"wishlist",
+      amount:c.target==="collection"&&Number.isFinite(Number(c.amount))&&Number(c.amount)>=0?Number(c.amount):undefined,
+      added:String(c.added||new Date().toISOString()),
+      perfumes:c.perfumes.filter(valid).slice(0,12).map(perfume)
+    })).filter((c:Combo)=>c.perfumes.length>=2)
   };
 }
 function money(value:number,c:Currency) { return new Intl.NumberFormat("en-US",{style:"currency",currency:c,minimumFractionDigits:0,maximumFractionDigits:2}).format(value).replace("NGN","₦"); }
@@ -106,6 +114,19 @@ function Fragrance(){
   const [sort,setSort]=useState("newest");
   const [filter,setFilter]=useState("");
   const [backupOpen,setBackupOpen]=useState(false);
+  const [comboOpen,setComboOpen]=useState(false);
+  const [comboId,setComboId]=useState<string|null>(null);
+  const [comboName,setComboName]=useState("");
+  const [comboPerfumes,setComboPerfumes]=useState<Perfume[]>([]);
+  const [comboTarget,setComboTarget]=useState<"collection"|"wishlist">("wishlist");
+  const [comboAmount,setComboAmount]=useState("");
+  const [comboFilter,setComboFilter]=useState("");
+  const [comboManualBrand,setComboManualBrand]=useState("");
+  const [comboManualName,setComboManualName]=useState("");
+  const [comboPhoto,setComboPhoto]=useState<Blob|null>(null);
+  const [comboPreview,setComboPreview]=useState<string|null>(null);
+  const [comboSaving,setComboSaving]=useState(false);
+  const [comboError,setComboError]=useState("");
   const [manualOpen,setManualOpen]=useState(false);
   const [manualBrand,setManualBrand]=useState("");
   const [manualName,setManualName]=useState("");
@@ -129,16 +150,22 @@ function Fragrance(){
   useEffect(()=>{
     if(!ready)return;
     let canceled=false;
-    const keys=[...new Set([...store.collection.map(x=>x.perfume.id),...store.wishlist.map(p=>p.id)].filter(k=>k.startsWith("manual:")))];
+    const keys=[...new Set([
+      ...store.collection.map(x=>x.perfume.id),
+      ...store.wishlist.map(p=>p.id),
+      ...store.combos.map(x=>x.id),
+      ...store.combos.flatMap(x=>x.perfumes.map(p=>p.id))
+    ].filter(k=>k.startsWith("manual:")||k.startsWith("combo:")))];
     Promise.all(keys.map(async key=>{
       if(storedUrls.current.has(key))return;
       try{const blob=await getScentPhoto(key);if(blob&&!canceled)showStoredPhoto(key,blob);}
       catch{/* browser private mode may not provide IndexedDB */}
     })).catch(()=>{});
     return()=>{canceled=true;};
-  },[ready,store.collection,store.wishlist]);
+  },[ready,store.collection,store.wishlist,store.combos]);
   useEffect(()=>()=>{storedUrls.current.forEach(u=>URL.revokeObjectURL(u));},[]);
   useEffect(()=>()=>{if(manualPreview)URL.revokeObjectURL(manualPreview);},[manualPreview]);
+  useEffect(()=>()=>{if(comboPreview)URL.revokeObjectURL(comboPreview);},[comboPreview]);
   async function chooseManualPhoto(e:React.ChangeEvent<HTMLInputElement>){
     const file=e.target.files?.[0];if(!file)return;
     setPhotoError("");setPhotoBusy(true);
@@ -190,7 +217,11 @@ function Fragrance(){
   },[store,ready]);
   const ownedMap=useMemo(()=>new Map(store.collection.map(x=>[x.perfume.id,x])),[store.collection]);
   const wishIds=useMemo(()=>new Set(store.wishlist.map(x=>x.id)),[store.wishlist]);
-  const moneyNGN=store.collection.filter(x=>x.currency==="NGN").reduce((s,x)=>s+x.amount,0);
+  const myCombos=store.combos.filter(x=>x.target==="collection");
+  const wishCombos=store.combos.filter(x=>x.target==="wishlist");
+  const bottleCount=store.collection.length+myCombos.reduce((n,x)=>n+x.perfumes.length,0);
+  const wishCount=store.wishlist.length+wishCombos.reduce((n,x)=>n+x.perfumes.length,0);
+  const moneyNGN=store.collection.filter(x=>x.currency==="NGN").reduce((s,x)=>s+x.amount,0)+myCombos.reduce((s,x)=>s+(x.amount||0),0);
   const legacyUSD=store.collection.filter(x=>x.currency==="USD").length;
   const list=useMemo(()=>store.collection.filter(x=>(x.perfume.name+" "+x.perfume.brand).toLowerCase().includes(filter.toLowerCase())).sort((a,b)=>sort==="price"?b.amount-a.amount:sort==="alpha"?(a.perfume.name.localeCompare(b.perfume.name)):sort==="favorite"?Number(Boolean(b.favorite))-Number(Boolean(a.favorite)):b.added.localeCompare(a.added)),[store.collection,filter,sort]);
   function go(p:Page){setPage(p);setSelected(null);window.scrollTo({top:0,behavior:"smooth"});}
@@ -218,10 +249,13 @@ function Fragrance(){
   }
   async function exportBackup(){
     try{
-      const allIds=[...new Set([...store.collection.map(x=>x.perfume.id),...store.wishlist.map(x=>x.id)].filter(k=>k.startsWith("manual:")))];
+      const allIds=[...new Set([
+        ...store.collection.map(x=>x.perfume.id),...store.wishlist.map(x=>x.id),
+        ...store.combos.map(c=>c.id),...store.combos.flatMap(c=>c.perfumes.map(p=>p.id))
+      ].filter(k=>k.startsWith("manual:")||k.startsWith("combo:")))];
       const ownerPhotos:Record<string,string>={};
       for(const key of allIds){const photo=await getScentPhoto(key);if(photo)ownerPhotos[key]=await blobAsDataUrl(photo);}
-      const contents=JSON.stringify({app:"Scent Cabinet",version:2,exportedAt:new Date().toISOString(),...store,ownerPhotos},null,2);
+      const contents=JSON.stringify({app:"Scent Cabinet",version:3,exportedAt:new Date().toISOString(),...store,ownerPhotos},null,2);
       const blob=new Blob([contents],{type:"application/json"});
       const href=URL.createObjectURL(blob);const a=document.createElement("a");
       a.href=href;a.download="scent-cabinet-backup-"+today()+".json";
@@ -237,13 +271,13 @@ function Fragrance(){
       if(!Array.isArray(value.collection)||!Array.isArray(value.wishlist))throw Error("Not a Scent Cabinet backup.");
       const restored=sanitize(value);
       const photos=value.ownerPhotos;
-      const validIds=new Set([...restored.collection.map(x=>x.perfume.id),...restored.wishlist.map(p=>p.id)]);
+      const validIds=new Set([...restored.collection.map(x=>x.perfume.id),...restored.wishlist.map(p=>p.id),...restored.combos.map(c=>c.id),...restored.combos.flatMap(c=>c.perfumes.map(p=>p.id))]);
       const entries=photos&&typeof photos==="object"&&!Array.isArray(photos)?Object.entries(photos):[];
-      if(entries.length>130)throw Error("Too many backup images.");
+      if(entries.length>300)throw Error("Too many backup images.");
       if(!window.confirm("Replace your current shelf and wishlist with this backup?"))return;
       // Restore images before replacing collection state; never silently discard images on failure.
       for(const [key,payload] of entries){
-        if(!validIds.has(key)||!key.startsWith("manual:")||typeof payload!=="string")continue;
+        if(!validIds.has(key)||!(key.startsWith("manual:")||key.startsWith("combo:"))||typeof payload!=="string")continue;
         const blob=dataUrlAsBlob(payload);
         await saveScentPhoto(key,blob);
         showStoredPhoto(key,blob);
@@ -321,7 +355,7 @@ function Fragrance(){
       </div>
     </article>;
   };
-  const allMyPerfumes=store.collection.map(x=>x.perfume);
+  const allMyPerfumes=[...store.collection.map(x=>x.perfume),...myCombos.flatMap(x=>x.perfumes)];
   const left=allMyPerfumes.find(x=>x.id===layerA),right=allMyPerfumes.find(x=>x.id===layerB);
   const aAcc=new Set([...(left?.notes||[]),...(left?.accords||[])].map(s=>s.toLowerCase()));
   const match=[...(right?.notes||[]),...(right?.accords||[])].filter(n=>aAcc.has(n.toLowerCase()));
@@ -329,7 +363,7 @@ function Fragrance(){
     <header className="sc-topbar"><button type="button" className="sc-wordmark" onClick={()=>go("collection")} aria-label="Scent Cabinet home">SCENT<span> / </span>CABINET</button><button type="button" className="sc-top-action" onClick={()=>setBackupOpen(true)} aria-label="Backup and restore my collection" title="Backup and restore"><Download size={19}/><span>Backup</span></button></header>
     <div className="sc-inner">
       {storageError&&<div className="sc-storage-alert" role="alert"><span>{storageError==="corrupt"?"Your saved collection could not be read. Restore an earlier backup.":"Changes couldn't be saved in this browser. Export a backup now."}</span><button type="button" onClick={()=>setBackupOpen(true)}>{storageError==="corrupt"?"Restore":"Backup"}</button></div>}
-      {(page==="collection"||page==="worth")&&<div className="sc-stats sc-stats-naira"><div><span>BOTTLES</span><strong>{store.collection.length}</strong></div><div><span>WISHLIST</span><strong>{store.wishlist.length}</strong></div><div><span>COLLECTION WORTH</span><strong>{money(moneyNGN,"NGN")}</strong></div></div>}
+      {(page==="collection"||page==="worth")&&<div className="sc-stats sc-stats-naira"><div><span>BOTTLES</span><strong>{bottleCount}</strong></div><div><span>WISHLIST</span><strong>{wishCount}</strong></div><div><span>COLLECTION WORTH</span><strong>{money(moneyNGN,"NGN")}</strong></div></div>}
       <nav className="sc-tabs" aria-label="Fragrance sections">
         {([["collection","My collection",ShoppingBag],["discover","Discover",Search],["wishlist","Wishlist",Heart],["worth","Collection worth",Wallet],["layer","Layer lab",Layers]] as const).map(([key,label,Icon])=><button key={key} className={page===key?"active":""} onClick={()=>go(key)}><Icon size={18}/>{label}</button>)}
       </nav>
