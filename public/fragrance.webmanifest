@@ -1,12 +1,16 @@
 {
-  "name": "Scent Cabinet | Ibrahim Alli",
+  "id": "/fragrance",
+  "name": "Scent Cabinet",
   "short_name": "Scent Cabinet",
-  "description": "My personal perfume collection, wishlist and scent journal.",
+  "description": "Personal perfume shelf, wishlist and collection worth.",
   "start_url": "/fragrance",
   "scope": "/fragrance",
   "display": "standalone",
   "background_color": "#f5f0e6",
   "theme_color": "#244437",
+  "categories": [
+    "lifestyle"
+  ],
   "icons": [
     {
       "src": "/fragrance-icon.svg",
