@@ -13,6 +13,12 @@
   ],
   "icons": [
     {
+      "src": "/fragrance-apple-touch.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
       "src": "/fragrance-icon.svg",
       "sizes": "any",
       "type": "image/svg+xml",
