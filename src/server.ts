@@ -69,21 +69,39 @@ async function fragranceSearch(request:Request,bindings?:unknown):Promise<Respon
  const page=Math.min(2,Math.max(1,Math.floor(Number(url.searchParams.get("page"))||1)));
  const rawSource=url.searchParams.get("source");
  const source:SearchSource=rawSource==="beautyfacts"||rawSource==="productsfacts"||rawSource==="noteboxd"||rawSource==="fragella"?rawSource:"auto";
+ const cacheStore=(globalThis as typeof globalThis&{caches?:{default?:Cache}}).caches?.default;
  if(mode==="browse"||q.length<3){
-   // Browse deliberately never calls outside APIs, so opening the app uses no quota.
-   const items=SCENT_SEED.slice((page-1)*20,page*20);
-   return Response.json({results:items,total:SCENT_SEED.length,source:"starter",connected:true,hasMore:false},{
-     headers:{"cache-control":"public, max-age=300"}
-   });
+   // Discover browsing is keyless only; never touch Noteboxd/Fragella allowances.
+   // Cached at the Cloudflare edge so simply opening Discover doesn't refetch.
+   const browseCacheKey=new Request(new URL("/api/fragrance/browse?page="+page,url.origin).toString());
+   if(cacheStore)try{
+     const cached=await cacheStore.match(browseCacheKey);
+     if(cached)return cached;
+   }catch{}
+   let found:SearchResult|null=null;
+   for(const provider of ["beautyfacts","productsfacts"] as const){
+     try{
+       const choice=await searchOpenFacts("eau de parfum",page,provider);
+       const photos=scentPhotoResults(choice.results);
+       if(photos.length){
+         found={...choice,results:photos,total:photos.length};break;
+       }
+     }catch(err){console.warn("Free discovery catalogue unavailable:",provider,err instanceof Error?err.message:"failed");}
+   }
+   const result=found?{...found,connected:true,attribution:"Open Facts contributors"}:{
+     results:[],total:0,hasMore:false,source:"none",connected:true,
+     providerWarning:"Browse is temporarily unavailable. Search a brand or add a perfume manually."
+   };
+   const response=Response.json(result,{headers:{"cache-control":"public, max-age=0, s-maxage="+(found?86400:300)}});
+   if(cacheStore)try{await cacheStore.put(browseCacheKey,response.clone());}catch{}
+   return response;
  }
  const cacheKey=new Request(new URL("/api/fragrance/search?source="+source+"&page="+page+"&q="+encodeURIComponent(q.toLowerCase()),url.origin).toString());
- const cacheStore=(globalThis as typeof globalThis&{caches?:{default?:Cache}}).caches?.default;
- if(cacheStore){
-   try{
-     const cached=await cacheStore.match(cacheKey);
-     if(cached)return new Response(cached.body,{status:cached.status,headers:{...Object.fromEntries(cached.headers.entries()),"x-scent-cache":"HIT"}});
-   }catch{/* unavailable in local runtime */}
- }
+ if(cacheStore)try{
+   const cached=await cacheStore.match(cacheKey);
+   if(cached)return new Response(cached.body,{status:cached.status,headers:{...Object.fromEntries(cached.headers.entries()),"x-scent-cache":"HIT"}});
+ }catch{}
+
  const noteboxd=runtimeSecret(bindings,"NOTEBOXD_API_KEY"),fragella=runtimeSecret(bindings,"FRAGELLA_API_KEY");
  const plan:SearchSource[]=source==="auto"?["beautyfacts","productsfacts","noteboxd","fragella"]:
    [source,...(["beautyfacts","productsfacts"] as SearchSource[]).filter(s=>s!==source)];
