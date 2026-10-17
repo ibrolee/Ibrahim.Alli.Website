@@ -11,15 +11,16 @@ export function hasCabinetData(state:unknown):boolean {
   if(!state||typeof state!=="object")return false;
   const d=state as Record<string,unknown>;
   return ["collection","wishlist","combos","mixes"].some(k=>Array.isArray(d[k])&&(d[k] as unknown[]).length>0)||
-    Boolean(d.insights&&typeof d.insights==="object"&&Object.keys(d.insights).length);
+    Boolean(d['insights']&&typeof d['insights']==="object"&&Object.keys(d['insights']).length);
 }
 export type InitialDecision="upload"|"download"|"matched"|"conflict";
 export function chooseCabinetSync(local:unknown,remote:unknown,remoteVersion:number,meta:Meta|null):InitialDecision{
   if(remoteVersion===0)return hasCabinetData(local)?"upload":"matched";
-  if(!hasCabinetData(local))return "download";
   if(safeString(local)===safeString(remote))return "matched";
   if(meta&&meta.synced===safeString(local))return "download";
+  // An intentional deletion on a previously synced device is an edit.
   if(meta&&meta.version===remoteVersion)return "upload";
+  if(!hasCabinetData(local))return "download";
   return "conflict";
 }
 async function api(path:string,method="GET",body?:unknown):Promise<CloudResult>{
@@ -69,7 +70,7 @@ export function useCabinetSync<T extends {collection:unknown[];wishlist:unknown[
       const snapshot=await api("snapshot");
       const version=Number(snapshot.version||0);
       if(before!==localRef.current){
-        setStatus("synced");return; // A fresh edit occurred during the read; retry soon.
+        setStatus("synced");setTimeout(()=>void syncNow(),1200);return; // An edit happened while fetching.
       }
       const decision=chooseCabinetSync(before,snapshot.data,version,meta.current);
       if(decision==="conflict"){
