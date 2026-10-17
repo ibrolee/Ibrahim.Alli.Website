@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { ArrowLeft, ArrowRight, Bookmark, Check, ChevronDown, CloudOff, Download, FlaskConical, Heart, ImageOff, Layers, Plus, Search, ShoppingBag, Sparkles, Trash2, Upload, Wallet, X } from "lucide-react";
+import { ArrowRight, Bookmark, Check, ChevronDown, CloudOff, Download, FlaskConical, Heart, ImageOff, Layers, Plus, Search, ShoppingBag, Sparkles, Trash2, Upload, Wallet, X } from "lucide-react";
 import { seedSearch } from "@/lib/scent-catalog-seed";
 import { compressScentPhoto, saveScentPhoto, getScentPhoto, removeScentPhoto, blobAsDataUrl, dataUrlAsBlob } from "@/lib/scent-photos";
 import css from "../fragrance.css?url";
@@ -91,6 +91,7 @@ function Fragrance(){
   const [query,setQuery]=useState("");
   const [draftQuery,setDraftQuery]=useState("");
   const [results,setResults]=useState<Perfume[]>([]);
+  const [checkedPhotos,setCheckedPhotos]=useState<Record<string,"ready"|"missing">>({});
   const [catalogPage,setCatalogPage]=useState(1);
   const [hasMore,setHasMore]=useState(false);
   const [searching,setSearching]=useState(false);
@@ -250,7 +251,7 @@ function Fragrance(){
         try{response=await fetch(API+path+"?"+params,{signal:ctrl.signal,headers:{Accept:"application/json"}});}finally{clearTimeout(t);}
         if(!response.ok)throw Error("The fragrance database responded "+response.status);
         const payload=await response.json();
-        setCatalogueNotice(typeof payload.providerWarning==="string"?payload.providerWarning:"");
+        setCatalogueNotice("");
         const rows=Array.isArray(payload)?payload:payload.results||payload.fragrances||payload.items||payload.data?.results;
         if(!Array.isArray(rows))throw Error("Catalogue format not recognised");
         const items=rows.map(normalize).filter((p:Perfume|null):p is Perfume=>Boolean(p));
@@ -261,14 +262,33 @@ function Fragrance(){
         try{sessionStorage.setItem("ia-scent-last-search",JSON.stringify({query,page:catalogPage,items,time:Date.now()}));}catch{}
       }catch(err){
         if(n!==searchId.current||ctrl.signal.aborted)return;
-        setError("Online search is currently unavailable. Showing the built-in selection.");
-        const local=seedSearch(query.trim(),catalogPage,20);
-        setResults(old=>catalogPage===1?local:[...old,...local]);
+        setError("Search unavailable. Please try again.");
+        setResults(old=>catalogPage===1?[]:old);
         setHasMore(false);
       }finally{if(n===searchId.current)setSearching(false);}
     },40);
     return()=>{clearTimeout(delay);ctrl.abort()};
   },[page,query,catalogPage,refreshKey]);
+  // Keep Discover photo-only. Preflight URLs using browser image loading
+  // so broken provider photos never create empty product cards.
+  useEffect(()=>{
+    if(page!=="discover" || !query.trim())return;
+    const candidates=results.filter(p=>p.image?.startsWith("https://") && checkedPhotos[p.id]===undefined);
+    if(!candidates.length)return;
+    const pending:HTMLImageElement[]=[];
+    let disposed=false;
+    for(const p of candidates){
+      const photo=new Image();
+      pending.push(photo);
+      photo.onload=()=>{if(!disposed)setCheckedPhotos(prev=>({...prev,[p.id]:"ready"}))};
+      photo.onerror=()=>{if(!disposed)setCheckedPhotos(prev=>({...prev,[p.id]:"missing"}))};
+      photo.src=p.image!;
+      if(photo.complete && photo.naturalWidth>0)photo.onload?.(new Event("load"));
+    }
+    return()=>{disposed=true;for(const p of pending){p.onload=null;p.onerror=null;}};
+  },[page,query,results]);
+  const photographed=results.filter(p=>p.image?.startsWith("https://") && checkedPhotos[p.id]==="ready");
+  const checkingPhotos=results.some(p=>p.image?.startsWith("https://") && checkedPhotos[p.id]===undefined);
   const item=(p:Perfume,context:Page)=>{
     const owned=ownedMap.get(p.id);
     return <article className="sc-perfume" key={p.id}>
@@ -291,7 +311,7 @@ function Fragrance(){
   const aAcc=new Set([...(left?.notes||[]),...(left?.accords||[])].map(s=>s.toLowerCase()));
   const match=[...(right?.notes||[]),...(right?.accords||[])].filter(n=>aAcc.has(n.toLowerCase()));
   return <main id="main-content" className="sc-app">
-    <header className="sc-topbar"><a href="/" className="sc-back"><ArrowLeft size={17}/> IBRAHIM ALLI</a><a href="/fragrance" className="sc-wordmark" aria-label="Scent Cabinet home">SCENT<span> / </span>CABINET</a><button className="sc-top-action" onClick={()=>setBackupOpen(true)}><Download size={17}/><span>My data</span></button></header>
+    <header className="sc-topbar"><a href="/fragrance" className="sc-wordmark" aria-label="Scent Cabinet home">SCENT<span> / </span>CABINET</a><button className="sc-top-action" onClick={()=>setBackupOpen(true)}><Download size={17}/><span>My data</span></button></header>
     <div className="sc-inner">
       {(page==="collection"||page==="worth")&&<div className="sc-stats sc-stats-naira"><div><span>BOTTLES</span><strong>{store.collection.length}</strong></div><div><span>WISHLIST</span><strong>{store.wishlist.length}</strong></div><div><span>COLLECTION WORTH</span><strong>{money(moneyNGN,"NGN")}</strong></div></div>}
       <nav className="sc-tabs" aria-label="Fragrance sections">
@@ -309,7 +329,7 @@ function Fragrance(){
 
         {error&&<div className="sc-warning"><CloudOff size={19}/><span>{error}</span><button onClick={()=>setRefreshKey(k=>k+1)}>Retry</button></div>}
         {catalogueNotice&&<p className="sc-source-note">{catalogueNotice}</p>}
-        {results.length>0?<><div className="sc-grid">{results.map(p=>item(p,"discover"))}</div>{hasMore&&<button className="sc-loadmore" disabled={searching} onClick={()=>setCatalogPage(x=>x+1)}>{searching?"Loading...":"Load more fragrances"} <ChevronDown size={18}/></button>}</>:searching?<div className="sc-loading">Searching the fragrance library…</div>:!error?<div className="sc-empty"><Search size={40}/><h3>No matching fragrances.</h3><p>Try a different name, or add a missing fragrance.</p></div>:null}
+        {photographed.length>0?<><div className="sc-grid">{photographed.map(p=>item(p,"discover"))}</div>{hasMore&&<button className="sc-loadmore" disabled={searching} onClick={()=>setCatalogPage(x=>x+1)}>{searching?"Loading...":"Load more"} <ChevronDown size={18}/></button>}</>:searching||checkingPhotos?<div className="sc-loading">Loading photos…</div>:query.trim()?<p className="sc-no-results">No perfumes with verified photos found. Try another search or <button onClick={()=>setManualOpen(true)}>add manually</button>.</p>:<p className="sc-discover-intro">Search a perfume or choose a brand above.</p>}
       </section>}
       {page==="wishlist"&&<section className="sc-section">
         <div className="sc-section-head"><div><h2>Wishlist</h2></div><button className="sc-primary" onClick={()=>go("discover")}><Plus size={17}/> Find fragrances</button></div>
