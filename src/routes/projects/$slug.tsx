@@ -8,7 +8,6 @@ import { projects } from "@/lib/portfolio-content";
 import { JisProjectVisual } from "@/components/jis-project-visual";
 import { ProjectWalkthrough } from "@/components/project-walkthrough";
 import { projectDecisions } from "@/lib/project-decisions";
-import { track } from "@vercel/analytics";
 
 export const Route = createFileRoute("/projects/$slug")({
   loader: ({ params }) => {
@@ -105,8 +104,7 @@ function ProjectPage() {
               <span>{decision.label}</span>
               <p>{decision.boundaries}</p>
             </div>
-            <Link to="/start-project" search={{service:decision.service}} className="ia-4d-case-link"
-              onClick={()=>track("portfolio_case_study_cta_click",{project:project.slug,action:"open_project_form"})}>
+            <Link to="/start-project" search={{service:decision.service}} className="ia-4d-case-link">
               {decision.linkText} <ArrowRight size={18} aria-hidden="true"/>
             </Link>
           </div>
