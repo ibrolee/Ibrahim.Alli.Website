@@ -50,7 +50,21 @@ function isH3SwallowedErrorBody(body: string): boolean {
 export default {
   async fetch(request: Request, env: unknown, ctx: unknown) {
     try {
-      if (new URL(request.url).pathname.startsWith("/api/fragrance/sync/")) return await scentSyncApi(request, env);
+      if (new URL(request.url).pathname.startsWith("/api/fragrance/sync/")) {
+        // Nitro may invoke this nested server entry with an empty/adapter env instead
+        // of the Worker fetch bindings. Use Cloudflare's documented importable env
+        // when the D1 binding is not present on the provided object.
+        let runtimeEnv = env;
+        if (!runtimeEnv || typeof runtimeEnv !== "object" || !("SCENT_SYNC_DB" in runtimeEnv)) {
+          try {
+            const cloudflare = await import("cloudflare:workers");
+            runtimeEnv = cloudflare.env;
+          } catch {
+            // Non-Cloudflare tests and local dev can still show setup-needed.
+          }
+        }
+        return await scentSyncApi(request, runtimeEnv);
+      }
       if (new URL(request.url).pathname.startsWith("/api/fragrance/")) return await fragranceSearch(request, env, ctx && typeof ctx === "object" ? ctx : undefined);
       const handler = await getServerEntry();
       const response = await handler.fetch(request, env, ctx);
