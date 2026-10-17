@@ -50,6 +50,7 @@ describe("Scent Cabinet private sync",()=>{
     expect(chooseCabinetSync(empty(),withSix(),1,null)).toBe("download");
     expect(chooseCabinetSync(withSix(),{...empty(),wishlist:[{id:"else"}]},1,null)).toBe("conflict");
     expect(chooseCabinetSync(withSix(),withSix(),3,null)).toBe("matched");
+    expect(chooseCabinetSync(empty(),withSix(),3,{version:3,synced:JSON.stringify(withSix())})).toBe("upload");
   });
   test("sync remains disabled and public snapshot is inaccessible without D1",async()=>{
     const status=await scentSyncApi(request("status"),{});
