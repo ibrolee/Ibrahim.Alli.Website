@@ -448,7 +448,7 @@ function Fragrance(){
       </div>
       <div className="sc-combo-info"><span className="sc-combo-tag">PERFUME COMBO</span>
       <h3>{c.name}</h3>
-      <p>{c.perfumes.map(p=>p.name).join(" · ")}</p>
+      <div className="sc-combo-members">{c.perfumes.slice(0,4).map(p=><button type="button" key={p.id} onClick={()=>setSelected(p)}>{p.name}</button>)}{c.perfumes.length>4&&<span>+{c.perfumes.length-4} more</span>}</div>
       {c.target==="collection"&&<strong className="sc-combo-cost">{money(c.amount||0,"NGN")} <small>total paid</small></strong>}
       <div className="sc-combo-actions">
         <button type="button" onClick={()=>editCombo(c)}>Edit combo</button>
@@ -518,6 +518,15 @@ function Fragrance(){
         <label>COMBO PHOTO (OPTIONAL)</label>
         <label className="sc-photo-picker sc-combo-photo"><input type="file" accept="image/*" onChange={selectComboPhoto} disabled={comboSaving}/>{comboPreview?<img alt="New combo photo" src={comboPreview}/>:comboId&&photoUrls[comboId]?<img alt="Saved combo photo" src={photoUrls[comboId]}/>:<span><Upload size={18}/> Upload combo photo</span>}</label>
         {comboPreview&&<button type="button" className="sc-photo-clear" onClick={()=>{setComboPreview(null);setComboPhoto(null)}}>Remove selected photo</button>}
+        {comboId&&!comboPreview&&photoUrls[comboId]&&<button type="button" className="sc-photo-clear" onClick={async()=>{
+          try{
+            await removeScentPhoto(comboId);
+            const existing=storedUrls.current.get(comboId);
+            if(existing)URL.revokeObjectURL(existing);
+            storedUrls.current.delete(comboId);
+            setPhotoUrls(prev=>{const next={...prev};delete next[comboId];return next;});
+          }catch{setComboError("Couldn't remove photo.");}
+        }}>Remove combo photo</button>}
         {comboTarget==="collection"&&<><label>TOTAL PRICE PAID (₦)</label><div className="sc-money-input"><span className="sc-money-prefix">₦</span><input type="number" min="0" step="0.01" inputMode="decimal" required value={comboAmount} onChange={e=>setComboAmount(e.target.value)} placeholder="0.00"/></div></>}
         {comboError&&<p className="sc-form-error" role="alert">{comboError}</p>}
         <button type="submit" className="sc-primary sc-block" disabled={comboSaving||comboPerfumes.length<2}><Check size={17}/>{comboSaving?"Saving...":comboId?"Save changes":"Save combo"}</button>
