@@ -129,3 +129,30 @@ test("old and current house names in a product title do not create duplicate Inv
  const b=perfume({id:"productsfacts:2222222222222",brand:"Rabanne",name:"Paco Rabanne Invictus Eau de Toilette"});
  expect(mergeCatalogue([[a],[b]])).toHaveLength(1);
 });
+
+test("multi-source search keeps only matching perfumes and ranks exact names first",()=>{
+ const result=mergeCatalogue([[
+  perfume({id:"dior:one",brand:"Dior",name:"Miss Dior"}),
+  perfume({id:"dior:two",brand:"Dior",name:"Sauvage Elixir"}),
+  perfume({id:"dior:three",brand:"Dior",name:"Sauvage"}),
+  perfume({id:"other:one",brand:"Versace",name:"Eros"})
+ ]],"dior sauvage");
+ expect(result.map(p=>p.name)).toEqual(["Sauvage","Sauvage Elixir"]);
+ expect(mergeCatalogue([[perfume({id:"1",brand:"Lattafa",name:"Asad"}),perfume()]],"lattafakhamrah").map(p=>p.name)).toEqual(["Khamrah"]);
+});
+
+test("no-match search broadens once without showing unrelated first-pass hits",async()=>{
+ const searches:string[]=[];
+ const spy=spyOn(globalThis,"fetch").mockImplementation(async input=>{
+  const u=new URL(String(input));searches.push(u.searchParams.get("q")||"");
+  return Response.json({results:u.searchParams.get("q")==="latta"?
+    [perfume({name:"Khamrah"})]:[perfume({name:"Asad"})]});
+ });
+ try{
+  const response=await fragranceSearch(new Request("https://example.com/api/fragrance/search?q=lattafakhamrah&source=noteboxd"),{NOTEBOXD_API_KEY:"test"});
+  const data=await response.json();
+  expect(searches).toEqual(["lattafakhamrah","latta"]);
+  expect(data.results.map((p:CatalogRecord)=>p.name)).toEqual(["Khamrah"]);
+  expect(data.searchHint).toContain("close matches");
+ }finally{spy.mockRestore();}
+});
