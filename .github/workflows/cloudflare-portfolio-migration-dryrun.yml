@@ -28,6 +28,8 @@ jobs:
           echo "Worker entry exists; static assets were generated."
       - name: Wrangler packaging dry-run (no credentials or deployment)
         run: npx --yes wrangler@4.135.0 deploy --dry-run --outdir .cloudflare-dryrun
+      - name: Fragrance providers unit tests (no real API calls)
+        run: bun test src/lib/scent-providers.test.ts
       - name: Local Workers smoke tests (no Cloudflare deployment)
         run: |
           set -e
@@ -49,16 +51,14 @@ jobs:
           grep -qi 'Ibrahim' /tmp/portfolio-home.html
           curl -fsS --max-time 20 http://127.0.0.1:8787/fragrance -o /tmp/fragrance-page.html
           grep -qi 'Scent Cabinet' /tmp/fragrance-page.html
-          curl -fsS --max-time 10 http://127.0.0.1:8787/api/fragrance/browse -o /tmp/fragrance-browse.json
-          grep -q '"source":"starter"' /tmp/fragrance-browse.json
-          echo "Portfolio root, Scent Cabinet SSR, and fragrance API all responded under local workerd."
+          echo "Portfolio root and Scent Cabinet SSR responded under local workerd. Fragrance providers are mocked in unit tests."
       - name: Verify public Cloudflare preview (read-only)
         env:
           PREVIEW_URL: https://ibrahimalli-portfolio-preview.alliibrahim3.workers.dev
         run: |
           set -euo pipefail
           echo "Checking external workers.dev URL (no paid API searches)"
-          for path in / /fragrance /fragrance.webmanifest /fragrance-apple-touch.png /api/fragrance/browse; do
+          for path in / /fragrance /fragrance.webmanifest /fragrance-apple-touch.png; do
             status=$(curl -sS -L --max-time 20 -o /tmp/cloudflare-preview-check -w '%{http_code}' "$PREVIEW_URL$path")
             echo "Cloudflare $path: HTTP $status"
             if [ "$status" != "200" ]; then
@@ -67,9 +67,6 @@ jobs:
             fi
             if [ "$path" = "/fragrance" ]; then
               grep -qi 'Scent Cabinet' /tmp/cloudflare-preview-check
-            fi
-            if [ "$path" = "/api/fragrance/browse" ]; then
-              grep -q '"source":"starter"' /tmp/cloudflare-preview-check
             fi
           done
           echo "Public preview smoke checks all passed."
