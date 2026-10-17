@@ -362,6 +362,34 @@
 .sc-catalogue-summary a{color:#3f6749;text-decoration:underline}
 
 .sc-search .sc-search-submit{color:#fff}
+/* Make the Search action unmissable: override the older transparent button rule. */
+.sc-search .sc-search-submit{
+  flex:0 0 auto;display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  min-height:40px;min-width:110px;padding:9px 13px;border:1px solid #1c402d;
+  border-radius:6px;background:#254f35;color:#fff;font-weight:800;
+  box-shadow:0 2px 6px #173c251c;white-space:nowrap;
+}
+.sc-search .sc-search-submit:hover:not(:disabled){background:#366747;color:#fff}
+.sc-search .sc-search-submit:disabled{opacity:.65;background:#627767;border-color:#627767}
+.sc-search .sc-search-submit svg{color:currentColor;flex-shrink:0}
+.sc-search .sc-search-clear{flex:0 0 auto;display:inline-flex;align-items:center;justify-content:center;min-width:26px;min-height:38px}
+.sc-search-progress{display:flex;align-items:center;gap:11px;padding:12px 13px;margin:10px 0 13px;
+  border:1px solid #b9d3b5;background:#eff6ed;color:#28513b;border-radius:8px}
+.sc-search-progress>svg{flex:none;color:#39774f}
+.sc-search-progress strong{display:block;font-size:12px;font-weight:800;line-height:1.5}
+.sc-search-progress span{display:block;font-size:11px;line-height:1.5;color:#526c5d}
+.sc-search-hint{font-size:11px;line-height:1.5;color:#46674f;margin:9px 0 13px}
+.sc-spin{animation:sc-search-spin 1s linear infinite}
+@keyframes sc-search-spin{to{transform:rotate(360deg)}}
+@media(prefers-reduced-motion:reduce){.sc-spin{animation:none}}
+@media(max-width:660px){
+ .sc-search{min-height:51px;height:auto;padding:6px 7px;gap:6px;border-radius:7px}
+ .sc-search>svg{width:16px;height:16px;flex-shrink:0}
+ .sc-search input{flex:1;min-width:0;font-size:16px}
+ .sc-search .sc-search-submit{min-width:93px;min-height:38px;padding:7px 8px;font-size:11px;gap:5px}
+ .sc-search .sc-search-submit svg{width:14px;height:14px}
+ .sc-search-progress{padding:10px}
+}
 
 .sc-stats.sc-stats-naira{grid-template-columns:.7fr .7fr 1.3fr 1.3fr}
 .sc-shelf-switch{display:flex;gap:6px;border-bottom:1px solid var(--sc-line);padding-bottom:12px;margin-bottom:12px}

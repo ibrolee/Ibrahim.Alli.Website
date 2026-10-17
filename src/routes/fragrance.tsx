@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { ArrowRight, Bookmark, Check, ChevronDown, CloudOff, Download, FlaskConical, Heart, ImageOff, Layers, Plus, Search, ShoppingBag, Sparkles, Trash2, Upload, Wallet, X } from "lucide-react";
+import { ArrowRight, Bookmark, Check, ChevronDown, CloudOff, Download, FlaskConical, Heart, ImageOff, LoaderCircle, Layers, Plus, Search, ShoppingBag, Sparkles, Trash2, Upload, Wallet, X } from "lucide-react";
 import { compressScentPhoto, saveScentPhoto, getScentPhoto, removeScentPhoto, blobAsDataUrl, dataUrlAsBlob } from "@/lib/scent-photos";
 import css from "../fragrance.css?url";
 import { comboBottleCost, restoreBottleLife, savedFinishDate, setBottleFinished, setComboBottleFinished, shelfTotals } from "@/lib/scent-shelf";
@@ -159,6 +159,7 @@ function Fragrance(){
   const [searching,setSearching]=useState(false);
   const [error,setError]=useState("");
   const [catalogueNotice,setCatalogueNotice]=useState("");
+  const [searchHint,setSearchHint]=useState("");
   const [refreshKey,setRefreshKey]=useState(0);
   const [selected,setSelected]=useState<Perfume|null>(null);
   const [selectedBottleId,setSelectedBottleId]=useState<string|null>(null);
@@ -295,6 +296,14 @@ function Fragrance(){
   const legacyUSD=store.collection.filter(x=>x.currency==="USD").length;
   const list=useMemo(()=>store.collection.filter(x=>Boolean(x.finishedAt)===(shelfView==="finished")).filter(x=>(x.perfume.name+" "+x.perfume.brand).toLowerCase().includes(filter.toLowerCase())).sort((a,b)=>sort==="price"?b.amount-a.amount:sort==="alpha"?a.perfume.name.localeCompare(b.perfume.name):sort==="favorite"?Number(Boolean(b.favorite))-Number(Boolean(a.favorite)):(shelfView==="finished"?(b.finishedAt||b.added).localeCompare(a.finishedAt||a.added):b.added.localeCompare(a.added))),[store.collection,filter,sort,shelfView]);
   const visibleCombos=myCombos.filter(c=>c.perfumes.some(p=>Boolean(c.finishedPerfumes?.[p.id])===(shelfView==="finished"))).filter(c=>(c.name+" "+c.perfumes.map(p=>p.brand+" "+p.name).join(" ")).toLowerCase().includes(filter.toLowerCase()));
+  function runDiscoverSearch(text:string){
+    const submitted=text.trim().replace(/\s+/g," ");
+    if(submitted.length<3)return;
+    setSearching(true);setError("");setCatalogueNotice("");setSearchHint("");
+    setResults([]);setHasMore(false);setCatalogPage(1);setActiveSource(sourceChoice);
+    if(submitted===query&&sourceChoice===activeSource)setRefreshKey(k=>k+1);
+    else setQuery(submitted);
+  }
   function go(p:Page){setPage(p);setSelected(null);setSelectedBottleId(null);setSelectedComboId(null);setInsightEdit("closed");window.scrollTo({top:0,behavior:"smooth"});}
   function openDetail(p:Perfume,bottle?:Owned,combo?:Combo){setSelected(p);setSelectedBottleId(bottle?.id||null);setSelectedComboId(combo?.id||null);setInsightEdit("closed");}
   function dateLabel(value:string){const d=new Date(value);return Number.isFinite(d.getTime())?d.toLocaleDateString("en-GB",{day:"numeric",month:"short",year:"numeric"}):"Date not recorded";}
@@ -490,6 +499,7 @@ function Fragrance(){
         const payload=await response.json();
         if(n!==searchId.current)return;
         const sourceName=String(payload.source||"");
+        setSearchHint(typeof payload.searchHint==="string"?payload.searchHint:"");
         setResultSource(sourceName);
         setResultSources(Array.isArray(payload.sources)?payload.sources.filter((v:unknown)=>typeof v==="string"):[sourceName]);
         setCatalogueNotice(typeof payload.providerWarning==="string"?payload.providerWarning:"");
@@ -612,9 +622,11 @@ function Fragrance(){
       </section>}
       {page==="discover"&&<section className="sc-section">
         <div className="sc-section-head"><div><h2>Discover</h2></div><button className="sc-secondary sc-add-combo-discover" onClick={()=>startCombo("wishlist")}><Plus size={16}/> Combo</button></div>
-        <form className="sc-search" onSubmit={e=>{e.preventDefault();const v=draftQuery.trim();if(v.length<3)return;setCatalogPage(1);setActiveSource(sourceChoice);if(v===query&&sourceChoice===activeSource)setRefreshKey(k=>k+1);else setQuery(v)}}><Search size={20}/><input autoFocus={false} value={draftQuery} onChange={e=>setDraftQuery(e.target.value)} placeholder="Search perfume or brand..." aria-label="Search perfumes"/>{draftQuery&&<button type="button" onClick={()=>{setDraftQuery("");setQuery("");setCatalogPage(1)}} aria-label="Clear search"><X size={19}/></button>}<button className="sc-search-submit" type="submit" disabled={draftQuery.trim().length<3||searching}>{sourceChoice==="auto"?"Search all":"Search"}</button></form>
+        <form className="sc-search" role="search" onSubmit={e=>{e.preventDefault();runDiscoverSearch(draftQuery)}}><Search size={20} aria-hidden="true"/><input autoFocus={false} value={draftQuery} onChange={e=>setDraftQuery(e.target.value)} placeholder="Perfume name or brand..." aria-label="Search perfumes" enterKeyHint="search"/>{draftQuery&&<button className="sc-search-clear" type="button" onClick={()=>{setDraftQuery("");setQuery("");setCatalogPage(1);setResults([]);setHasMore(false);setSearching(true);setSearchHint("");setRefreshKey(k=>k+1)}} aria-label="Clear search"><X size={18}/></button>}<button className="sc-search-submit" type="submit" disabled={draftQuery.trim().length<3||searching}>{searching?<><LoaderCircle className="sc-spin" size={16}/> Searching</>:<><Search size={16}/>{sourceChoice==="auto"?"Search all":"Search"}</>}</button></form>
+        {searching&&<div className="sc-search-progress" role="status" aria-live="polite"><LoaderCircle className="sc-spin" size={18}/><div><strong>{catalogPage>1?"Loading more perfumes":query?"Searching for “"+query+"”":"Finding fragrances"}</strong><span>Checking available fragrance catalogues and matching names…</span></div></div>}
+        {!searching&&searchHint&&<p className="sc-search-hint">{searchHint}</p>}
         <details className="sc-source-options"><summary>Choose a source (optional)</summary><div className="sc-source-picker"><label htmlFor="sc-search-source">Look in</label><select id="sc-search-source" value={sourceChoice} onChange={e=>setSourceChoice(e.target.value as CatalogSource)}>{SOURCES.map(s=><option key={s.id} value={s.id}>{s.name}</option>)}</select><span>Search all combines available sources and removes repeated perfumes. Then tap Search.</span></div></details>
-        <div className="sc-chips">{["Qasida","Bakhur","Lattafa","Afnan","Dior","Tom Ford"].map(t=><button key={t} onClick={()=>{setDraftQuery(t);setCatalogPage(1);if(query===t&&sourceChoice===activeSource)setRefreshKey(k=>k+1);else{setActiveSource(sourceChoice);setQuery(t)}}}>{t}</button>)}</div>
+        <div className="sc-chips">{["Qasida","Bakhur","Lattafa","Afnan","Dior","Tom Ford"].map(t=><button key={t} onClick={()=>{setDraftQuery(t);runDiscoverSearch(t)}}>{t}</button>)}</div>
         <div className="sc-discover-tools"><button className="sc-filter-trigger" type="button" aria-expanded={showDiscoverFilters} onClick={()=>setShowDiscoverFilters(v=>!v)}> <Layers size={16}/> Filters & Sort {filterCount>0&&<span>{filterCount}</span>} <ChevronDown size={16} className={showDiscoverFilters?"sc-rotate":""}/></button>
           <span className="sc-filter-result-count">{filteredPhotographed.length} of {photographed.length} photographed results</span></div>
         {showDiscoverFilters&&<div className="sc-discover-filter-panel">
@@ -643,7 +655,7 @@ function Fragrance(){
         {error&&<div className="sc-warning"><CloudOff size={19}/><span>{error}</span><button onClick={()=>setRefreshKey(k=>k+1)}>Retry</button></div>}
         {catalogueNotice&&<p className="sc-source-note">{catalogueNotice}</p>}
         {photographed.length>0&&<div className="sc-catalogue-summary" aria-live="polite"><span>{photographed.length} perfumes{resultSources.length>1?" · combined without repeats":""}</span><details><summary>Sources & photo credits</summary><p>{resultSources.map(v=>SOURCES.find(x=>x.id===v)?.name.replace(/ · .*/,"")||v).join(" · ")}</p>{resultSources.some(v=>v==="beautyfacts"||v==="productsfacts")&&<p>Data © <a href="https://world.openbeautyfacts.org" target="_blank" rel="noreferrer">Open Facts contributors</a> (<a href="https://opendatacommons.org/licenses/odbl/1-0/" target="_blank" rel="noreferrer">ODbL</a>). Images belong to their contributors.</p>}{resultSources.includes("wikidata")&&<p>Wikidata data: CC0. Open a perfume to see its Wikimedia photo credit and licence.</p>}</details></div>}
-        {filteredPhotographed.length>0?<><div className="sc-grid">{filteredPhotographed.map(p=>item(p,"discover"))}</div>{hasMore&&<button className="sc-loadmore" disabled={searching} onClick={()=>setCatalogPage(x=>x+1)}>{searching?"Loading...":"Load more"} <ChevronDown size={18}/></button>}</>:searching||checkingPhotos?<div className="sc-loading">Loading photos…</div>:photographed.length>0?<div className="sc-no-results"><p>No perfumes match these filters yet. Perfumes with missing ratings or prices will not appear when you filter by those details.</p><button onClick={()=>setDiscoverFilters(DEFAULT_DISCOVER_FILTERS)}>Clear filters</button><p>Try Search all to find more perfumes and details.</p></div>:query.trim()?<p className="sc-no-results">No perfumes with verified photos found. Try another search or <button onClick={()=>setManualOpen(true)}>add manually</button>.</p>:<p className="sc-discover-intro">Search a perfume or choose a brand above.</p>}
+        {filteredPhotographed.length>0?<><div className="sc-grid">{filteredPhotographed.map(p=>item(p,"discover"))}</div>{hasMore&&<button className="sc-loadmore" disabled={searching} onClick={()=>setCatalogPage(x=>x+1)}>{searching?"Loading more…":"Load more"} <ChevronDown size={18}/></button>}</>:searching||checkingPhotos?<div className="sc-loading">{searching?"Results will appear here when the search finishes…":"Checking perfume photos…"}</div>:photographed.length>0?<div className="sc-no-results"><p>No perfumes match these filters yet. Perfumes with missing ratings or prices will not appear when you filter by those details.</p><button onClick={()=>setDiscoverFilters(DEFAULT_DISCOVER_FILTERS)}>Clear filters</button><p>Try Search all to find more perfumes and details.</p></div>:query.trim()?<p className="sc-no-results">No closely matching perfumes with verified photos found. Try another spelling, or <button onClick={()=>setManualOpen(true)}>add manually</button>.</p>:<p className="sc-discover-intro">Search a perfume or choose a brand above.</p>}
       </section>}
       {page==="wishlist"&&<section className="sc-section">
         <div className="sc-section-head"><div><h2>Wishlist</h2></div><div className="sc-combo-header-actions"><button className="sc-secondary" onClick={()=>startCombo("wishlist")}><Plus size={16}/> Add combo</button><button className="sc-primary" onClick={()=>go("discover")}><Plus size={16}/> Fragrance</button></div></div>

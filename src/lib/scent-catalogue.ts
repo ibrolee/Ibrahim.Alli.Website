@@ -1,4 +1,5 @@
-import { sameScent, scentIdentity, scentText } from "./scent-identity";
+import { sameScent, scentIdentity } from "./scent-identity";
+import { fragranceMatchScore } from "./scent-search";
 import type { CatalogRecord, SearchResult } from "./scent-providers";
 
 export const CATALOG_PROVIDERS=["noteboxd","fragella","beautyfacts","productsfacts","wikidata"] as const;
@@ -40,12 +41,11 @@ export function mergeCatalogue(groups:CatalogRecord[][],query=""):CatalogRecord[
     }
     merged[index]=combined;
   }
-  const words=scentText(query).split(" ").filter(Boolean);
-  function rank(p:CatalogRecord):number {
-    const label=scentText(p.brand+" "+p.name),name=scentText(p.name),q=scentText(query);
-    return (name===q?100:0)+(label===q?90:0)+(label.includes(q)?30:0)+words.filter(w=>label.includes(w)).length*8+Math.min(richness(p),15);
-  }
-  return merged.filter(p=>p.image?.startsWith("https://")).sort((a,b)=>query?rank(b)-rank(a):0);
+  // Keep only products whose brand/name actually answers the query.
+  // Provider search often returns unrelated items from broad brand/category hits.
+  return merged.filter(p=>p.image?.startsWith("https://")&&(!query||fragranceMatchScore(p,query)>0))
+    .sort((a,b)=>query?
+      fragranceMatchScore(b,query)-fragranceMatchScore(a,query)||richness(b)-richness(a):0);
 }
 
 export async function collectCatalogues(
