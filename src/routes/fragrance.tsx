@@ -427,7 +427,7 @@ function Fragrance(){
         <div className="sc-perfume-actions">
           {context==="collection"?
           <><button onClick={()=>openPrice(p)}>Edit price</button><button onClick={()=>favorite(p)} title="Favourite" aria-label="Toggle favourite"><Heart size={17} fill={owned?.favorite?"currentColor":"none"}/></button></>:
-          <><button onClick={()=>openPrice(p)}>{owned?"Owned · Edit price":"+ My shelf"}</button><button onClick={()=>wish(p)} title={wishIds.has(p.id)?"Remove from wishlist":"Add to wishlist"} aria-label="Toggle wishlist"><Heart size={17} fill={wishIds.has(p.id)?"currentColor":"none"}/></button>{context==="discover"&&<button className="sc-combo-add-card" onClick={()=>startCombo("wishlist",p)} title="Start combo with this fragrance"><Plus size={14}/> Combo</button>}</>
+          <><button onClick={()=>openPrice(p)}>{owned?"Owned · Edit price":"+ My shelf"}</button><button onClick={()=>wish(p)} title={wishIds.has(p.id)?"Remove from wishlist":"Add to wishlist"} aria-label="Toggle wishlist"><Heart size={17} fill={wishIds.has(p.id)?"currentColor":"none"}/></button>{context==="discover"&&<button className="sc-combo-add-card" onClick={()=>startCombo("wishlist",p)} title="Start combo with this fragrance"><Plus size={14}/> Combo</button>}</>}
         </div>
       </div>
     </article>;
