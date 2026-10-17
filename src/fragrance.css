@@ -478,7 +478,7 @@
   .sc-cabinet-section .sc-combo-info h3{font-size:19px}
   .sc-cabinet-section .sc-combo-bottle-list{margin:3px 0;gap:2px;max-height:76px;overflow-y:auto}
   .sc-cabinet-section .sc-combo-bottle-list>div{padding:2px 0}
-  .sc-cabinet-section .sc-combo-bottle-list button{min-height:30px;padding:3px 5px}
+  .sc-cabinet-section .sc-combo-bottle-list button{min-height:36px;padding:4px 5px}
   .sc-cabinet-section .sc-combo-actions{padding-top:0}
   .sc-cabinet-section .sc-combo-actions button{padding:5px}
 }
