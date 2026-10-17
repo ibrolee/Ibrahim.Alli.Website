@@ -39,6 +39,7 @@ async function readPhotoIndex(bucket:ScentR2){
       let id:string;
       try{id=decodeURIComponent(item.key.slice(PHOTO_PREFIX.length));}catch{continue;}
       if(validPhotoId(id))entries[id]={deleted:item.customMetadata?.["deleted"]==="1",...(item.etag?{etag:item.etag}:{})};
+      if(Object.keys(entries).length>SCENT_R2_MAX_PHOTOS)throw new Error("Photo quota reached");
     }
     if(!list.truncated)break;
     if(!list.cursor||list.cursor===cursor)throw new Error("Photo list incomplete");
