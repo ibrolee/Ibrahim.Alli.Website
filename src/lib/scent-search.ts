@@ -52,6 +52,6 @@ export function fragranceMatchScore(item:SearchableScent,query:string):number {
 export function broaderSearchTerm(value:string):string|undefined {
   const q=cleanQuery(value),tokens=words(q).filter(w=>w.length>=4);
   if(!q || !tokens.length)return undefined;
-  const wider=tokens.length>1?[...tokens].sort((a,b)=>b.length-a.length)[0]!:tokens[0]!.slice(0,tokens[0]!.length>=8?5:4);
+  const wider=tokens.length>1?[...tokens].sort((a,b)=>b.length-a.length||tokens.indexOf(b)-tokens.indexOf(a))[0]!:tokens[0]!.slice(0,tokens[0]!.length>=8?5:4);
   return wider && wider!==q?wider:undefined;
 }
