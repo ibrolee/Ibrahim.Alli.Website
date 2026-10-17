@@ -270,7 +270,30 @@ function Fragrance(){
   const moneyNGN=store.collection.filter(x=>x.currency==="NGN").reduce((s,x)=>s+x.amount,0)+myCombos.reduce((s,x)=>s+(x.amount||0),0);
   const legacyUSD=store.collection.filter(x=>x.currency==="USD").length;
   const list=useMemo(()=>store.collection.filter(x=>(x.perfume.name+" "+x.perfume.brand).toLowerCase().includes(filter.toLowerCase())).sort((a,b)=>sort==="price"?b.amount-a.amount:sort==="alpha"?(a.perfume.name.localeCompare(b.perfume.name)):sort==="favorite"?Number(Boolean(b.favorite))-Number(Boolean(a.favorite)):b.added.localeCompare(a.added)),[store.collection,filter,sort]);
-  function go(p:Page){setPage(p);setSelected(null);window.scrollTo({top:0,behavior:"smooth"});}
+  function go(p:Page){setPage(p);setSelected(null);setInsightEdit("closed");window.scrollTo({top:0,behavior:"smooth"});}
+  function openDetail(p:Perfume){setSelected(p);setInsightEdit("closed");}
+  function editMyInsight(p:Perfume){
+    const current=store.insights[p.id];
+    setInsightPrice(current?.priceNGN===undefined?"":String(current.priceNGN));
+    setInsightLongevity(current?.longevity||"");
+    setInsightProjection(current?.projection||"");
+    setInsightEdit("open");
+  }
+  function saveMyInsight(e:React.FormEvent){
+    e.preventDefault();if(!selected)return;
+    const newPrice=insightPrice.trim()===""?undefined:Number(insightPrice);
+    if(newPrice!==undefined&&(!Number.isFinite(newPrice)||newPrice<0||newPrice>100_000_000))return;
+    const entry:MyInsight={...(newPrice!==undefined?{priceNGN:newPrice}:{}),
+      ...(insightLongevity?{longevity:insightLongevity}:{}),
+      ...(insightProjection?{projection:insightProjection}:{})};
+    setStore(prev=>{
+      const insights={...prev.insights};
+      if(Object.keys(entry).length)insights[selected.id]=entry;
+      else delete insights[selected.id];
+      return {...prev,insights};
+    });
+    setInsightEdit("closed");
+  }
   function isOwned(p:Perfume){return ownedMap.has(p.id);}
   function wish(p:Perfume){setStore(s=>({...s,wishlist:s.wishlist.some(x=>x.id===p.id)?s.wishlist.filter(x=>x.id!==p.id):[p,...s.wishlist]}));}
   function openPrice(p:Perfume){setSelected(null);setPriceOpen(p);const old=ownedMap.get(p.id);setPrice(old?.currency==="NGN"?String(old.amount):"");}
@@ -461,15 +484,29 @@ function Fragrance(){
     return()=>{disposed=true;for(const p of pending){p.onload=null;p.onerror=null;}};
   },[page,query,results]);
   const photographed=results.filter(p=>p.image?.startsWith("https://") && checkedPhotos[p.id]==="ready");
+  const filteredPhotographed=filterAndSortDiscover(photographed,discoverFilters,store.insights,(perfumeId)=>{
+    const purchased=ownedMap.get(perfumeId);
+    return purchased?.currency==="NGN"?purchased.amount:undefined;
+  });
+  const filterCount=(Object.keys(DEFAULT_DISCOVER_FILTERS) as (keyof DiscoverFilters)[]).filter(k=>discoverFilters[k]!==DEFAULT_DISCOVER_FILTERS[k]).length;
+  const availableLongevity=photographed.filter(p=>Boolean(valueForLongevity(store.insights[p.id]?.longevity||p.longevity))).length;
+  const availableProjection=photographed.filter(p=>Boolean(valueForProjection(store.insights[p.id]?.projection||p.projection))).length;
+  const availablePrice=photographed.filter(p=>store.insights[p.id]?.priceNGN!==undefined||ownedMap.get(p.id)?.currency==="NGN").length;
   const checkingPhotos=results.some(p=>p.image?.startsWith("https://") && checkedPhotos[p.id]===undefined);
   const item=(p:Perfume,context:Page)=>{
     const owned=ownedMap.get(p.id);
     return <article className="sc-perfume" key={p.id}>
-      <button className="sc-perfume-image" onClick={()=>setSelected(p)} aria-label={"Details for "+p.name}>{pic(p,"card",photoUrls[p.id],context==="discover"?()=>setCheckedPhotos(v=>({...v,[p.id]:"missing"})):undefined)}</button>
+      <button className="sc-perfume-image" onClick={()=>openDetail(p)} aria-label={"Details for "+p.name}>{pic(p,"card",photoUrls[p.id],context==="discover"?()=>setCheckedPhotos(v=>({...v,[p.id]:"missing"})):undefined)}</button>
       <div className="sc-perfume-info">
         <span className="sc-perfume-brand">{p.brand}</span>
         <button className="sc-name" onClick={()=>setSelected(p)}>{p.name}</button>
         <span className="sc-perfume-meta">{p.family||p.accords.slice(0,2).join(" · ")||"Fragrance"}</span>
+        {context==="discover"&&<div className="sc-performance-tags">
+          {(store.insights[p.id]?.longevity||p.longevity)&&<span><strong>Lasts</strong> {store.insights[p.id]?.longevity||p.longevity}</span>}
+          {(store.insights[p.id]?.projection||p.projection)&&<span><strong>Projects</strong> {store.insights[p.id]?.projection||p.projection}</span>}
+          {p.rating!==undefined&&<span><strong>Rating</strong> {p.rating.toFixed(1)}/5</span>}
+          {store.insights[p.id]?.priceNGN!==undefined&&<span><strong>My price</strong> {money(store.insights[p.id].priceNGN!,"NGN")}</span>}
+        </div>}
         {owned?<strong className="sc-price">{owned.currency==="NGN"?money(owned.amount,"NGN"):"Set ₦ price"}</strong>:null}
         <div className="sc-perfume-actions">
           {context==="collection"?
@@ -525,6 +562,29 @@ function Fragrance(){
         <form className="sc-search" onSubmit={e=>{e.preventDefault();const v=draftQuery.trim();if(v.length<3)return;setCatalogPage(1);setActiveSource(sourceChoice);if(v===query&&sourceChoice===activeSource)setRefreshKey(k=>k+1);else setQuery(v)}}><Search size={20}/><input autoFocus={false} value={draftQuery} onChange={e=>setDraftQuery(e.target.value)} placeholder="Search perfume or brand..." aria-label="Search perfumes"/>{draftQuery&&<button type="button" onClick={()=>{setDraftQuery("");setQuery("");setCatalogPage(1)}} aria-label="Clear search"><X size={19}/></button>}<button className="sc-search-submit" type="submit" disabled={draftQuery.trim().length<3||searching}>Search</button></form>
         <div className="sc-source-picker"><label htmlFor="sc-search-source">Search database</label><select id="sc-search-source" value={sourceChoice} onChange={e=>setSourceChoice(e.target.value as CatalogSource)}>{SOURCES.map(s=><option key={s.id} value={s.id}>{s.name}</option>)}</select><span>Only searches use API calls. Switching sources needs Search.</span></div>
         <div className="sc-chips">{["Qasida","Bakhur","Lattafa","Afnan","Dior","Tom Ford"].map(t=><button key={t} onClick={()=>{setDraftQuery(t);setCatalogPage(1);if(query===t&&sourceChoice===activeSource)setRefreshKey(k=>k+1);else{setActiveSource(sourceChoice);setQuery(t)}}}>{t}</button>)}</div>
+        <div className="sc-discover-tools"><button className="sc-filter-trigger" type="button" aria-expanded={showDiscoverFilters} onClick={()=>setShowDiscoverFilters(v=>!v)}> <Layers size={16}/> Filters & Sort {filterCount>0&&<span>{filterCount}</span>} <ChevronDown size={16} className={showDiscoverFilters?"sc-rotate":""}/></button>
+          <span className="sc-filter-result-count">{filteredPhotographed.length} of {photographed.length} photographed results</span></div>
+        {showDiscoverFilters&&<div className="sc-discover-filter-panel">
+          <div className="sc-filter-grid">
+            <label>Sort by<select aria-label="Sort fragrances" value={discoverFilters.sort} onChange={e=>setDiscoverFilters(v=>({...v,sort:e.target.value as DiscoverFilters["sort"]}))}>
+              <option value="relevance">Best match</option><option value="name">Brand / A–Z</option><option value="rating">Highest rated</option><option value="longevity">Longest lasting</option><option value="projection">Strongest projection</option><option value="price-low">Lowest ₦ price</option><option value="price-high">Highest ₦ price</option><option value="newest">Newest release</option></select></label>
+            <label>Longevity<select aria-label="Minimum longevity" value={discoverFilters.longevity} onChange={e=>setDiscoverFilters(v=>({...v,longevity:e.target.value as DiscoverFilters["longevity"]}))}>
+              <option value="any">Any · {availableLongevity} rated</option><option value="4">8+ hours · long lasting</option><option value="5">12+ hours · very long lasting</option></select></label>
+            <label>Projection<select aria-label="Minimum projection" value={discoverFilters.projection} onChange={e=>setDiscoverFilters(v=>({...v,projection:e.target.value as DiscoverFilters["projection"]}))}>
+              <option value="any">Any · {availableProjection} rated</option><option value="4">Strong · beyond arm's length</option><option value="5">Enormous · fills a room</option></select></label>
+            <label>My ₦ price limit<select aria-label="Maximum saved naira price" value={discoverFilters.budget} onChange={e=>setDiscoverFilters(v=>({...v,budget:e.target.value as DiscoverFilters["budget"]}))}>
+              <option value="">Any · {availablePrice} priced</option><option value="20000">Under ₦20,000</option><option value="40000">Under ₦40,000</option><option value="60000">Under ₦60,000</option><option value="100000">Under ₦100,000</option></select></label>
+            <label>Notes / scent family<select aria-label="Filter accords" value={discoverFilters.accord} onChange={e=>setDiscoverFilters(v=>({...v,accord:e.target.value}))}>
+              <option value="all">All scents</option>{["Oud","Vanilla","Woody","Fresh","Citrus","Amber","Floral","Musk","Spicy","Gourmand","Sweet","Leather","Aquatic","Rose"].map(x=><option value={x.toLowerCase()} key={x}>{x}</option>)}</select></label>
+            <label>Rating<select aria-label="Minimum fragrance rating" value={discoverFilters.minRating} onChange={e=>setDiscoverFilters(v=>({...v,minRating:e.target.value as DiscoverFilters["minRating"]}))}>
+              <option value="any">Any rating</option><option value="4">4.0+ out of 5</option><option value="4.5">4.5+ out of 5</option></select></label>
+            <label>Gender profile<select aria-label="Fragrance target profile" value={discoverFilters.gender} onChange={e=>setDiscoverFilters(v=>({...v,gender:e.target.value as DiscoverFilters["gender"]}))}>
+              <option value="all">All</option><option value="men">Men</option><option value="women">Women</option><option value="unisex">Unisex</option></select></label>
+            <label>Top-ranked season<select aria-label="Filter season" value={discoverFilters.season} onChange={e=>setDiscoverFilters(v=>({...v,season:e.target.value}))}>
+              <option value="all">Any season</option>{["Summer","Winter","Spring","Fall"].map(x=><option value={x.toLowerCase()} key={x}>{x}</option>)}</select></label>
+          </div>
+          <div className="sc-filter-foot"><p>Filters only use the perfumes already loaded. Community longevity and sillage are estimates, not guarantees. ₦ prices are your saved estimates or purchase prices—not foreign-currency retail prices. Missing values aren't guessed.</p><button type="button" onClick={()=>setDiscoverFilters(DEFAULT_DISCOVER_FILTERS)}>Reset filters</button></div>
+        </div>}
         <button className="sc-add-missing" onClick={()=>setManualOpen(true)}><Plus size={14}/> Not listed? Add it</button>
 
         {error&&<div className="sc-warning"><CloudOff size={19}/><span>{error}</span><button onClick={()=>setRefreshKey(k=>k+1)}>Retry</button></div>}
@@ -533,7 +593,7 @@ function Fragrance(){
           From {SOURCES.find(x=>x.id===resultSource)?.name.replace(/ · .*/,"")||resultSource}
           {(resultSource==="beautyfacts"||resultSource==="productsfacts")&&<> · Data © <a href={resultSource==="beautyfacts"?"https://world.openbeautyfacts.org":"https://world.openproductsfacts.org"} target="_blank" rel="noreferrer">Open Facts contributors</a> (<a href="https://opendatacommons.org/licenses/odbl/1-0/" target="_blank" rel="noreferrer">ODbL</a>) · Images credited to their contributors</>}
         </p>}
-        {photographed.length>0?<><div className="sc-grid">{photographed.map(p=>item(p,"discover"))}</div>{hasMore&&<button className="sc-loadmore" disabled={searching} onClick={()=>setCatalogPage(x=>x+1)}>{searching?"Loading...":"Load more"} <ChevronDown size={18}/></button>}</>:searching||checkingPhotos?<div className="sc-loading">Loading photos…</div>:query.trim()?<p className="sc-no-results">No perfumes with verified photos found. Try another search or <button onClick={()=>setManualOpen(true)}>add manually</button>.</p>:<p className="sc-discover-intro">Search a perfume or choose a brand above.</p>}
+        {filteredPhotographed.length>0?<><div className="sc-grid">{filteredPhotographed.map(p=>item(p,"discover"))}</div>{hasMore&&<button className="sc-loadmore" disabled={searching} onClick={()=>setCatalogPage(x=>x+1)}>{searching?"Loading...":"Load more"} <ChevronDown size={18}/></button>}</>:searching||checkingPhotos?<div className="sc-loading">Loading photos…</div>:photographed.length>0?<div className="sc-no-results"><p>No loaded perfumes match these filters. Results without rated longevity, projection or ₦ prices are excluded when those filters are active.</p><button onClick={()=>setDiscoverFilters(DEFAULT_DISCOVER_FILTERS)}>Clear filters</button><p>For more performance data, select Fragella as your search database, then press Search when ready (uses its quota).</p></div>:query.trim()?<p className="sc-no-results">No perfumes with verified photos found. Try another search or <button onClick={()=>setManualOpen(true)}>add manually</button>.</p>:<p className="sc-discover-intro">Search a perfume or choose a brand above.</p>}
       </section>}
       {page==="wishlist"&&<section className="sc-section">
         <div className="sc-section-head"><div><h2>Wishlist</h2></div><div className="sc-combo-header-actions"><button className="sc-secondary" onClick={()=>startCombo("wishlist")}><Plus size={16}/> Add combo</button><button className="sc-primary" onClick={()=>go("discover")}><Plus size={16}/> Fragrance</button></div></div>
