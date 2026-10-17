@@ -1,6 +1,7 @@
 import { searchNoteboxd, searchFragella, searchOpenFacts, CatalogueHttpError, type SearchResult } from "./scent-providers";
 import { searchWikidata } from "./scent-wikidata";
 import { CATALOG_PROVIDERS, FREE_PROVIDERS, collectCatalogues, type CatalogProvider, type CatalogSource } from "./scent-catalogue";
+import { broaderSearchTerm } from "./scent-search";
 
 function runtimeSecret(bindings:unknown,key:"NOTEBOXD_API_KEY"|"FRAGELLA_API_KEY"):string|undefined {
  const worker=bindings&&typeof bindings==="object"?(bindings as Record<string,unknown>)[key]:undefined;
@@ -25,7 +26,7 @@ export async function fragranceSearch(request:Request,bindings?:unknown,context?
  const desired=mode==="browse"||source==="free"?FREE_PROVIDERS:source==="auto"?[...CATALOG_PROVIDERS]:[source];
  const sources=desired.filter(enabled);
  const cache=(globalThis as typeof globalThis&{caches?:{default?:Cache}}).caches?.default;
- const cacheKey=(path:string)=>new Request(new URL("/api/fragrance/cache-v5/"+path,url.origin));
+ const cacheKey=(path:string)=>new Request(new URL("/api/fragrance/cache-v6/"+path,url.origin));
  const aggregateKey=cacheKey(`${mode}?q=${encodeURIComponent(q.toLowerCase())}&source=${source}&page=${page}&enabled=${sources.join(",")}`);
  async function match(key:Request):Promise<Response|undefined>{try{return await cache?.match(key);}catch{return undefined;}}
  async function put(key:Request,value:unknown,seconds:number):Promise<void>{
@@ -34,9 +35,9 @@ export async function fragranceSearch(request:Request,bindings?:unknown,context?
    if(context?.waitUntil)context.waitUntil(promise);else await promise;
  }
  const cached=await match(aggregateKey);
- if(cached)return new Response(cached.body,{headers:{...Object.fromEntries(cached.headers),"cache-control":"public, max-age=0, s-maxage=300","x-scent-cache":"HIT","x-scent-catalogue":"combined-v5"}});
- async function load(provider:CatalogProvider):Promise<SearchResult|null>{
-   const searchQuery=mode==="browse"?(provider==="wikidata"?"":"eau de parfum"):q;
+ if(cached)return new Response(cached.body,{headers:{...Object.fromEntries(cached.headers),"cache-control":"public, max-age=0, s-maxage=300","x-scent-cache":"HIT","x-scent-catalogue":"combined-v6"}});
+ async function load(provider:CatalogProvider,alternative?:string):Promise<SearchResult|null>{
+   const searchQuery=mode==="browse"?(provider==="wikidata"?"":"eau de parfum"):(alternative||q);
    const recordKey=cacheKey(`provider/${provider}?q=${encodeURIComponent(searchQuery.toLowerCase())}&page=${page}`);
    const existing=await match(recordKey);if(existing)return await existing.json() as SearchResult;
    const cooldownKey=cacheKey(`cooldown/${provider}`);
@@ -61,14 +62,28 @@ export async function fragranceSearch(request:Request,bindings?:unknown,context?
      throw error;
    }
  }
- const result=await collectCatalogues(sources,load,mode==="search"?q:"");
+ let result=await collectCatalogues(sources,provider=>load(provider),mode==="search"?q:"");
+ // A single wider second pass helps when upstream APIs require exact spacing
+ // or word forms. It runs only after no closely matching photographed result,
+ // and re-checks every candidate against the ORIGINAL query.
+ const wider=mode==="search"&&page===1&&!result.results.length&&
+   result.sourceStatus.some(s=>s.status==="ok")?broaderSearchTerm(q):undefined;
+ let usedWider=false;
+ if(wider){
+   const second=await collectCatalogues(sources,provider=>load(provider,wider),q);
+   if(second.results.length){
+     result={...second,hasMore:false}; // Later pages use the original query, not the fallback.
+     usedWider=true;
+   }
+ }
  for(const missing of desired.filter(p=>!enabled(p)))result.sourceStatus.push({source:missing,status:"not-configured",count:0});
  const unavailable=result.sourceStatus.filter(p=>p.status==="unavailable"||p.status==="not-configured");
  const data={...result,total:result.results.length,source:result.sources.length>1?"combined":result.sources[0]||"none",
    connected:result.sources.length>0,requestedSource:source,sourcesTried:sources,
+   ...(usedWider?{searchHint:"Showing close matches despite different spacing or spelling."}:{}),
    ...(unavailable.length&&result.results.length?{providerWarning:"Some sources are unavailable. Showing the perfumes we found."}:{}),
    ...(!result.results.length?{providerWarning:"No perfume photos found this time. Try a different name or add your own."}:{})};
  const ttl=unavailable.length||!result.results.length?300:86400;
  await put(aggregateKey,data,ttl);
- return Response.json(data,{headers:{"cache-control":`public, max-age=0, s-maxage=${ttl}`,"x-scent-catalogue":"combined-v5"}});
+ return Response.json(data,{headers:{"cache-control":`public, max-age=0, s-maxage=${ttl}`,"x-scent-catalogue":"combined-v6"}});
 }
