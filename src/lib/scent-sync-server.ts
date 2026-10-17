@@ -10,7 +10,8 @@ type D1Statement={
 export type ScentD1={prepare:(sql:string)=>D1Statement};
 type Bindings={SCENT_SYNC_DB?:ScentD1;SCENT_SYNC_SETUP_KEY?:string};
 const COOKIE="__Host-scent_sync";
-const ITERATIONS=120000;
+/** workerd currently caps PBKDF2 at 100,000 iterations; higher values throw on live Workers. */
+export const SCENT_PBKDF2_ITERATIONS=100000;
 const SESSION_LENGTH=30*24*60*60*1000;
 const MAX_BODY_BYTES=900_000;
 const json=(value:unknown,status=200,extra?:HeadersInit)=>Response.json(value,{status,headers:{"cache-control":"no-store","x-content-type-options":"nosniff",...extra}});
@@ -31,7 +32,7 @@ function hexToBytes(hex:string):Uint8Array{
 async function sha(value:string):Promise<string>{
   return bytesToHex(new Uint8Array(await crypto.subtle.digest("SHA-256",new TextEncoder().encode(value))));
 }
-async function passwordHash(password:string,salt:string,iterations=ITERATIONS):Promise<string>{
+async function passwordHash(password:string,salt:string,iterations=SCENT_PBKDF2_ITERATIONS):Promise<string>{
   const key=await crypto.subtle.importKey("raw",new TextEncoder().encode(password),"PBKDF2",false,["deriveBits"]);
   const bits=await crypto.subtle.deriveBits({name:"PBKDF2",salt:hexToBytes(salt) as BufferSource,iterations,hash:"SHA-256"},key,256);
   return bytesToHex(new Uint8Array(bits));
@@ -93,7 +94,7 @@ export async function scentSyncApi(request:Request,env:unknown):Promise<Response
       if(typeof pass!=="string"||pass.length<12||pass.length>200)return json({error:"Choose a password with at least 12 characters"},400);
       const salt=bytesToHex(crypto.getRandomValues(new Uint8Array(16)));
       const hash=await passwordHash(pass,salt);
-      const saved=await db.prepare("INSERT OR IGNORE INTO scent_account(id,salt,password_hash,iterations,created_at) VALUES('owner',?,?,?,?)").bind(salt,hash,ITERATIONS,Date.now()).run();
+      const saved=await db.prepare("INSERT OR IGNORE INTO scent_account(id,salt,password_hash,iterations,created_at) VALUES('owner',?,?,?,?)").bind(salt,hash,SCENT_PBKDF2_ITERATIONS,Date.now()).run();
       if(saved.meta.changes!==1)return json({error:"Account already set up; sign in instead"},409);
       return json({ok:true},201);
     }
