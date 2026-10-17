@@ -121,6 +121,8 @@ function Fragrance(){
   const [comboTarget,setComboTarget]=useState<"collection"|"wishlist">("wishlist");
   const [comboAmount,setComboAmount]=useState("");
   const [comboFilter,setComboFilter]=useState("");
+  const [comboSearchResults,setComboSearchResults]=useState<Perfume[]>([]);
+  const [comboSearching,setComboSearching]=useState(false);
   const [comboManualBrand,setComboManualBrand]=useState("");
   const [comboManualName,setComboManualName]=useState("");
   const [comboPhoto,setComboPhoto]=useState<Blob|null>(null);
@@ -246,6 +248,81 @@ function Fragrance(){
     setManualOpen(false);setManualBrand("");setManualName("");setManualPhoto(null);setManualPreview(null);setPhotoError("");
     if(manualTarget==="wishlist")wish(perfume);
     else openPrice(perfume);
+  }
+  function startCombo(target:"collection"|"wishlist",first?:Perfume){
+    setComboId(null);setComboName("");setComboPerfumes(first?[first]:[]);
+    setComboTarget(target);setComboAmount("");setComboFilter("");setComboManualBrand("");setComboManualName("");
+    setComboPhoto(null);setComboPreview(null);setComboError("");setComboSearchResults([]);
+    setSelected(null);setComboOpen(true);
+  }
+  function editCombo(c:Combo){
+    setComboId(c.id);setComboName(c.name);setComboPerfumes(c.perfumes);
+    setComboTarget(c.target);setComboAmount(c.amount===undefined?"":String(c.amount));
+    setComboFilter("");setComboManualBrand("");setComboManualName("");
+    setComboPhoto(null);setComboPreview(null);setComboError("");setComboSearchResults([]);
+    setComboOpen(true);
+  }
+  function addComboPerfume(p:Perfume){
+    setComboPerfumes(previous=>{
+      if(previous.some(x=>x.id===p.id)||previous.length>=12)return previous;
+      return [...previous,p];
+    });
+  }
+  function addComboManual(){
+    const brand=comboManualBrand.trim().slice(0,80),name=comboManualName.trim().slice(0,100);
+    if(!brand||!name){setComboError("Enter the brand and perfume name.");return;}
+    setComboError("");
+    addComboPerfume({id:"manual:"+id(),brand,name,notes:[],top:[],heart:[],base:[],accords:[]});
+    setComboManualBrand("");setComboManualName("");
+  }
+  async function comboSearch(e:React.FormEvent){
+    e.preventDefault();const search=comboFilter.trim().slice(0,90);if(search.length<3)return;
+    setComboSearching(true);setComboError("");
+    try{
+      const response=await fetch(API+"/search?q="+encodeURIComponent(search)+"&page=1",{headers:{Accept:"application/json"},signal:AbortSignal.timeout(13000)});
+      if(!response.ok)throw Error("Search failed");
+      const payload=await response.json();
+      const entries=Array.isArray(payload.results)?payload.results:[];
+      setComboSearchResults(entries.map(normalize).filter((p:Perfume|null):p is Perfume=>Boolean(p)));
+    }catch{setComboError("Search unavailable. Add this perfume manually below.");}
+    finally{setComboSearching(false);}
+  }
+  async function selectComboPhoto(e:React.ChangeEvent<HTMLInputElement>){
+    const file=e.target.files?.[0];if(!file)return;setComboSaving(true);setComboError("");
+    try{
+      const photo=await compressScentPhoto(file);
+      setComboPhoto(photo);setComboPreview(URL.createObjectURL(photo));
+    }catch(err){setComboError(err instanceof Error?err.message:"Couldn't process image.");}
+    finally{setComboSaving(false);e.target.value="";}
+  }
+  async function saveCombo(e:React.FormEvent){
+    e.preventDefault();
+    if(comboSaving)return;
+    if(comboPerfumes.length<2){setComboError("Add at least 2 perfumes.");return;}
+    if(comboPerfumes.length>12){setComboError("Maximum 12 perfumes per combo.");return;}
+    const amount=Number(comboAmount);
+    if(comboTarget==="collection"&&(comboAmount.trim()===""||!Number.isFinite(amount)||amount<0)){
+      setComboError("Enter the total combo price in naira.");return;
+    }
+    setComboSaving(true);setComboError("");
+    const finalId=comboId||"combo:"+id();
+    try{
+      if(comboPhoto){await saveScentPhoto(finalId,comboPhoto);showStoredPhoto(finalId,comboPhoto);}
+      const old=store.combos.find(c=>c.id===finalId);
+      const combo:Combo={id:finalId,name:comboName.trim().slice(0,80)||comboPerfumes.map(p=>p.name).slice(0,2).join(" + "),
+        perfumes:comboPerfumes,target:comboTarget,
+        ...(comboTarget==="collection"?{amount}:{}),added:old?.added||new Date().toISOString()};
+      setStore(prev=>({...prev,combos:[combo,...prev.combos.filter(c=>c.id!==finalId)]}));
+      setComboOpen(false);setComboPhoto(null);setComboPreview(null);
+      go(comboTarget==="collection"?"collection":"wishlist");
+    }catch(err){setComboError(err instanceof Error?err.message:"Couldn't save combo image.");}
+    finally{setComboSaving(false);}
+  }
+  function removeCombo(c:Combo){
+    if(!window.confirm("Delete "+c.name+" combo? The individual perfumes stay in your other saved lists."))return;
+    setStore(prev=>({...prev,combos:prev.combos.filter(x=>x.id!==c.id)}));
+    removeScentPhoto(c.id).catch(()=>{});
+    setComboOpen(false);
   }
   async function exportBackup(){
     try{
