@@ -457,7 +457,7 @@ function Fragrance(){
       </div></div>
     </article>;
   };
-  const allMyPerfumes=[...store.collection.map(x=>x.perfume),...myCombos.flatMap(x=>x.perfumes)];
+  const allMyPerfumes=[...new Map([...store.collection.map(x=>x.perfume),...myCombos.flatMap(x=>x.perfumes)].map(p=>[p.id,p])).values()];
   const left=allMyPerfumes.find(x=>x.id===layerA),right=allMyPerfumes.find(x=>x.id===layerB);
   const aAcc=new Set([...(left?.notes||[]),...(left?.accords||[])].map(s=>s.toLowerCase()));
   const match=[...(right?.notes||[]),...(right?.accords||[])].filter(n=>aAcc.has(n.toLowerCase()));
