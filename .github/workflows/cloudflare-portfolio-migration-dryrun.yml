@@ -52,6 +52,27 @@ jobs:
           curl -fsS --max-time 10 http://127.0.0.1:8787/api/fragrance/browse -o /tmp/fragrance-browse.json
           grep -q '"source":"starter"' /tmp/fragrance-browse.json
           echo "Portfolio root, Scent Cabinet SSR, and fragrance API all responded under local workerd."
+      - name: Verify public Cloudflare preview (read-only)
+        env:
+          PREVIEW_URL: https://ibrahimalli-portfolio-preview.alliibrahim3.workers.dev
+        run: |
+          set -euo pipefail
+          echo "Checking external workers.dev URL (no paid API searches)"
+          for path in / /fragrance /fragrance.webmanifest /fragrance-apple-touch.png /api/fragrance/browse; do
+            status=$(curl -sS -L --max-time 20 -o /tmp/cloudflare-preview-check -w '%{http_code}' "$PREVIEW_URL$path")
+            echo "Cloudflare $path: HTTP $status"
+            if [ "$status" != "200" ]; then
+              head -c 450 /tmp/cloudflare-preview-check || true
+              exit 1
+            fi
+            if [ "$path" = "/fragrance" ]; then
+              grep -qi 'Scent Cabinet' /tmp/cloudflare-preview-check
+            fi
+            if [ "$path" = "/api/fragrance/browse" ]; then
+              grep -q '"source":"starter"' /tmp/cloudflare-preview-check
+            fi
+          done
+          echo "Public preview smoke checks all passed."
       - name: Summarize build output
         if: always()
         run: |
