@@ -1,5 +1,8 @@
 name: Diagnose Scent Cabinet live D1 binding
 on:
+  pull_request:
+    branches:
+      - migration/cloudflare-portfolio-2026-10-17
   push:
     branches:
       - diagnostic/scent-sync-live-binding-2026-10-17
