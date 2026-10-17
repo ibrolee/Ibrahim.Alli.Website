@@ -519,3 +519,16 @@
 .sc-photo-cloud-box>span{display:flex;align-items:center;gap:7px;font-size:12px}
 .sc-photo-cloud-box p{font-size:12px;line-height:1.55;margin:7px 0;color:#526e5c}
 .sc-photo-cloud-box button{font-size:11px;padding:7px 12px;min-height:36px}
+
+/* Spending relies on the single existing stats strip above. Keep history close
+   to the heading and avoid the old summary/footer's excessive empty space. */
+.sc-spending-section{min-height:0;padding:28px 0 80px}
+.sc-spending-section .sc-section-head{margin-bottom:10px}
+.sc-spending-section .sc-section-head h2{font-size:clamp(30px,4.5vw,54px);line-height:1.1;white-space:normal}
+.sc-spending-section .sc-worth-list{margin-top:16px}
+@media(max-width:660px){
+  .sc-spending-section{min-height:0;padding:22px 0 calc(env(safe-area-inset-bottom,0px) + 105px)}
+  .sc-spending-section .sc-section-head{margin-bottom:9px}
+  .sc-spending-section .sc-section-head h2{font-size:clamp(29px,7.5vw,37px);white-space:normal;line-height:1.04}
+  .sc-spending-section .sc-worth-list{margin-top:16px}
+}

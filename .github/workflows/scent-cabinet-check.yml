@@ -29,7 +29,7 @@ jobs:
       - run: bun install --frozen-lockfile
       - run: bun run build
       - name: Check combined search, duplicate handling and provider outages
-        run: bun test src/lib/scent-providers.test.ts src/lib/scent-filters.test.ts src/lib/scent-catalogue.test.ts src/lib/scent-shelf.test.ts src/lib/scent-search.test.ts src/lib/scent-discover-manual.test.ts src/lib/scent-cabinet-layout.test.ts src/lib/scent-sync.test.ts src/lib/scent-photo-cloud.test.ts
+        run: bun test src/lib/scent-providers.test.ts src/lib/scent-filters.test.ts src/lib/scent-catalogue.test.ts src/lib/scent-shelf.test.ts src/lib/scent-search.test.ts src/lib/scent-discover-manual.test.ts src/lib/scent-cabinet-layout.test.ts src/lib/scent-sync.test.ts src/lib/scent-photo-cloud.test.ts src/lib/scent-spending-layout.test.ts
       - name: Check new fragrance code types
         run: |
           bun x tsc --noEmit > type-errors.txt 2>&1 || true
