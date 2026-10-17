@@ -6,7 +6,7 @@ export type CatalogRecord={
  id:string;name:string;brand:string;image?:string;year?:string;family?:string;
  description?:string;top:string[];heart:string[];base:string[];notes:string[];accords:string[];
 };
-export type SearchResult={results:CatalogRecord[];hasMore:boolean;source:"noteboxd"|"fragella";total:number};
+export type SearchResult={results:CatalogRecord[];hasMore:boolean;source:"noteboxd"|"fragella"|"beautyfacts"|"productsfacts";total:number};
 function str(value:unknown):string{return typeof value==="string"?value.trim():"";}
 function maybeObj(value:unknown):Record<string,unknown>{
  return value&&typeof value==="object"&&!Array.isArray(value)?value as Record<string,unknown>:{};
@@ -128,4 +128,60 @@ export async function searchFragella(q:string,key:string,page:number):Promise<Se
  const pagination=maybeObj(wrapper["pagination"]);
  const next=pagination["has_more"]??pagination["hasNextPage"]??(page===1&&list.length===10);
  return {results,total:Number(pagination["total"]||0)||results.length,hasMore:Boolean(next)&&page<2,source:"fragella"};
+}
+
+/** Public product catalogues: these do not use limited private fragrance API keys.
+ * Open Beauty Facts / Open Products Facts catalogue data © contributors, ODbL.
+ * Bottles are user-supplied product images; attribution is shown in Discover.
+ * Text search uses the legacy CGI endpoint, since v2 product search is filter-only.
+ */
+export type OpenCatalogSource="beautyfacts"|"productsfacts";
+export async function searchOpenFacts(q:string,page:number,source:OpenCatalogSource):Promise<SearchResult & {source:OpenCatalogSource}>{
+ const host=source==="beautyfacts"?"world.openbeautyfacts.org":"world.openproductsfacts.org";
+ const url=new URL("https://"+host+"/cgi/search.pl");
+ url.searchParams.set("search_terms",q);
+ url.searchParams.set("search_simple","1");
+ url.searchParams.set("action","process");
+ url.searchParams.set("json","1");
+ url.searchParams.set("page_size","40");
+ url.searchParams.set("page",String(page));
+ url.searchParams.set("fields","code,product_name,product_name_en,brands,image_front_url,image_url,categories_tags,quantity");
+ const response=await fetch(url.toString(),{
+  headers:{"Accept":"application/json","User-Agent":"ScentCabinet/1.0 (https://ibrahimalli.com; personal fragrance catalogue)"},
+  signal:AbortSignal.timeout(8500)
+ });
+ if(!response.ok)throw new Error(source+" HTTP "+response.status);
+ if(!(response.headers.get("content-type")||"").includes("json"))throw new Error(source+" returned non-JSON");
+ const body=await response.text();if(body.length>1_500_000)throw new Error(source+" response too large");
+ const payload:unknown=JSON.parse(body);
+ const x=maybeObj(payload);
+ if(!Array.isArray(x["products"]))throw new Error(source+" invalid product results");
+ const products=x["products"] as unknown[];
+ const seen=new Set<string>();
+ const results:CatalogRecord[]=[];
+ const normalizedQuery=q.toLowerCase().trim();
+ const terms=normalizedQuery.split(/\s+/).filter(Boolean);
+ for(const product of products){
+   const row=maybeObj(product);
+   const rawName=text(row["product_name_en"]||row["product_name"]);
+   const brand=text(row["brands"]).split(",")[0]?.trim()||"Unknown brand";
+   const urlImage=image(row["image_front_url"]||row["image_url"]);
+   const cat=Array.isArray(row["categories_tags"])?row["categories_tags"].map(text).join(" ").toLowerCase():"";
+   const label=(brand+" "+rawName).toLowerCase();
+   // Reject deodorants, cosmetics and unrelated products even when the brand matches.
+   const excluded=/deodorant|roll.on|aftershave balm|body lotion|shower gel|soap|candle|diffuser|room spray|hair mist|anti.perspirant|body wash/i;
+   const fragrance=/perfume|parfum|fragrance|cologne|toilette|attar|oud|eau de|extrait|elixir/i;
+   if(!rawName||!urlImage||excluded.test(label+" "+cat))continue;
+   if(!fragrance.test(label+" "+cat) && !terms.every(t=>label.includes(t)))continue;
+   if(!terms.some(t=>t.length>=3 && label.includes(t)))continue;
+   const barcode=text(row["code"]);const identity=barcode||[brand,rawName].join(":").toLowerCase().replace(/[^a-z0-9]+/g,"-");
+   if(seen.has(identity))continue;seen.add(identity);
+   results.push({
+     id:source+":"+identity,brand,name:rawName,image:urlImage,
+     notes:[],top:[],heart:[],base:[],accords:[],
+     family:cat.includes("eau-de-parfum")?"Eau de Parfum":cat.includes("eau-de-toilette")?"Eau de Toilette":"Fragrance"
+   });
+ }
+ const total=Number(x["count"])||0;
+ return {results,total,source,hasMore:page<2&&total>page*40&&products.length>0};
 }
