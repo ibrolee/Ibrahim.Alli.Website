@@ -1,0 +1,35 @@
+name: Cloudflare portfolio migration dry run
+
+on:
+  push:
+    branches: [migration/cloudflare-portfolio-2026-10-17]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  dry-run:
+    name: Verify Workers build and package without deployment
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+      - name: Install locked dependencies
+        run: bun install --frozen-lockfile
+      - name: Build TanStack Start/Nitro for Cloudflare
+        run: bun run build
+      - name: Assert expected Cloudflare files exist
+        run: |
+          test -f .output/server/index.mjs
+          test -d .output/public
+          test -f .output/public/index.html || test "$(find .output/public -type f | wc -l)" -gt 0
+          echo "Worker entry exists; static assets were generated."
+      - name: Wrangler packaging dry-run (no credentials or deployment)
+        run: npx --yes wrangler@4.135.0 deploy --dry-run --outdir .cloudflare-dryrun
+      - name: Summarize build output
+        if: always()
+        run: |
+          du -sh .output/server .output/public 2>/dev/null || true
+          find .cloudflare-dryrun -maxdepth 2 -type f | head -20 || true
