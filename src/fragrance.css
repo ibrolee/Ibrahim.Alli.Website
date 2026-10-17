@@ -362,3 +362,24 @@
 .sc-catalogue-summary a{color:#3f6749;text-decoration:underline}
 
 .sc-search .sc-search-submit{color:#fff}
+
+.sc-stats.sc-stats-naira{grid-template-columns:.7fr .7fr 1.3fr 1.3fr}
+.sc-shelf-switch{display:flex;gap:6px;border-bottom:1px solid var(--sc-line);padding-bottom:12px;margin-bottom:12px}
+.sc-shelf-switch button{border:1px solid #c5d0c1;background:transparent;color:#3c5944;padding:11px 16px;font-size:12px;font-weight:700;min-height:43px;border-radius:3px}
+.sc-shelf-switch button[aria-pressed=true]{background:#294e38;border-color:#294e38;color:#fff}
+.sc-shelf-explain{font-size:12px;line-height:1.65;color:#637568;margin:0 0 20px}
+.sc-bottle-date{display:block;font-size:10px;color:#697b6c;line-height:1.5;margin:5px 0}
+.sc-shelf-notice{display:flex;gap:12px;align-items:center;background:#e7eedf;border:1px solid #b4c5a9;padding:12px 14px;margin:15px 0;color:#294e38;font-size:12px}
+.sc-shelf-notice span{flex:1;overflow-wrap:anywhere}
+.sc-shelf-notice button{background:transparent;border:0;color:#294e38;min-height:32px;font-weight:700;cursor:pointer}
+.sc-shelf-notice button:first-of-type{text-decoration:underline}
+.sc-combo-bottle-list{display:flex;flex-direction:column;gap:5px;margin:12px 0}
+.sc-combo-bottle-list>div{display:flex;align-items:center;gap:8px;border-bottom:1px solid #dce1d4;padding:6px 0}
+.sc-combo-bottle-list button{font-size:11px;min-height:38px;color:#35543e;background:transparent;border:1px solid #c3cfba;padding:6px 9px}
+.sc-combo-bottle-list .sc-combo-bottle-name{border:0;flex:1;text-align:left;padding-left:0;font-weight:700}
+.sc-combo-bottle-name small{display:block;font-size:10px;font-weight:400;color:#6b7e6b;margin-top:3px}
+.sc-detail-actions .sc-purchase-status{flex-basis:100%;font-size:12px;color:#637568;margin:6px 0}
+.sc-worth-list small{line-height:1.6}
+@media(max-width:660px){.sc-stats.sc-stats-naira{grid-template-columns:1fr 1fr}.sc-stats.sc-stats-naira>div{min-height:76px;padding:13px}.sc-stats.sc-stats-naira>div:nth-child(2){border-bottom:1px solid #426152}.sc-shelf-switch button{flex:1;padding:10px 7px;font-size:11px}.sc-shelf-explain{font-size:11px}.sc-worth-list>div{gap:8px}.sc-worth-list>div>strong{font-size:12px}.sc-worth-list>div>button{padding:7px}.sc-combo-bottle-list>div{gap:5px}}
+
+@media(max-width:660px){.sc-stats.sc-stats-naira>div:nth-child(n+3) strong{font-size:clamp(20px,5.5vw,29px)!important}}
