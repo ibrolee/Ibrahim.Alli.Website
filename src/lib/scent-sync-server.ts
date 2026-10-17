@@ -14,7 +14,11 @@ export type ScentR2={
   put:(key:string,value:ArrayBuffer|Uint8Array,opts?:{httpMetadata?:{contentType:string};customMetadata?:Record<string,string>})=>Promise<unknown>;
   list:(opts:{prefix:string;cursor?:string;limit?:number;include?:string[]})=>Promise<{objects:Array<{key:string;etag?:string;customMetadata?:Record<string,string>}>;truncated:boolean;cursor?:string}>;
 };
-const MAX_PHOTO_BYTES=500_000;
+// Deliberately tiny application allowance: max 200 compressed images x 450 kB
+// (at most ~90 MB), under 1% of R2 Standard's 10 GB-month free storage.
+export const SCENT_R2_MAX_PHOTOS=200;
+export const SCENT_R2_MAX_PHOTO_BYTES=450_000;
+const MAX_PHOTO_BYTES=SCENT_R2_MAX_PHOTO_BYTES;
 const PHOTO_PREFIX="owner/photos/";
 function validPhotoId(id:string):boolean{
   return /^(?:manual|combo):[a-zA-Z0-9._-]{1,140}$/.test(id);
@@ -41,6 +45,8 @@ async function readPhotoIndex(bucket:ScentR2){
     cursor=list.cursor;
     if(page===9)throw new Error("Too many private photos");
   }
+  // Halt rather than scanning growing buckets or performing unbounded list requests.
+  if(Object.keys(entries).length>SCENT_R2_MAX_PHOTOS)throw new Error("Photo quota reached");
   return entries;
 }
 async function photoApi(request:Request,env:unknown,db:ScentD1,path:string):Promise<Response>{
@@ -48,7 +54,7 @@ async function photoApi(request:Request,env:unknown,db:ScentD1,path:string):Prom
   const bucket=bucketFrom(env);
   if(path==="photos/status"&&request.method==="GET")return json({enabled:Boolean(bucket)});
   if(!bucket)return json({error:"Cloudflare R2 photo storage not connected",code:"R2_SETUP_REQUIRED"},503);
-  if(path==="photos/index"&&request.method==="GET")return json({records:await readPhotoIndex(bucket)});
+  if(path==="photos/index"&&request.method==="GET")return json({records:await readPhotoIndex(bucket),maxPhotos:SCENT_R2_MAX_PHOTOS,maxPhotoBytes:MAX_PHOTO_BYTES});
   if(!path.startsWith("photos/item/"))return json({error:"Not found"},404);
   let id:string;
   try{id=decodeURIComponent(path.slice("photos/item/".length));}catch{return json({error:"Invalid photo"},400);}
@@ -71,6 +77,10 @@ async function photoApi(request:Request,env:unknown,db:ScentD1,path:string):Prom
     if(!["image/jpeg","image/png","image/webp"].includes(type))return json({error:"JPEG, PNG or WebP required"},415);
     const bytes=await request.arrayBuffer();
     if(!bytes.byteLength||bytes.byteLength>MAX_PHOTO_BYTES)return json({error:"Photo too large or empty"},413);
+    // Enforce small fixed per-app storage cap on the server, even with a modified client.
+    const records=await readPhotoIndex(bucket);
+    if(!Object.hasOwn(records,id)&&Object.keys(records).length>=SCENT_R2_MAX_PHOTOS)
+      return json({error:"Photo sync limit reached (200 photos). Existing pictures are safe.",code:"PHOTO_QUOTA"},507);
     // The first sync must never silently replace a photo already uploaded by another device.
     if(request.headers.get("x-scent-create-only")==="1"&&await bucket.get(key))
       return json({error:"Cloud photo already exists",code:"PHOTO_EXISTS"},409);
@@ -78,6 +88,9 @@ async function photoApi(request:Request,env:unknown,db:ScentD1,path:string):Prom
     return json({ok:true});
   }
   if(method==="DELETE"){
+    // Avoid creating unlimited deletion markers for unknown IDs.
+    const records=await readPhotoIndex(bucket);
+    if(!Object.hasOwn(records,id))return json({ok:true});
     // Tombstone: stale, still-local copies must not automatically resurrect a deleted photo.
     await bucket.put(key,new Uint8Array(),{httpMetadata:{contentType:"application/octet-stream"},customMetadata:{deleted:"1"}});
     return json({ok:true});
