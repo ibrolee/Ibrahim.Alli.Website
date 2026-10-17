@@ -1,6 +1,6 @@
 import {describe,expect,test} from "bun:test";
-import {scentSyncApi,type ScentR2,type ScentD1} from "./scent-sync-server";
-import {allowedPhotoKey} from "./scent-photo-cloud";
+import {scentSyncApi,SCENT_R2_MAX_PHOTOS,SCENT_R2_MAX_PHOTO_BYTES,type ScentR2,type ScentD1} from "./scent-sync-server";
+import {allowedPhotoKey,PHOTO_SYNC_MAX_ITEMS} from "./scent-photo-cloud";
 
 const url="https://ibrahimalli.com/api/fragrance/sync/";
 const token="a".repeat(64);
@@ -59,6 +59,22 @@ describe("Scent Cabinet private R2 photo API",()=>{
     expect((await scentSyncApi(req("photos/item/manual:one","PUT",new Uint8Array([1,2]),"text/plain"),env)).status).toBe(415);
     expect((await scentSyncApi(req("photos/item/manual:one","PUT",new Uint8Array(500001),"image/jpeg"),env)).status).toBe(413);
     expect((await scentSyncApi(req("photos/item/manual:%2E%2E%2Ftest"),env)).status).toBe(400);
+  });
+  test("enforces intentionally tiny free-tier storage allowance",async()=>{
+    expect(SCENT_R2_MAX_PHOTOS).toBe(200);
+    expect(PHOTO_SYNC_MAX_ITEMS).toBe(200);
+    expect(SCENT_R2_MAX_PHOTO_BYTES).toBe(450000);
+    expect(SCENT_R2_MAX_PHOTOS*SCENT_R2_MAX_PHOTO_BYTES).toBe(90000000);
+    const r2=new FakeR2(),env={SCENT_SYNC_DB:fakeD1(),SCENT_PHOTOS_R2:r2};
+    const small=new Uint8Array([255,216,255,217]);
+    expect((await scentSyncApi(req("photos/item/manual:allowed","PUT",small,"image/jpeg"),env)).status).toBe(200);
+    expect((await scentSyncApi(req("photos/item/manual:too-big","PUT",new Uint8Array(450001),"image/jpeg"),env)).status).toBe(413);
+    for(let i=0;i<199;i++)r2.entries.set("owner/photos/manual:"+i,{bytes:small,type:"image/jpeg",metadata:{deleted:"0"},etag:String(i)});
+    const denied=await scentSyncApi(req("photos/item/manual:new","PUT",small,"image/jpeg"),env);
+    expect(denied.status).toBe(507);
+    expect((await denied.json()).code).toBe("PHOTO_QUOTA");
+    // Allow replacing an existing image without raising the quota.
+    expect((await scentSyncApi(req("photos/item/manual:allowed","PUT",small,"image/jpeg"),env)).status).toBe(200);
   });
   test("copies jpeg, protects initial upload, and uses tombstone on deletion",async()=>{
     const r2=new FakeR2(),env={SCENT_SYNC_DB:fakeD1(),SCENT_PHOTOS_R2:r2};
