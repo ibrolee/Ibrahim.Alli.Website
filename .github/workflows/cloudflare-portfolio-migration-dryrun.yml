@@ -73,35 +73,6 @@ jobs:
             fi
           done
           echo "Public preview smoke checks all passed."
-      - name: Inspect open fragrance catalogues (one-off diagnostic)
-        continue-on-error: true
-        run: |
-          bun -e '
-            for(const [name,url] of [
-              ["preservation","https://api.thepreservationnetwork.org/v1/fragrances/search?q=Lattafa&per_page=5"],
-              ["openbeautyfacts","https://world.openbeautyfacts.org/cgi/search.pl?search_terms=Lattafa&search_simple=1&action=process&json=1&page_size=5"]
-            ]){
-              try{
-                const response=await fetch(url,{signal:AbortSignal.timeout(9000),headers:{"User-Agent":"ScentCabinet/1.0 (public fragrance catalogue diagnostic; contact: ibrahimalli.com)","Accept":"application/json"}});
-                const raw=await response.text();let payload;try{payload=JSON.parse(raw)}catch{};
-                const entries=payload?.results||payload?.products||[];
-                console.log(JSON.stringify({provider:name,http:response.status,type:response.headers.get("content-type"),count:entries.length,shape:Object.keys(payload||{}).slice(0,12),first:entries.slice(0,2).map(x=>({keys:Object.keys(x).slice(0,12),data:x.data?Object.keys(x.data).slice(0,16):undefined,name:x.product_name||x.data?.Name||x.data?.name||x.name,image:x.image_front_url||x.data?.["Image URL"]||x.data?.image||x.image})),hint:raw.slice(0,150).replace(/[^ -~]/g,"")}));
-              }catch(error){console.log(JSON.stringify({provider:name,error:String(error).slice(0,200)}))}
-            }
-          '
-      - name: Verify live perfume search and secret bindings (read-only)
-        env:
-          PREVIEW_URL: https://ibrahimalli-portfolio-preview.alliibrahim3.workers.dev
-        run: |
-          set -euo pipefail
-          status=$(curl -sS -L --max-time 35 -o /tmp/cloudflare-fragrance-live.json -w '%{http_code}' "$PREVIEW_URL/api/fragrance/search?q=Lattafa&page=1")
-          HTTP_STATUS="$status" bun -e '
-            import {readFileSync} from "node:fs";
-            const body=JSON.parse(readFileSync("/tmp/cloudflare-fragrance-live.json","utf8"));
-            const photos=Array.isArray(body.results)?body.results.filter(x=>typeof x.image==="string" && x.image.startsWith("https://")).length:0;
-            console.log(JSON.stringify({httpStatus:Number(process.env.HTTP_STATUS),source:body.source,connected:body.connected,count:body.results?.length||0,photoCount:photos}));
-            if(process.env.HTTP_STATUS!=="200"||!body.connected||!["noteboxd","fragella"].includes(body.source)||(body.results?.length||0)<1||photos<1)process.exit(1);
-          '
       - name: Summarize build output
         if: always()
         run: |
