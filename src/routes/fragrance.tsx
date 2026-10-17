@@ -758,7 +758,7 @@ function Fragrance(){
             <h2>Collection <em>finances.</em></h2>
             <p>A clear picture of what you've spent on the fragrances you love.</p>
           </div>
-          <button className="sc-finance-add" type="button" onClick={()=>go("discover")}><Plus size={17}/> Add a purchase</button>
+          <button className="sc-finance-add" type="button" onClick={()=>go("discover")} aria-label="Add a fragrance purchase"><Plus size={17}/> Add a purchase</button>
         </div>
         <div className="sc-finance-overview">
           <div className="sc-finance-hero">
