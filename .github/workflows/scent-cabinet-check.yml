@@ -16,6 +16,7 @@ on:
       - 'src/lib/scent-wikidata.ts'
       - 'src/fragrance.css'
       - 'src/server.ts'
+      - 'wrangler.jsonc'
       - 'src/routes/__root.tsx'
       - 'public/fragrance*'
 jobs:
