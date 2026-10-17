@@ -157,3 +157,19 @@
  .sc-worth-one strong{font-size:clamp(29px,9vw,46px)}
  .sc-money-prefix{min-width:48px}
 }
+
+/* Genuine product photography only. No fabricated bottle artwork. */
+.sc-photo-only{background:#ebece7!important;display:flex!important;align-items:center!important;justify-content:center!important}
+.sc-no-photo{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;color:#8a918b;letter-spacing:.01em;text-align:center}
+.sc-no-photo small{font-size:10px;color:#8a918b;font-family:"DM Sans",system-ui,sans-serif;font-weight:500;text-transform:none;letter-spacing:0}
+.sc-photo-only img{background:#fdfdfb!important;mix-blend-mode:normal!important;position:absolute!important;inset:0!important;width:100%!important;height:100%!important;object-fit:contain!important;padding:9%!important}
+.sc-perfume-image .sc-photo-only:hover img{transform:none}
+.sc-add-missing{display:inline-flex;align-items:center;gap:5px;margin:0 0 14px;padding:4px 0;border:0;background:transparent;color:#47604c;font-size:12px;font-weight:700;text-decoration:underline;text-underline-offset:2px}
+.sc-manual-form{display:flex;flex-direction:column;gap:9px}
+.sc-manual-form>input{min-height:44px;border:1px solid #cbd2c7;background:#fff;padding:9px 13px;color:#213c2c;font-size:14px}
+.sc-manual-form>label{margin-top:6px}
+.sc-manual-target{display:flex;gap:18px;align-items:center;margin:4px 0 10px;color:#384b3d;font-size:13px}
+.sc-manual-target label{display:flex;align-items:center;gap:7px}
+.sc-manual-target input{accent-color:#28523b}
+.sc-manual-form .sc-primary{width:100%;margin-top:4px}
+@media(max-width:660px){.sc-no-photo small{font-size:9px}.sc-add-missing{margin-bottom:12px}.sc-manual-form>input{height:46px}}
