@@ -1,0 +1,35 @@
+name: Cloudflare Portfolio Visit Watch
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/scripts/cloudflare_portfolio_watch.py'
+      - '.github/workflows/cloudflare-portfolio-visit-watch.yml'
+  workflow_dispatch:
+  schedule:
+    - cron: '17 * * * *'
+permissions:
+  contents: read
+  issues: write
+concurrency:
+  group: portfolio-web-analytics
+  cancel-in-progress: false
+jobs:
+  monitor:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    env:
+      CLOUDFLARE_ACCOUNT_ID: b0635b96f308274d270afb59fcc238b9
+      CLOUDFLARE_ANALYTICS_TOKEN: ${{ secrets.CLOUDFLARE_ANALYTICS_TOKEN }}
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - name: Checkout trusted main branch
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          persist-credentials: false
+      - name: Check Python source syntax
+        run: python3 -m py_compile .github/scripts/cloudflare_portfolio_watch.py
+      - name: Check browser visits
+        run: python3 .github/scripts/cloudflare_portfolio_watch.py
