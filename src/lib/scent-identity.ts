@@ -20,7 +20,8 @@ export function scentIdentity(p:ScentIdentity):{key:string;concentration:string}
   // Le Parfum, Sport, Absolu, gender and every other flanker token stay intact.
   name=name.replace(/\b(?:eau de parfum|eau de toilette|eau de cologne|extrait de parfum|edp|edt|edc)\b/g," ")
     .replace(/\b(?:natural spray|spray|vaporisateur|refillable|rechargeable)\b/g," ").trim().replace(/\s+/g," ");
-  for(const raw of [scentText(p.brand),brand]) {
+  const matchingBrands=[scentText(p.brand),brand,...Object.keys(brandAliases).filter(alias=>brandAliases[alias]===brand)].sort((a,b)=>b.length-a.length);
+  for(const raw of matchingBrands) {
     if(raw&&name.startsWith(raw+" "))name=name.slice(raw.length+1);
     if(raw&&name.endsWith(" "+raw))name=name.slice(0,-raw.length-1);
   }

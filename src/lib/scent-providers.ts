@@ -194,10 +194,13 @@ export async function searchOpenFacts(q:string,page:number,source:OpenCatalogSou
    const cat=Array.isArray(row["categories_tags"])?row["categories_tags"].map(text).join(" ").toLowerCase():"";
    const label=(brand+" "+rawName).toLowerCase();
    // Reject deodorants, cosmetics and unrelated products even when the brand matches.
-   const excluded=/deodorant|roll.on|aftershave balm|body lotion|shower gel|soap|candle|diffuser|room spray|hair mist|anti.perspirant|body wash/i;
-   const fragrance=/perfume|parfum|fragrance|cologne|toilette|attar|oud|eau de|extrait|elixir/i;
-   if(!rawName||!urlImage||excluded.test(label+" "+cat))continue;
-   if(!fragrance.test(label+" "+cat) && !terms.every(t=>label.includes(t)))continue;
+   const excluded=/deodorant|roll.on|aftershave balm|body lotion|shower gel|soap|candle|diffuser|room spray|hair mist|anti.perspirant|body wash|bleach|javel|chlor|disinfect|desinfect|detergent|laundry|lessive|cleaner|nettoyant|menager|household|fabric softener|adoucissant|dishwash|vaisselle|incense|encens|lipstick|mascara|foundation|make.up|shampoo|shampoing/i;
+   const fragrance=/\b(?:perfumes?|parfums?|fragrances?|colognes?|toilette|attar|extrait|elixir)\b/i;
+   const searchable=(label+" "+cat).normalize("NFKD").replace(/[\u0300-\u036f]/g,"");
+   if(!rawName||!urlImage||excluded.test(searchable))continue;
+   // Brand matching alone is not perfume evidence: a Dior foundation is not a
+   // Dior fragrance, and "parfum citron" on bleach is not a personal perfume.
+   if(!fragrance.test(searchable))continue;
    if(!terms.some(t=>t.length>=3 && label.includes(t)))continue;
    const barcode=text(row["code"]);const identity=barcode||[brand,rawName].join(":").toLowerCase().replace(/[^a-z0-9]+/g,"-");
    if(seen.has(identity))continue;seen.add(identity);

@@ -25,7 +25,7 @@ export async function fragranceSearch(request:Request,bindings?:unknown,context?
  const desired=mode==="browse"||source==="free"?FREE_PROVIDERS:source==="auto"?[...CATALOG_PROVIDERS]:[source];
  const sources=desired.filter(enabled);
  const cache=(globalThis as typeof globalThis&{caches?:{default?:Cache}}).caches?.default;
- const cacheKey=(path:string)=>new Request(new URL("/api/fragrance/cache-v4/"+path,url.origin));
+ const cacheKey=(path:string)=>new Request(new URL("/api/fragrance/cache-v5/"+path,url.origin));
  const aggregateKey=cacheKey(`${mode}?q=${encodeURIComponent(q.toLowerCase())}&source=${source}&page=${page}&enabled=${sources.join(",")}`);
  async function match(key:Request):Promise<Response|undefined>{try{return await cache?.match(key);}catch{return undefined;}}
  async function put(key:Request,value:unknown,seconds:number):Promise<void>{
@@ -34,7 +34,7 @@ export async function fragranceSearch(request:Request,bindings?:unknown,context?
    if(context?.waitUntil)context.waitUntil(promise);else await promise;
  }
  const cached=await match(aggregateKey);
- if(cached)return new Response(cached.body,{headers:{...Object.fromEntries(cached.headers),"x-scent-cache":"HIT","x-scent-catalogue":"combined-v4"}});
+ if(cached)return new Response(cached.body,{headers:{...Object.fromEntries(cached.headers),"cache-control":"public, max-age=0, s-maxage=300","x-scent-cache":"HIT","x-scent-catalogue":"combined-v5"}});
  async function load(provider:CatalogProvider):Promise<SearchResult|null>{
    const searchQuery=mode==="browse"?(provider==="wikidata"?"":"eau de parfum"):q;
    const recordKey=cacheKey(`provider/${provider}?q=${encodeURIComponent(searchQuery.toLowerCase())}&page=${page}`);
@@ -70,5 +70,5 @@ export async function fragranceSearch(request:Request,bindings?:unknown,context?
    ...(!result.results.length?{providerWarning:"No perfume photos found this time. Try a different name or add your own."}:{})};
  const ttl=unavailable.length||!result.results.length?300:86400;
  await put(aggregateKey,data,ttl);
- return Response.json(data,{headers:{"cache-control":`public, max-age=0, s-maxage=${ttl}`,"x-scent-catalogue":"combined-v4"}});
+ return Response.json(data,{headers:{"cache-control":`public, max-age=0, s-maxage=${ttl}`,"x-scent-catalogue":"combined-v5"}});
 }

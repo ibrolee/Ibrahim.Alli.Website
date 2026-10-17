@@ -43,3 +43,18 @@ test("No remote calls on invalid free catalogue responses beyond the mocked requ
     expect(spy).toHaveBeenCalledTimes(1);
   }finally{spy.mockRestore();}
 });
+
+test("public catalogues exclude scented bleach and non-perfume brand products",async()=>{
+ const spy=spyOn(globalThis,"fetch").mockImplementation(async()=>Response.json({count:4,products:[
+  {code:"1",brands:"Auchan",product_name:"Eau de javel parfum citron",image_front_url:"https://example.com/bleach.jpg"},
+  {code:"2",brands:"Dior",product_name:"Forever Foundation",image_front_url:"https://example.com/makeup.jpg"},
+  {code:"3",brands:"Dior",product_name:"Sauvage Eau de Parfum",image_front_url:"https://example.com/sauvage.jpg"},
+  {code:"4",brands:"Dior",product_name:"Scented Laundry Fragrance",image_front_url:"https://example.com/detergent.jpg"}
+ ]}));
+ try{
+  const discovery=await searchOpenFacts("eau de parfum",1,"productsfacts");
+  expect(discovery.results.map(p=>p.name)).toEqual(["Sauvage Eau de Parfum"]);
+  const branded=await searchOpenFacts("Dior",1,"productsfacts");
+  expect(branded.results.map(p=>p.name)).toEqual(["Sauvage Eau de Parfum"]);
+ }finally{spy.mockRestore();}
+});

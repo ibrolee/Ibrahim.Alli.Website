@@ -123,3 +123,9 @@ test("Noteboxd load more follows its real cursor without repeating its first pag
   expect(cursors).toEqual([null,"second-page"]);
  }finally{spy.mockRestore();if(previous)Object.defineProperty(globalThis,"caches",previous);else Reflect.deleteProperty(globalThis,"caches");}
 });
+
+test("old and current house names in a product title do not create duplicate Invictus cards",()=>{
+ const a=perfume({id:"beautyfacts:1111111111111",brand:"Rabanne",name:"Invictus Eau de Toilette 100 ml"});
+ const b=perfume({id:"productsfacts:2222222222222",brand:"Rabanne",name:"Paco Rabanne Invictus Eau de Toilette"});
+ expect(mergeCatalogue([[a],[b]])).toHaveLength(1);
+});

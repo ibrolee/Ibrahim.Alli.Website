@@ -21,8 +21,10 @@ export async function searchWikidata(q:string,page:number):Promise<SearchResult>
    .map(word=>`FILTER(CONTAINS(LCASE(CONCAT(STR(?name), " ", STR(?brand))), ${JSON.stringify(word)}))`).join("\n");
  const url=new URL("https://query.wikidata.org/sparql");
  url.searchParams.set("format","json");
- url.searchParams.set("query",`SELECT DISTINCT ?item ?name ?brand ?image ?date WHERE {
-   ?item wdt:P31 wd:Q131746; wdt:P18 ?image; rdfs:label ?name; (wdt:P1716|wdt:P176) ?maker.
+ url.searchParams.set("query",`SELECT DISTINCT ?item ?name ?brand ?image ?date ?kind WHERE {
+   ?item wdt:P31 wd:Q131746; wdt:P18 ?image; rdfs:label ?name.
+   { ?item wdt:P1716 ?maker. BIND("brand" AS ?kind) }
+   UNION { ?item wdt:P176 ?maker. BIND("maker" AS ?kind) FILTER NOT EXISTS { ?item wdt:P1716 ?statedBrand. } }
    ?maker rdfs:label ?brand. FILTER(LANG(?name)="en" && LANG(?brand)="en")
    OPTIONAL { ?item wdt:P571 ?date. } ${filters}
  } ORDER BY ?name ?item LIMIT 20 OFFSET ${(page-1)*20}`);
@@ -31,8 +33,9 @@ export async function searchWikidata(q:string,page:number):Promise<SearchResult>
  if(!Array.isArray(bindings))throw Error("Invalid Wikidata results");
  const rows=bindings.map(obj).map(row=>{
    let file="";try{file=decodeURIComponent(value(row["image"]).split("Special:FilePath/")[1]||"");}catch{}
-   return {id:value(row["item"]).split("/").pop()||"",name:value(row["name"]),brand:value(row["brand"]),file,year:value(row["date"]).slice(0,4)};
- }).filter(row=>/^Q\d+$/.test(row.id)&&row.name&&row.brand&&/\.(jpe?g|png|webp)$/i.test(row.file)&&!/(?:advertisement|poster|golden moments)/i.test(row.file));
+   return {id:value(row["item"]).split("/").pop()||"",name:value(row["name"]),brand:value(row["brand"]),kind:value(row["kind"]),file,year:value(row["date"]).slice(0,4)};
+ }).filter(row=>/^Q\d+$/.test(row.id)&&row.name&&row.brand&&/\.(jpe?g|png|webp)$/i.test(row.file)&&!/(?:advertisement|poster|golden moments)/i.test(row.file))
+ .filter(row=>row.kind!=="maker"||row.file.toLowerCase().replace(/[^a-z0-9]/g,"").includes(row.brand.toLowerCase().replace(/[^a-z0-9]/g,"")));
  if(!rows.length)return {source:"wikidata",results:[],total:0,hasMore:bindings.length===20&&page<10};
  const commons=new URL("https://commons.wikimedia.org/w/api.php");
  commons.searchParams.set("action","query");commons.searchParams.set("format","json");
