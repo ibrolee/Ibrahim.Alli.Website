@@ -255,9 +255,9 @@ function Fragrance(){
     setComboPhoto(null);setComboPreview(null);setComboError("");setComboSearchResults([]);
     setSelected(null);setComboOpen(true);
   }
-  function editCombo(c:Combo){
+  function editCombo(c:Combo,moveTo?: "collection"|"wishlist"){
     setComboId(c.id);setComboName(c.name);setComboPerfumes(c.perfumes);
-    setComboTarget(c.target);setComboAmount(c.amount===undefined?"":String(c.amount));
+    setComboTarget(moveTo||c.target);setComboAmount(c.amount===undefined?"":String(c.amount));
     setComboFilter("");setComboManualBrand("");setComboManualName("");
     setComboPhoto(null);setComboPreview(null);setComboError("");setComboSearchResults([]);
     setComboOpen(true);
@@ -427,9 +427,27 @@ function Fragrance(){
         <div className="sc-perfume-actions">
           {context==="collection"?
           <><button onClick={()=>openPrice(p)}>Edit price</button><button onClick={()=>favorite(p)} title="Favourite" aria-label="Toggle favourite"><Heart size={17} fill={owned?.favorite?"currentColor":"none"}/></button></>:
-          <><button onClick={()=>openPrice(p)}>{owned?"Owned · Edit price":"+ My shelf"}</button><button onClick={()=>wish(p)} title={wishIds.has(p.id)?"Remove from wishlist":"Add to wishlist"} aria-label="Toggle wishlist"><Heart size={17} fill={wishIds.has(p.id)?"currentColor":"none"}/></button></>}
+          <><button onClick={()=>openPrice(p)}>{owned?"Owned · Edit price":"+ My shelf"}</button><button onClick={()=>wish(p)} title={wishIds.has(p.id)?"Remove from wishlist":"Add to wishlist"} aria-label="Toggle wishlist"><Heart size={17} fill={wishIds.has(p.id)?"currentColor":"none"}/></button>{context==="discover"&&<button className="sc-combo-add-card" onClick={()=>startCombo("wishlist",p)} title="Start combo with this fragrance"><Plus size={14}/> Combo</button>}</>
         </div>
       </div>
+    </article>;
+  };
+  const comboCard=(c:Combo)=>{
+    const four=c.perfumes.slice(0,4);
+    return <article className="sc-combo-card" key={c.id}>
+      <div className="sc-combo-visual">{photoUrls[c.id]?<img className="sc-combo-cover" src={photoUrls[c.id]} alt={c.name+" combo photo"}/>:
+        <div className="sc-combo-collage">{four.map((p,i)=><div key={p.id+":"+i}>{pic(p,"card",photoUrls[p.id])}</div>)}</div>}
+        <span className="sc-combo-count">{c.perfumes.length} bottles</span>
+      </div>
+      <div className="sc-combo-info"><span className="sc-combo-tag">PERFUME COMBO</span>
+      <h3>{c.name}</h3>
+      <p>{c.perfumes.map(p=>p.name).join(" · ")}</p>
+      {c.target==="collection"&&<strong className="sc-combo-cost">{money(c.amount||0,"NGN")} <small>total paid</small></strong>}
+      <div className="sc-combo-actions">
+        <button type="button" onClick={()=>editCombo(c)}>Edit combo</button>
+        {c.target==="wishlist"&&<button type="button" onClick={()=>editCombo(c,"collection")}>Purchased <ArrowRight size={13}/></button>}
+        <button type="button" className="sc-combo-delete" aria-label={"Delete "+c.name} onClick={()=>removeCombo(c)}><Trash2 size={16}/></button>
+      </div></div>
     </article>;
   };
   const allMyPerfumes=[...store.collection.map(x=>x.perfume),...myCombos.flatMap(x=>x.perfumes)];
@@ -445,11 +463,11 @@ function Fragrance(){
         {([["collection","My collection",ShoppingBag],["discover","Discover",Search],["wishlist","Wishlist",Heart],["worth","Collection worth",Wallet],["layer","Layer lab",Layers]] as const).map(([key,label,Icon])=><button key={key} className={page===key?"active":""} onClick={()=>go(key)}><Icon size={18}/>{label}</button>)}
       </nav>
       {page==="collection"&&<section className="sc-section">
-        <div className="sc-section-head"><div><h2>My collection</h2></div><button className="sc-primary" onClick={()=>go("discover")}><Plus size={18}/> Add fragrance</button></div>
-        {store.collection.length>0?<><div className="sc-filters"><label><Search size={17}/><input value={filter} onChange={e=>setFilter(e.target.value)} placeholder="Find a bottle on my shelf" /></label><select aria-label="Sort collection" value={sort} onChange={e=>setSort(e.target.value)}><option value="newest">Recently added</option><option value="alpha">A — Z</option><option value="price">Price paid</option><option value="favorite">Favourites</option></select></div><div className="sc-grid">{list.map(x=>item(x.perfume,"collection"))}</div></>:<div className="sc-empty"><FlaskConical size={48} strokeWidth={1}/><h3>Begin with your first bottle.</h3><p>Search a perfume, then enter the price you paid.</p><button className="sc-primary" onClick={()=>go("discover")}>Explore fragrances <ArrowRight size={17}/></button></div>}
+        <div className="sc-section-head"><div><h2>My collection</h2></div><div className="sc-combo-header-actions"><button className="sc-secondary" onClick={()=>startCombo("collection")}><Plus size={16}/> Add combo</button><button className="sc-primary" onClick={()=>go("discover")}><Plus size={16}/> Fragrance</button></div></div>
+        {store.collection.length>0||myCombos.length>0?<>{myCombos.length>0&&<div className="sc-combo-grid">{myCombos.map(comboCard)}</div>}{store.collection.length>0&&<><div className="sc-filters"><label><Search size={17}/><input value={filter} onChange={e=>setFilter(e.target.value)} placeholder="Find a bottle on my shelf" /></label><select aria-label="Sort collection" value={sort} onChange={e=>setSort(e.target.value)}><option value="newest">Recently added</option><option value="alpha">A — Z</option><option value="price">Price paid</option><option value="favorite">Favourites</option></select></div><div className="sc-grid">{list.map(x=>item(x.perfume,"collection"))}</div></>}</>:<div className="sc-empty"><FlaskConical size={48} strokeWidth={1}/><h3>Begin with your first bottle.</h3><p>Search a perfume, then enter the price you paid.</p><button className="sc-primary" onClick={()=>go("discover")}>Explore fragrances <ArrowRight size={17}/></button></div>}
       </section>}
       {page==="discover"&&<section className="sc-section">
-        <div className="sc-section-head"><div><h2>Discover</h2></div></div>
+        <div className="sc-section-head"><div><h2>Discover</h2></div><button className="sc-secondary sc-add-combo-discover" onClick={()=>startCombo("wishlist")}><Plus size={16}/> Combo</button></div>
         <form className="sc-search" onSubmit={e=>{e.preventDefault();const v=draftQuery.trim();if(v.length<3)return;setCatalogPage(1);if(v===query)setRefreshKey(k=>k+1);else setQuery(v)}}><Search size={20}/><input autoFocus={false} value={draftQuery} onChange={e=>setDraftQuery(e.target.value)} placeholder="Search perfume or brand..." aria-label="Search perfumes"/>{draftQuery&&<button type="button" onClick={()=>{setDraftQuery("");setQuery("");setCatalogPage(1)}} aria-label="Clear search"><X size={19}/></button>}<button className="sc-search-submit" type="submit" disabled={draftQuery.trim().length<3||searching}>Search</button></form>
         <div className="sc-chips">{["Qasida","Bakhur","Lattafa","Afnan","Dior","Tom Ford"].map(t=><button key={t} onClick={()=>{setDraftQuery(t);setCatalogPage(1);if(query===t)setRefreshKey(k=>k+1);else setQuery(t)}}>{t}</button>)}</div>
         <button className="sc-add-missing" onClick={()=>setManualOpen(true)}><Plus size={14}/> Not listed? Add it</button>
@@ -459,19 +477,19 @@ function Fragrance(){
         {photographed.length>0?<><div className="sc-grid">{photographed.map(p=>item(p,"discover"))}</div>{hasMore&&<button className="sc-loadmore" disabled={searching} onClick={()=>setCatalogPage(x=>x+1)}>{searching?"Loading...":"Load more"} <ChevronDown size={18}/></button>}</>:searching||checkingPhotos?<div className="sc-loading">Loading photos…</div>:query.trim()?<p className="sc-no-results">No perfumes with verified photos found. Try another search or <button onClick={()=>setManualOpen(true)}>add manually</button>.</p>:<p className="sc-discover-intro">Search a perfume or choose a brand above.</p>}
       </section>}
       {page==="wishlist"&&<section className="sc-section">
-        <div className="sc-section-head"><div><h2>Wishlist</h2></div><button className="sc-primary" onClick={()=>go("discover")}><Plus size={17}/> Find fragrances</button></div>
-        {store.wishlist.length?<div className="sc-grid">{store.wishlist.map(p=>item(p,"wishlist"))}</div>:<div className="sc-empty"><Heart size={45} strokeWidth={1}/><h3>A little room for desire.</h3><p>Save perfumes to buy later.</p><button className="sc-primary" onClick={()=>go("discover")}>Find my next scent <ArrowRight size={17}/></button></div>}
+        <div className="sc-section-head"><div><h2>Wishlist</h2></div><div className="sc-combo-header-actions"><button className="sc-secondary" onClick={()=>startCombo("wishlist")}><Plus size={16}/> Add combo</button><button className="sc-primary" onClick={()=>go("discover")}><Plus size={16}/> Fragrance</button></div></div>
+        {store.wishlist.length||wishCombos.length?<>{wishCombos.length>0&&<div className="sc-combo-grid">{wishCombos.map(comboCard)}</div>}{store.wishlist.length>0&&<div className="sc-grid">{store.wishlist.map(p=>item(p,"wishlist"))}</div>}</>:<div className="sc-empty"><Heart size={45} strokeWidth={1}/><h3>A little room for desire.</h3><p>Save perfumes to buy later.</p><button className="sc-primary" onClick={()=>go("discover")}>Find my next scent <ArrowRight size={17}/></button></div>}
       </section>}
       {page==="worth"&&<section className="sc-section">
         <div className="sc-section-head"><div><h2>Collection worth</h2></div><button className="sc-primary" onClick={()=>go("discover")}><Plus size={17}/> Add a bottle</button></div>
         <div className="sc-worth-summary sc-worth-one"><div><span>₦ TOTAL PAID</span><strong>{money(moneyNGN,"NGN")}</strong></div></div>
 
         {legacyUSD>0&&<p className="sc-legacy-note">{legacyUSD} older dollar-priced bottle(s) are excluded until you enter a naira price.</p>}
-        <div className="sc-worth-list"><h3>Purchase prices</h3>{store.collection.length?store.collection.map(x=><div key={x.perfume.id}><span>{x.perfume.brand} <strong>{x.perfume.name}</strong></span><strong>{x.currency==="NGN"?money(x.amount,"NGN"):"Set ₦ price"}</strong><button onClick={()=>openPrice(x.perfume)}>Edit</button></div>):<p>No fragrances added yet.</p>}</div>
+        <div className="sc-worth-list"><h3>Purchase prices</h3>{store.collection.length||myCombos.length?store.collection.map(x=><div key={x.perfume.id}><span>{x.perfume.brand} <strong>{x.perfume.name}</strong></span><strong>{x.currency==="NGN"?money(x.amount,"NGN"):"Set ₦ price"}</strong><button onClick={()=>openPrice(x.perfume)}>Edit</button></div>):null}{myCombos.map(c=><div key={c.id}><span>Perfume combo <strong>{c.name} · {c.perfumes.length} bottles</strong></span><strong>{money(c.amount||0,"NGN")}</strong><button onClick={()=>editCombo(c)}>Edit</button></div>)}{store.collection.length===0&&myCombos.length===0&&<p>No fragrances added yet.</p>}</div>
       </section>}
       {page==="layer"&&<section className="sc-section"><div className="sc-section-head"><div><span className="sc-kicker">05 / THE EXPERIMENTAL STUDIO</span><h2>Layer <em>lab.</em></h2><p>Pair two perfumes from your shelf and discover shared scent notes. Suggestions aren't verified performance predictions.</p></div></div>
-        {store.collection.length<2?<div className="sc-empty"><Layers size={45}/><h3>Two bottles make a combination.</h3><p>Collect at least two fragrances to start mixing.</p><button className="sc-primary" onClick={()=>go("discover")}>Expand my shelf</button></div>:<div className="sc-layer-panel"><div className="sc-pair"><label>FIRST FRAGRANCE<select value={layerA} onChange={e=>setLayerA(e.target.value)}><option value="">Choose a bottle</option>{allMyPerfumes.map(p=><option key={p.id} value={p.id}>{p.brand} — {p.name}</option>)}</select></label><Plus size={22}/><label>SECOND FRAGRANCE<select value={layerB} onChange={e=>setLayerB(e.target.value)}><option value="">Choose another</option>{allMyPerfumes.filter(p=>p.id!==layerA).map(p=><option key={p.id} value={p.id}>{p.brand} — {p.name}</option>)}</select></label></div>{left&&right&&left.id!==right.id&&<div className="sc-layer-result"><Sparkles size={27}/><h3>{left.name} <span>×</span> {right.name}</h3><p>{match.length?"Shared notes / accords: "+[...new Set(match)].join(", "):"No shared notes were listed by the database. Try one spray of each and assess on your own skin."}</p><button className="sc-primary" onClick={()=>setStore(s=>({...s,mixes:[{id:id(),left:left.id,right:right.id,date:today()},...s.mixes]}))}>Save this combination <Bookmark size={16}/></button></div>}</div>}
-        {store.mixes.length>0&&<div className="sc-mix-list"><h3>Saved combinations</h3>{store.mixes.map(m=><div key={m.id}><span>{store.collection.find(x=>x.perfume.id===m.left)?.perfume.name||"Removed"} × {store.collection.find(x=>x.perfume.id===m.right)?.perfume.name||"Removed"}</span><button aria-label="Delete saved combination" onClick={()=>setStore(s=>({...s,mixes:s.mixes.filter(x=>x.id!==m.id)}))}><X size={17}/></button></div>)}</div>}
+        {allMyPerfumes.length<2?<div className="sc-empty"><Layers size={45}/><h3>Two bottles make a combination.</h3><p>Collect at least two fragrances to start mixing.</p><button className="sc-primary" onClick={()=>go("discover")}>Expand my shelf</button></div>:<div className="sc-layer-panel"><div className="sc-pair"><label>FIRST FRAGRANCE<select value={layerA} onChange={e=>setLayerA(e.target.value)}><option value="">Choose a bottle</option>{allMyPerfumes.map(p=><option key={p.id} value={p.id}>{p.brand} — {p.name}</option>)}</select></label><Plus size={22}/><label>SECOND FRAGRANCE<select value={layerB} onChange={e=>setLayerB(e.target.value)}><option value="">Choose another</option>{allMyPerfumes.filter(p=>p.id!==layerA).map(p=><option key={p.id} value={p.id}>{p.brand} — {p.name}</option>)}</select></label></div>{left&&right&&left.id!==right.id&&<div className="sc-layer-result"><Sparkles size={27}/><h3>{left.name} <span>×</span> {right.name}</h3><p>{match.length?"Shared notes / accords: "+[...new Set(match)].join(", "):"No shared notes were listed by the database. Try one spray of each and assess on your own skin."}</p><button className="sc-primary" onClick={()=>setStore(s=>({...s,mixes:[{id:id(),left:left.id,right:right.id,date:today()},...s.mixes]}))}>Save this combination <Bookmark size={16}/></button></div>}</div>}
+        {store.mixes.length>0&&<div className="sc-mix-list"><h3>Saved combinations</h3>{store.mixes.map(m=><div key={m.id}><span>{allMyPerfumes.find(x=>x.id===m.left)?.name||"Removed"} × {allMyPerfumes.find(x=>x.id===m.right)?.name||"Removed"}</span><button aria-label="Delete saved combination" onClick={()=>setStore(s=>({...s,mixes:s.mixes.filter(x=>x.id!==m.id)}))}><X size={17}/></button></div>)}</div>}
       </section>}
       <footer className="sc-footer"><span>SCENT / CABINET</span><button onClick={()=>setBackupOpen(true)}>Backup <ArrowRight size={15}/></button></footer>
     </div>
