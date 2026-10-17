@@ -1,0 +1,24 @@
+name: Diagnose Scent Cabinet live D1 binding
+on:
+  push:
+    branches:
+      - diagnostic/scent-sync-live-binding-2026-10-17
+permissions:
+  contents: read
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - name: Check public read-only sync status on each Worker origin
+        shell: bash
+        run: |
+          set -eu
+          for origin in             https://ibrahimalli.com             https://ibrahimalli-portfolio-preview.alliibrahim3.workers.dev             https://ibrahimalli-portfolio.alliibrahim3.workers.dev
+          do
+            echo "=== $origin/api/fragrance/sync/status"
+            code=$(curl -sS --connect-timeout 8 --max-time 20 -L -o /tmp/scent_status_response -w '%{http_code}' "$origin/api/fragrance/sync/status") || code="curl-error"
+            echo "HTTP $code"
+            head -c 700 /tmp/scent_status_response 2>/dev/null || true
+            echo
+          done
