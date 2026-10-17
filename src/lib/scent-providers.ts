@@ -5,6 +5,7 @@
 export type CatalogRecord={
  id:string;name:string;brand:string;image?:string;year?:string;family?:string;
  description?:string;top:string[];heart:string[];base:string[];notes:string[];accords:string[];
+ longevity?:string;projection?:string;rating?:number;gender?:string;popularity?:string;bestSeasons?:string[];bestOccasions?:string[];
 };
 export type SearchResult={results:CatalogRecord[];hasMore:boolean;source:"noteboxd"|"fragella"|"beautyfacts"|"productsfacts";total:number};
 function str(value:unknown):string{return typeof value==="string"?value.trim():"";}
@@ -74,6 +75,17 @@ export function normalizeProviderRecord(raw:unknown,source:"noteboxd"|"fragella"
  const family=text(x["family"]||x["fragrance_family"]||x["scent_family"]||x["concentration"]||x["OilType"]);
  const description=text(x["description"]||x["Description"]||x["summary"]);
  const record:CatalogRecord={id:source+":"+uniqueID,brand,name,top,heart,base,notes:[...new Set([...general,...top,...heart,...base])],accords};
+ const longevity=text(x["Longevity"]||x["longevity"]);if(longevity)record.longevity=longevity.slice(0,45);
+ const projection=text(x["Sillage"]||x["sillage"]||x["projection"]);if(projection)record.projection=projection.slice(0,45);
+ const rating=Number(x["rating"]??x["Rating"]??x["average_rating"]);
+ if(Number.isFinite(rating)&&rating>0&&rating<=5)record.rating=rating;
+ const gender=text(x["Gender"]||x["gender"]);if(gender)record.gender=gender.slice(0,40);
+ const popularity=text(x["Popularity"]||x["popularity"]);if(popularity)record.popularity=popularity.slice(0,35);
+ const ranking=(raw:unknown):string[]=>Array.isArray(raw)?raw.slice(0,4).map(v=>text(v)).filter(Boolean):[];
+ const seasons=ranking(x["Season Ranking"]||x["season_ranking"]||x["seasons"]);
+ const occasions=ranking(x["Occasion Ranking"]||x["occasion_ranking"]||x["occasions"]);
+ if(seasons.length)record.bestSeasons=seasons;
+ if(occasions.length)record.bestOccasions=occasions;
  const url=selectImage(x);
  if(url)record.image=url;
  if(year)record.year=year;
