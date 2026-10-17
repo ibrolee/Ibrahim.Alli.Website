@@ -29,7 +29,7 @@ jobs:
       - name: Wrangler packaging dry-run (no credentials or deployment)
         run: npx --yes wrangler@4.135.0 deploy --dry-run --outdir .cloudflare-dryrun
       - name: Fragrance providers unit tests (no real API calls)
-        run: bun test src/lib/scent-providers.test.ts
+        run: bun test src/lib/scent-providers.test.ts src/lib/scent-filters.test.ts
       - name: Local Workers smoke tests (no Cloudflare deployment)
         run: |
           set -e
