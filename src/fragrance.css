@@ -513,3 +513,9 @@
 .sc-sync-conflict small{color:#647466;font-size:11px;line-height:1.5}
 .sc-sync-footnote{color:#7a897d;font-size:11px;line-height:1.6;margin-top:18px;border-top:1px solid #e1e6df;padding-top:10px}
 @media(max-width:660px){.sc-top-controls{gap:12px}.sc-topbar .sc-sync-trigger{min-width:39px;justify-content:center}.sc-sync-dialog{padding-top:34px!important}}
+
+/* Owner-photo sync status: do not let photo setup masquerade as a full sync. */
+.sc-photo-cloud-box{background:#f2f5ed;border:1px solid #d3dfd1;margin-top:16px;padding:12px 13px;color:#31543d}
+.sc-photo-cloud-box>span{display:flex;align-items:center;gap:7px;font-size:12px}
+.sc-photo-cloud-box p{font-size:12px;line-height:1.55;margin:7px 0;color:#526e5c}
+.sc-photo-cloud-box button{font-size:11px;padding:7px 12px;min-height:36px}
