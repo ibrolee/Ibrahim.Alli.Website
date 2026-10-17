@@ -291,3 +291,20 @@
 .sc-combo-members button{background:#f1f4eb;color:#42604d;border:1px solid #d8e1d5;padding:4px 6px;font-size:10px;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer}
 .sc-combo-members button:hover{border-color:#779b80}
 .sc-combo-members span{color:#738274;font-size:10px;padding:4px}
+
+/* Scent Cabinet Cloudflare search sources: source selection applies to Discover + combo search. */
+.sc-source-picker{display:flex;align-items:center;flex-wrap:wrap;column-gap:9px;row-gap:5px;margin:8px 0 12px;font-size:12px;color:#65776b}
+.sc-source-picker label{font-weight:700;color:#36533f}
+.sc-source-picker select,.sc-combo-source select{min-height:37px;min-width:0;max-width:100%;font-size:13px;padding:7px 24px 7px 9px;background:#f8f9f3;color:#284835;border:1px solid #cbd8c9;border-radius:3px;cursor:pointer}
+.sc-source-picker span{font-size:10px;color:#829183}
+.sc-source-credit{font-size:10px;color:#78877b;line-height:1.5;margin:9px 0 14px}
+.sc-source-credit a{color:#4a7654;text-decoration:underline;text-underline-offset:2px}
+.sc-combo-source{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.sc-combo-source label{font-weight:700;color:#586d5e;font-size:10px}
+@media(max-width:660px){
+  .sc-source-picker{gap:6px;margin:4px 0 9px}
+  .sc-source-picker label{font-size:11px}
+  .sc-source-picker select,.sc-combo-source select{font-size:16px;min-height:40px;flex:1}
+  .sc-source-picker span{width:100%;font-size:10px}
+  .sc-source-credit{font-size:10px}
+}
