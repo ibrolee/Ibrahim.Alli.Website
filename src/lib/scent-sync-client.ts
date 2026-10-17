@@ -119,7 +119,9 @@ export function useCabinetSync<T extends {collection:unknown[];wishlist:unknown[
     function visibility(){if(document.visibilityState==="visible")online();}
     window.addEventListener("online",online);
     document.addEventListener("visibilitychange",visibility);
-    return()=>{window.removeEventListener("online",online);document.removeEventListener("visibilitychange",visibility);};
+    // Pick up changes made in Safari while the Home Screen app stays open.
+    const periodic=window.setInterval(()=>{if(document.visibilityState==="visible")online();},90000);
+    return()=>{window.removeEventListener("online",online);document.removeEventListener("visibilitychange",visibility);window.clearInterval(periodic);};
   },[conflict]);
   async function connect(password:string,setupCode?:string){
     if(password.length<12&&setupCode!==undefined)throw Error("Use at least 12 characters for your password.");
