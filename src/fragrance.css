@@ -411,3 +411,82 @@
 @media(max-width:660px){.sc-stats.sc-stats-naira{grid-template-columns:1fr 1fr}.sc-stats.sc-stats-naira>div{min-height:76px;padding:13px}.sc-stats.sc-stats-naira>div:nth-child(2){border-bottom:1px solid #426152}.sc-shelf-switch button{flex:1;padding:10px 7px;font-size:11px}.sc-shelf-explain{font-size:11px}.sc-worth-list>div{gap:8px}.sc-worth-list>div>strong{font-size:12px}.sc-worth-list>div>button{padding:7px}.sc-combo-bottle-list>div{gap:5px}}
 
 @media(max-width:660px){.sc-stats.sc-stats-naira>div:nth-child(n+3) strong{font-size:clamp(20px,5.5vw,29px)!important}}
+
+
+/* Compact cabinet browsing: preserve two comfortably wide columns and full-size
+   controls, but avoid tall square artwork, redundant metadata and deep gaps.
+   Discover's detailed catalogue tiles and Spending remain unchanged. */
+@media(max-width:660px){
+  .sc-cabinet-section{padding-top:10px}
+  .sc-cabinet-section .sc-section-head{margin-bottom:10px}
+  .sc-cabinet-section .sc-section-head h2{font-size:clamp(27px,7.2vw,33px)}
+  .sc-cabinet-section .sc-combo-header-actions{flex-wrap:nowrap}
+  .sc-cabinet-section .sc-combo-header-actions .sc-primary,
+  .sc-cabinet-section .sc-combo-header-actions .sc-secondary{min-height:34px;padding:6px 8px;font-size:10px}
+  .sc-cabinet-section .sc-combo-header-actions svg{width:13px;height:13px}
+  .sc-cabinet-section .sc-shelf-switch{gap:5px;padding-bottom:6px;margin-bottom:5px}
+  .sc-cabinet-section .sc-shelf-switch button{min-height:36px;padding:7px 6px}
+  .sc-cabinet-section .sc-shelf-explain{margin:0 0 8px;font-size:10px;line-height:1.35}
+  .sc-cabinet-section .sc-filters{margin-bottom:10px;gap:7px}
+  .sc-cabinet-section .sc-filters label,.sc-cabinet-section .sc-filters select{height:38px}
+  .sc-cabinet-grid{grid-template-columns:repeat(2,minmax(0,1fr));column-gap:11px;row-gap:11px}
+  .sc-cabinet-grid .sc-perfume{display:flex;flex-direction:column;min-width:0}
+  .sc-cabinet-grid .sc-perfume-image{
+    aspect-ratio:1.7;min-height:88px;max-height:106px;border-radius:5px;
+  }
+  .sc-cabinet-grid .sc-perfume-image img{width:83%;height:88%;object-fit:contain}
+  .sc-cabinet-grid .sc-perfume-info{display:flex;flex-direction:column;flex:1;min-width:0;padding:5px 1px 0}
+  .sc-cabinet-grid .sc-perfume-brand{margin-bottom:2px;font-size:9px;line-height:1.1;letter-spacing:.035em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .sc-cabinet-grid .sc-perfume .sc-name{
+    display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;
+    overflow:hidden;text-overflow:ellipsis;font-size:18px;line-height:1.07;
+    max-height:39px;min-height:0;margin-bottom:0;
+  }
+  .sc-cabinet-grid .sc-perfume-meta,.sc-cabinet-grid .sc-bottle-date{display:none}
+  .sc-cabinet-grid .sc-price{font-size:12px;line-height:1.25;margin:4px 0 2px}
+  .sc-cabinet-grid .sc-perfume-actions{display:flex;gap:4px;margin-top:auto;padding-top:5px}
+  .sc-cabinet-grid .sc-perfume-actions button{
+    min-height:35px;padding:5px 4px;font-size:10px;line-height:1.1;min-width:0;
+    border-radius:4px;
+  }
+  .sc-cabinet-grid .sc-perfume-actions button:first-child{flex:1}
+  .sc-cabinet-grid .sc-perfume-actions button:not(:first-child){min-width:35px}
+  .sc-cabinet-grid .sc-perfume-actions svg{width:15px;height:15px}
+  .sc-collection-stats.sc-stats.sc-stats-naira{
+    display:flex;flex-wrap:nowrap;overflow-x:auto;overflow-y:hidden;
+    gap:0;scrollbar-width:none;overscroll-behavior-x:contain;
+    margin:7px -18px 0;padding:7px 12px;border-radius:0;
+  }
+  .sc-collection-stats.sc-stats.sc-stats-naira::-webkit-scrollbar{display:none}
+  .sc-collection-stats.sc-stats.sc-stats-naira>div{
+    flex:0 0 auto;min-height:0;min-width:85px;padding:2px 12px;
+    border-bottom:0!important;border-right:1px solid #426152!important;
+  }
+  .sc-collection-stats.sc-stats.sc-stats-naira>div:nth-child(n+3){min-width:118px}
+  .sc-collection-stats.sc-stats.sc-stats-naira>div:last-child{border-right:0!important}
+  .sc-collection-stats.sc-stats.sc-stats-naira span{
+    font-size:8px;letter-spacing:.035em;line-height:1.15
+  }
+  .sc-collection-stats.sc-stats.sc-stats-naira strong,
+  .sc-collection-stats.sc-stats.sc-stats-naira>div:nth-child(n+3) strong{
+    font-size:clamp(13px,3.8vw,17px)!important;line-height:1.2;margin:2px 0 0
+  }
+  /* Grouped perfume combos stay full-width so their controls aren't crushed. */
+  .sc-cabinet-section .sc-combo-grid{gap:8px;margin-bottom:11px}
+  .sc-cabinet-section .sc-combo-visual,.sc-cabinet-section .sc-combo-collage{min-height:133px}
+  .sc-cabinet-section .sc-combo-info{padding:8px;gap:3px}
+  .sc-cabinet-section .sc-combo-info h3{font-size:19px}
+  .sc-cabinet-section .sc-combo-bottle-list{margin:3px 0;gap:2px;max-height:76px;overflow-y:auto}
+  .sc-cabinet-section .sc-combo-bottle-list>div{padding:2px 0}
+  .sc-cabinet-section .sc-combo-bottle-list button{min-height:30px;padding:3px 5px}
+  .sc-cabinet-section .sc-combo-actions{padding-top:0}
+  .sc-cabinet-section .sc-combo-actions button{padding:5px}
+}
+@media(max-width:359px){
+  .sc-cabinet-section .sc-section-head h2{font-size:26px}
+  .sc-cabinet-section .sc-combo-header-actions .sc-primary,
+  .sc-cabinet-section .sc-combo-header-actions .sc-secondary{font-size:9px;padding:6px}
+  .sc-cabinet-grid{column-gap:8px}
+  .sc-cabinet-grid .sc-perfume .sc-name{font-size:17px}
+  .sc-cabinet-grid .sc-perfume-actions button{font-size:9px}
+}
