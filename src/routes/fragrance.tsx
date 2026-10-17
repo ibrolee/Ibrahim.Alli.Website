@@ -841,7 +841,7 @@ function Fragrance(){
       {(sync.status==="synced"||sync.status==="syncing")&&<div className="sc-photo-cloud-box" role="status" aria-live="polite">
         <span><Cloud size={17}/><strong>Uploaded perfume photos</strong></span>
         <p>{photoCloudStatus==="syncing"?"Syncing photos…":photoCloudStatus==="checking"?"Checking photo storage…":photoCloudStatus==="ready"?photoCloudNote:photoCloudStatus==="unavailable"?photoCloudNote:photoCloudStatus==="error"?photoCloudNote:"Waiting for cloud photo sync."}</p>
-        {(photoCloudStatus==="ready"||photoCloudStatus==="error")&&<button type="button" className="sc-secondary" onClick={()=>void syncOwnerPhotos()}>Sync photos now</button>}
+        {(photoCloudStatus==="ready"||photoCloudStatus==="error"||photoCloudStatus==="unavailable")&&<button type="button" className="sc-secondary" onClick={()=>void syncOwnerPhotos()}>Check photo sync</button>}
       </div>}
       <p className="sc-sync-footnote">Your collection and photos stay saved locally too. Keep downloadable JSON backups for an extra copy of everything.</p>
     </section></div>}
