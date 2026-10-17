@@ -16,7 +16,7 @@ const SOURCES:{id:CatalogSource;name:string}[]=[
   {id:"fragella",name:"Fragella · uses quota"}
 ];
 type Perfume = { id: string; name: string; brand: string; image?: string | undefined; year?: string | undefined; family?: string | undefined; description?: string | undefined; notes: string[]; top: string[]; heart: string[]; base: string[]; accords: string[];
- longevity?:string;projection?:string;rating?:number;gender?:string;popularity?:string;bestSeasons?:string[];bestOccasions?:string[] };
+ longevity?:string|undefined;projection?:string|undefined;rating?:number|undefined;gender?:string|undefined;popularity?:string|undefined;bestSeasons?:string[]|undefined;bestOccasions?:string[]|undefined };
 type Owned = { perfume: Perfume; amount: number; currency: Currency; added: string; favorite?: boolean };
 type Mix = { id: string; left: string; right: string; date: string };
 type Combo = { id:string; name:string; perfumes:Perfume[]; target:"collection"|"wishlist"; amount?:number; added:string };
@@ -94,11 +94,11 @@ function sanitize(source: any): State {
     })).filter((c:Combo)=>c.perfumes.length>=2),
     insights:Object.fromEntries(Object.entries(source.insights&&typeof source.insights==="object"&&!Array.isArray(source.insights)?source.insights:{}).slice(0,1200).filter(([key])=>typeof key==="string"&&key.length<300).map(([key,value])=>{
       const x=value&&typeof value==="object"?value as Record<string,unknown>:{};
-      const number=typeof x.priceNGN==="number"?x.priceNGN:NaN;
+      const number=typeof x["priceNGN"]==="number"?x["priceNGN"]:NaN;
       const entry:MyInsight={};
       if(Number.isFinite(number)&&number>=0&&number<=100_000_000)entry.priceNGN=number;
-      if(typeof x.longevity==="string")entry.longevity=x.longevity.slice(0,45);
-      if(typeof x.projection==="string")entry.projection=x.projection.slice(0,45);
+      if(typeof x["longevity"]==="string")entry.longevity=x["longevity"].slice(0,45);
+      if(typeof x["projection"]==="string")entry.projection=x["projection"].slice(0,45);
       return [key,entry];
     }))
   };
@@ -505,7 +505,7 @@ function Fragrance(){
           {(store.insights[p.id]?.longevity||p.longevity)&&<span><strong>Lasts</strong> {store.insights[p.id]?.longevity||p.longevity}</span>}
           {(store.insights[p.id]?.projection||p.projection)&&<span><strong>Projects</strong> {store.insights[p.id]?.projection||p.projection}</span>}
           {p.rating!==undefined&&<span><strong>Rating</strong> {p.rating.toFixed(1)}/5</span>}
-          {store.insights[p.id]?.priceNGN!==undefined&&<span><strong>My price</strong> {money(store.insights[p.id].priceNGN!,"NGN")}</span>}
+          {store.insights[p.id]?.priceNGN!==undefined&&<span><strong>My price</strong> {money(store.insights[p.id]?.priceNGN??0,"NGN")}</span>}
         </div>}
         {owned?<strong className="sc-price">{owned.currency==="NGN"?money(owned.amount,"NGN"):"Set ₦ price"}</strong>:null}
         <div className="sc-perfume-actions">
@@ -618,7 +618,7 @@ function Fragrance(){
     <div><span>Longevity</span><strong>{store.insights[selected.id]?.longevity||selected.longevity||"Not rated"}</strong></div>
     <div><span>Projection</span><strong>{store.insights[selected.id]?.projection||selected.projection||"Not rated"}</strong></div>
     <div><span>Rating</span><strong>{selected.rating!==undefined?selected.rating.toFixed(1)+" / 5":"Not rated"}</strong></div>
-    <div><span>My ₦ price</span><strong>{store.insights[selected.id]?.priceNGN!==undefined?money(store.insights[selected.id].priceNGN!,"NGN"):ownedMap.get(selected.id)?.currency==="NGN"?money(ownedMap.get(selected.id)!.amount,"NGN"):"Not added"}</strong></div>
+    <div><span>My ₦ price</span><strong>{store.insights[selected.id]?.priceNGN!==undefined?money(store.insights[selected.id]?.priceNGN??0,"NGN"):ownedMap.get(selected.id)?.currency==="NGN"?money(ownedMap.get(selected.id)!.amount,"NGN"):"Not added"}</strong></div>
   </div>
   <p className="sc-fact-disclaimer">Performance figures are community perceptions when supplied by a catalogue, or your own entries. Price is only what you saved in ₦. Actual wear and Nigerian shop prices vary.</p>
   {Boolean(selected.bestSeasons?.length)&&<p className="sc-fact-hint">Best seasons: {selected.bestSeasons?.join(" · ")}</p>}
