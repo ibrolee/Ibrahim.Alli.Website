@@ -537,7 +537,7 @@ function Fragrance(){
     },40);
     return()=>{clearTimeout(delay);if(searchId.current===n)searchId.current++;ctrl.abort()};
   },[searchRequest]);
-  // Keep both browsing and submitted searches photo-only, including free catalogues.
+  // Keep explicitly searched results photo-only, including free catalogues.
   // Preflight URLs using browser image loading
   // so broken provider photos never create empty product cards.
   useEffect(()=>{
@@ -644,7 +644,7 @@ function Fragrance(){
         {!searching&&searchHint&&<p className="sc-search-hint">{searchHint}</p>}
         <details className="sc-source-options"><summary>Choose a source (optional)</summary><div className="sc-source-picker"><label htmlFor="sc-search-source">Look in</label><select id="sc-search-source" value={sourceChoice} onChange={e=>setSourceChoice(e.target.value as CatalogSource)}>{SOURCES.map(s=><option key={s.id} value={s.id}>{s.name}</option>)}</select><span>Search all combines available sources and removes repeated perfumes. Then tap Search.</span></div></details>
         <div className="sc-chips">{["Qasida","Bakhur","Lattafa","Afnan","Dior","Tom Ford"].map(t=><button key={t} onClick={()=>setDraftQuery(t)}>{t}</button>)}</div>
-        <p className="sc-search-guidance">Choose a suggestion or type a perfume, then press Search. Nothing searches automatically.</p>
+        <p className="sc-search-guidance">Choose a suggestion or type a perfume, then press Search. Suggestions only fill the box; searching starts when you press Search.</p>
         <div className="sc-discover-tools"><button className="sc-filter-trigger" type="button" aria-expanded={showDiscoverFilters} onClick={()=>setShowDiscoverFilters(v=>!v)}> <Layers size={16}/> Filters & Sort {filterCount>0&&<span>{filterCount}</span>} <ChevronDown size={16} className={showDiscoverFilters?"sc-rotate":""}/></button>
           <span className="sc-filter-result-count">{filteredPhotographed.length} of {photographed.length} photographed results</span></div>
         {showDiscoverFilters&&<div className="sc-discover-filter-panel">
@@ -670,7 +670,7 @@ function Fragrance(){
         </div>}
         <button className="sc-add-missing" onClick={()=>setManualOpen(true)}><Plus size={14}/> Not listed? Add it</button>
 
-        {error&&<div className="sc-warning"><CloudOff size={19}/><span>{error}</span><button onClick={()=>setRefreshKey(k=>k+1)}>Retry</button></div>}
+        {error&&<div className="sc-warning"><CloudOff size={19}/><span>{error}</span><button onClick={()=>runDiscoverSearch(query)}>Retry</button></div>}
         {catalogueNotice&&<p className="sc-source-note">{catalogueNotice}</p>}
         {photographed.length>0&&<div className="sc-catalogue-summary" aria-live="polite"><span>{photographed.length} perfumes{resultSources.length>1?" · combined without repeats":""}</span><details><summary>Sources & photo credits</summary><p>{resultSources.map(v=>SOURCES.find(x=>x.id===v)?.name.replace(/ · .*/,"")||v).join(" · ")}</p>{resultSources.some(v=>v==="beautyfacts"||v==="productsfacts")&&<p>Data © <a href="https://world.openbeautyfacts.org" target="_blank" rel="noreferrer">Open Facts contributors</a> (<a href="https://opendatacommons.org/licenses/odbl/1-0/" target="_blank" rel="noreferrer">ODbL</a>). Images belong to their contributors.</p>}{resultSources.includes("wikidata")&&<p>Wikidata data: CC0. Open a perfume to see its Wikimedia photo credit and licence.</p>}</details></div>}
         {filteredPhotographed.length>0?<><div className="sc-grid">{filteredPhotographed.map(p=>item(p,"discover"))}</div>{hasMore&&<button className="sc-loadmore" disabled={searching} onClick={loadMoreDiscover}>{searching?"Loading more…":"Load more"} <ChevronDown size={18}/></button>}</>:searching||checkingPhotos?<div className="sc-loading">{searching?"Results will appear here when the search finishes…":"Checking perfume photos…"}</div>:photographed.length>0?<div className="sc-no-results"><p>No perfumes match these filters yet. Perfumes with missing ratings or prices will not appear when you filter by those details.</p><button onClick={()=>setDiscoverFilters(DEFAULT_DISCOVER_FILTERS)}>Clear filters</button><p>Try Search all to find more perfumes and details.</p></div>:query.trim()?<p className="sc-no-results">No closely matching perfumes with verified photos found. Try another spelling, or <button onClick={()=>setManualOpen(true)}>add manually</button>.</p>:<p className="sc-discover-intro">Search a perfume or choose a brand above.</p>}
