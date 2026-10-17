@@ -3,6 +3,8 @@ import {getScentPhoto,removeScentPhoto,saveScentPhoto} from "./scent-photos";
 /** Private R2 photo sync. Intentional edits and deletes are queued locally first;
  * a browser without a cloud connection never loses its image. */
 const ROOT="/api/fragrance/sync/photos/";
+// Conservative personal-use ceiling: max 200 images (~90 MB total).
+export const PHOTO_SYNC_MAX_ITEMS=200;
 const QUEUE="ia-scent-photo-outbox-v1";
 const ETAGS="ia-scent-photo-etags-v1";
 export type PhotoSyncState="idle"|"checking"|"ready"|"unavailable"|"syncing"|"error";
@@ -51,14 +53,15 @@ async function markDeleted(id:string){await request(idUrl(id),{method:"DELETE"})
 async function download(id:string):Promise<Blob>{
   const response=await request(idUrl(id));
   const blob=await response.blob();
-  if(blob.size===0||blob.size>500000||!["image/jpeg","image/png","image/webp"].includes(blob.type))throw new Error("Invalid cloud photo.");
+  if(blob.size===0||blob.size>450000||!["image/jpeg","image/png","image/webp"].includes(blob.type))throw new Error("Invalid cloud photo.");
   return blob;
 }
 export type PhotoSyncReport={uploaded:number;downloaded:number;removed:number;conflicts:number;remaining:number};
 /** Reconcile explicit edits first. When two devices initially hold different images,
  * preserve both locally rather than overwriting either unasked. */
 export async function reconcilePhotos(keys:string[],onReceived:(id:string,blob:Blob)=>void,onDeleted:(id:string)=>void):Promise<PhotoSyncReport>{
-  const wanted=[...new Set(keys.filter(allowedPhotoKey))].slice(0,4000);
+  const wanted=[...new Set(keys.filter(allowedPhotoKey))];
+  if(wanted.length>PHOTO_SYNC_MAX_ITEMS)throw new Error("Photo syncing is limited to 200 images to avoid extra Cloudflare usage.");
   const queue=load<Record<string,PhotoAction>>(QUEUE,{});
   const known=load<Record<string,string>>(ETAGS,{});
   let uploaded=0,downloaded=0,removed=0,conflicts=0;
