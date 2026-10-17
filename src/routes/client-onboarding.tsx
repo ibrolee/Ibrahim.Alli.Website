@@ -1,5 +1,4 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { track } from "@vercel/analytics";
 import { useRef, useState, type FormEvent } from "react";
 import { ArrowLeft, ArrowRight, ArrowUpRight, Check, ClipboardCheck, FileText, Mail, MessageCircle, ShieldCheck } from "lucide-react";
 
@@ -59,8 +58,6 @@ function ClientOnboarding(){
   }
   function openHandoff(channel:"email"|"whatsapp"){
     const message=buildBrief();if(!message)return;
-    // Only the channel and intent are recorded; the answers remain in the visitor's browser.
-    track("portfolio_onboarding_handoff",{channel});
     if(channel==="email"){
       window.location.href="mailto:"+ownerEmail+"?subject="+encodeURIComponent("New project questionnaire")+"&body="+encodeURIComponent(message);
     }else{
