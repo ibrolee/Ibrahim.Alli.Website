@@ -9,9 +9,9 @@ type Page = "collection" | "discover" | "wishlist" | "worth" | "layer";
 type Perfume = { id: string; name: string; brand: string; image?: string | undefined; year?: string | undefined; family?: string | undefined; description?: string | undefined; notes: string[]; top: string[]; heart: string[]; base: string[]; accords: string[] };
 type Owned = { perfume: Perfume; amount: number; currency: Currency; added: string; favorite?: boolean };
 type Mix = { id: string; left: string; right: string; date: string };
-type State = { collection: Owned[]; wishlist: Perfume[]; mixes: Mix[]; currency: Currency };
+type State = { collection: Owned[]; wishlist: Perfume[]; mixes: Mix[] };
 const STORAGE = "ia-scent-cabinet-v1";
-const initial: State = { collection: [], wishlist: [], mixes: [], currency: "NGN" };
+const initial: State = { collection: [], wishlist: [], mixes: [] };
 const API = "/api/fragrance";
 
 function bits(value: unknown): string[] {
@@ -58,8 +58,7 @@ function sanitize(source: any): State {
   return {
     collection: (Array.isArray(source.collection)?source.collection:[]).filter((x:any)=>valid(x?.perfume)).slice(0,5000).map((x:any)=>({perfume:perfume(x.perfume), amount:Math.max(0,Number(x.amount)||0),currency:x.currency==="USD"?"USD":"NGN",added:String(x.added||new Date().toISOString()),favorite:Boolean(x.favorite)})),
     wishlist: (Array.isArray(source.wishlist)?source.wishlist:[]).filter(valid).slice(0,5000).map(perfume),
-    mixes: (Array.isArray(source.mixes)?source.mixes:[]).filter((m:any)=>m&&typeof m.left==="string"&&typeof m.right==="string").slice(0,1000),
-    currency: source.currency==="USD"?"USD":"NGN"
+    mixes: (Array.isArray(source.mixes)?source.mixes:[]).filter((m:any)=>m&&typeof m.left==="string"&&typeof m.right==="string").slice(0,1000)
   };
 }
 function money(value:number,c:Currency) { return new Intl.NumberFormat("en-US",{style:"currency",currency:c,minimumFractionDigits:0,maximumFractionDigits:2}).format(value).replace("NGN","₦"); }
@@ -104,7 +103,6 @@ function Fragrance(){
   const [selected,setSelected]=useState<Perfume|null>(null);
   const [priceOpen,setPriceOpen]=useState<Perfume|null>(null);
   const [price,setPrice]=useState("");
-  const [currency,setCurrency]=useState<Currency>("NGN");
   const [layerA,setLayerA]=useState("");
   const [layerB,setLayerB]=useState("");
   const [sort,setSort]=useState("newest");
@@ -130,13 +128,13 @@ function Fragrance(){
   const ownedMap=useMemo(()=>new Map(store.collection.map(x=>[x.perfume.id,x])),[store.collection]);
   const wishIds=useMemo(()=>new Set(store.wishlist.map(x=>x.id)),[store.wishlist]);
   const moneyNGN=store.collection.filter(x=>x.currency==="NGN").reduce((s,x)=>s+x.amount,0);
-  const moneyUSD=store.collection.filter(x=>x.currency==="USD").reduce((s,x)=>s+x.amount,0);
+  const legacyUSD=store.collection.filter(x=>x.currency==="USD").length;
   const list=useMemo(()=>store.collection.filter(x=>(x.perfume.name+" "+x.perfume.brand).toLowerCase().includes(filter.toLowerCase())).sort((a,b)=>sort==="price"?b.amount-a.amount:sort==="alpha"?(a.perfume.name.localeCompare(b.perfume.name)):sort==="favorite"?Number(Boolean(b.favorite))-Number(Boolean(a.favorite)):b.added.localeCompare(a.added)),[store.collection,filter,sort]);
   function go(p:Page){setPage(p);setSelected(null);window.scrollTo({top:0,behavior:"smooth"});}
   function isOwned(p:Perfume){return ownedMap.has(p.id);}
   function wish(p:Perfume){p=resolved(p);setStore(s=>({...s,wishlist:s.wishlist.some(x=>x.id===p.id)?s.wishlist.filter(x=>x.id!==p.id):[p,...s.wishlist]}));}
-  function openPrice(p:Perfume){p=resolved(p);setSelected(null);setPriceOpen(p);const old=ownedMap.get(p.id);setPrice(old?String(old.amount):"");setCurrency(old?.currency||store.currency);}
-  function savePrice(e:React.FormEvent){e.preventDefault();if(!priceOpen)return;const n=Number(price);if(!Number.isFinite(n)||n<0||price.trim()==="")return;const old=ownedMap.get(priceOpen.id);const item:Owned={perfume:priceOpen,amount:n,currency,added:old?.added||new Date().toISOString(),favorite:old?.favorite||false};setStore(s=>({...s,currency,collection:[item,...s.collection.filter(x=>x.perfume.id!==priceOpen.id)],wishlist:s.wishlist.filter(x=>x.id!==priceOpen.id)}));setPriceOpen(null);}
+  function openPrice(p:Perfume){p=resolved(p);setSelected(null);setPriceOpen(p);const old=ownedMap.get(p.id);setPrice(old?.currency==="NGN"?String(old.amount):"");}
+  function savePrice(e:React.FormEvent){e.preventDefault();if(!priceOpen)return;const n=Number(price);if(!Number.isFinite(n)||n<0||price.trim()==="")return;const old=ownedMap.get(priceOpen.id);const item:Owned={perfume:priceOpen,amount:n,currency:"NGN",added:old?.added||new Date().toISOString(),favorite:old?.favorite||false};setStore(s=>({...s,collection:[item,...s.collection.filter(x=>x.perfume.id!==priceOpen.id)],wishlist:s.wishlist.filter(x=>x.id!==priceOpen.id)}));setPriceOpen(null);}
   function remove(p:Perfume){if(!window.confirm("Remove "+p.name+" from your collection?"))return;setStore(s=>({...s,collection:s.collection.filter(x=>x.perfume.id!==p.id)}));setSelected(null);}
   function favorite(p:Perfume){setStore(s=>({...s,collection:s.collection.map(x=>x.perfume.id===p.id?{...x,favorite:!x.favorite}:x)}));}
   function exportBackup(){const blob=new Blob([JSON.stringify({app:"Scent Cabinet",version:1,exportedAt:new Date().toISOString(),...store},null,2)],{type:"application/json"});const href=URL.createObjectURL(blob);const a=document.createElement("a");a.href=href;a.download="scent-cabinet-backup-"+today()+".json";document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(href),500);}
@@ -182,7 +180,7 @@ function Fragrance(){
         <span className="sc-perfume-brand">{p.brand}</span>
         <button className="sc-name" onClick={()=>setSelected(p)}>{p.name}</button>
         <span className="sc-perfume-meta">{p.family||p.accords.slice(0,2).join(" · ")||"Fragrance"}</span>
-        {owned?<strong className="sc-price">{money(owned.amount,owned.currency)}</strong>:null}
+        {owned?<strong className="sc-price">{owned.currency==="NGN"?money(owned.amount,"NGN"):"Set ₦ price"}</strong>:null}
         <div className="sc-perfume-actions">
           {context==="collection"?
           <><button onClick={()=>openPrice(p)}>Edit price</button><button onClick={()=>favorite(p)} title="Favourite" aria-label="Toggle favourite"><Heart size={17} fill={owned?.favorite?"currentColor":"none"}/></button></>:
@@ -198,7 +196,7 @@ function Fragrance(){
   return <main id="main-content" className="sc-app">
     <header className="sc-topbar"><a href="/" className="sc-back"><ArrowLeft size={17}/> IBRAHIM ALLI</a><a href="/fragrance" className="sc-wordmark" aria-label="Scent Cabinet home">SCENT<span> / </span>CABINET</a><button className="sc-top-action" onClick={()=>setBackupOpen(true)}><Download size={17}/><span>My data</span></button></header>
     <div className="sc-inner">
-      {(page==="collection"||page==="worth")&&<div className="sc-stats"><div><span>BOTTLES</span><strong>{store.collection.length}</strong></div><div><span>WISHLIST</span><strong>{store.wishlist.length}</strong></div><div><span>₦ WORTH</span><strong>{money(moneyNGN,"NGN")}</strong></div><div><span>$ WORTH</span><strong>{money(moneyUSD,"USD")}</strong></div></div>}
+      {(page==="collection"||page==="worth")&&<div className="sc-stats sc-stats-naira"><div><span>BOTTLES</span><strong>{store.collection.length}</strong></div><div><span>WISHLIST</span><strong>{store.wishlist.length}</strong></div><div><span>COLLECTION WORTH</span><strong>{money(moneyNGN,"NGN")}</strong></div></div>}
       <nav className="sc-tabs" aria-label="Fragrance sections">
         {([["collection","My collection",ShoppingBag],["discover","Discover",Search],["wishlist","Wishlist",Heart],["worth","Collection worth",Wallet],["layer","Layer lab",Layers]] as const).map(([key,label,Icon])=><button key={key} className={page===key?"active":""} onClick={()=>go(key)}><Icon size={18}/>{label}</button>)}
       </nav>
@@ -223,7 +221,8 @@ function Fragrance(){
         <div className="sc-section-head"><div><h2>Collection worth</h2></div><button className="sc-primary" onClick={()=>go("discover")}><Plus size={17}/> Add a bottle</button></div>
         <div className="sc-worth-summary"><div><span>₦ PURCHASE TOTAL</span><strong>{money(moneyNGN,"NGN")}</strong></div><div><span>$ PURCHASE TOTAL</span><strong>{money(moneyUSD,"USD")}</strong></div></div>
 
-        <div className="sc-worth-list"><h3>My purchase prices</h3>{store.collection.length?store.collection.map(x=><div key={x.perfume.id}><span>{x.perfume.brand} <strong>{x.perfume.name}</strong></span><strong>{money(x.amount,x.currency)}</strong><button onClick={()=>openPrice(x.perfume)}>Edit</button></div>):<p>No fragrances added yet.</p>}</div>
+        {legacyUSD>0&&<p className="sc-legacy-note">{legacyUSD} older dollar-priced bottle(s) are excluded until you enter a naira price.</p>}
+        <div className="sc-worth-list"><h3>Purchase prices</h3>{store.collection.length?store.collection.map(x=><div key={x.perfume.id}><span>{x.perfume.brand} <strong>{x.perfume.name}</strong></span><strong>{x.currency==="NGN"?money(x.amount,"NGN"):"Set ₦ price"}</strong><button onClick={()=>openPrice(x.perfume)}>Edit</button></div>):<p>No fragrances added yet.</p>}</div>
       </section>}
       {page==="layer"&&<section className="sc-section"><div className="sc-section-head"><div><span className="sc-kicker">05 / THE EXPERIMENTAL STUDIO</span><h2>Layer <em>lab.</em></h2><p>Pair two perfumes from your shelf and discover shared scent notes. Suggestions aren't verified performance predictions.</p></div></div>
         {store.collection.length<2?<div className="sc-empty"><Layers size={45}/><h3>Two bottles make a combination.</h3><p>Collect at least two fragrances to start mixing.</p><button className="sc-primary" onClick={()=>go("discover")}>Expand my shelf</button></div>:<div className="sc-layer-panel"><div className="sc-pair"><label>FIRST FRAGRANCE<select value={layerA} onChange={e=>setLayerA(e.target.value)}><option value="">Choose a bottle</option>{allMyPerfumes.map(p=><option key={p.id} value={p.id}>{p.brand} — {p.name}</option>)}</select></label><Plus size={22}/><label>SECOND FRAGRANCE<select value={layerB} onChange={e=>setLayerB(e.target.value)}><option value="">Choose another</option>{allMyPerfumes.filter(p=>p.id!==layerA).map(p=><option key={p.id} value={p.id}>{p.brand} — {p.name}</option>)}</select></label></div>{left&&right&&left.id!==right.id&&<div className="sc-layer-result"><Sparkles size={27}/><h3>{left.name} <span>×</span> {right.name}</h3><p>{match.length?"Shared notes / accords: "+[...new Set(match)].join(", "):"No shared notes were listed by the database. Try one spray of each and assess on your own skin."}</p><button className="sc-primary" onClick={()=>setStore(s=>({...s,mixes:[{id:id(),left:left.id,right:right.id,date:today()},...s.mixes]}))}>Save this combination <Bookmark size={16}/></button></div>}</div>}
@@ -233,7 +232,7 @@ function Fragrance(){
     </div>
     <nav className="sc-mobile-nav" aria-label="Mobile fragrance navigation">{([["collection",ShoppingBag,"Shelf"],["discover",Search,"Discover"],["wishlist",Heart,"Wishlist"],["worth",Wallet,"Worth"],["layer",Layers,"Layer"]] as const).map(([key,Icon,text])=><button key={key} className={page===key?"active":""} onClick={()=>go(key)}><Icon size={21}/><span>{text}</span></button>)}</nav>
     {selected&&<div className="sc-overlay" role="presentation" onMouseDown={e=>{if(e.target===e.currentTarget)setSelected(null)}}><section className="sc-detail" role="dialog" aria-modal="true" aria-label={selected.name}><button className="sc-modal-close" onClick={()=>setSelected(null)} aria-label="Close"><X size={22}/></button><div className="sc-detail-art">{pic(resolved(selected),"hero")}</div><div className="sc-detail-copy"><span className="sc-kicker">{selected.brand.toUpperCase()}</span><h2>{selected.name}</h2><p className="sc-detail-meta">{[selected.family,selected.year].filter(Boolean).join(" · ")||"Fragrance profile"}</p>{selected.description&&<p>{selected.description}</p>}{selected.accords.length>0&&<div className="sc-notes"><strong>MAIN ACCORDS</strong><p>{selected.accords.join(" · ")}</p></div>}{([["TOP NOTES",selected.top],["HEART NOTES",selected.heart],["BASE NOTES",selected.base],["OTHER NOTES",selected.notes]] as const).map(([label,arr])=>arr.length>0&&<div key={label} className="sc-notes"><strong>{label}</strong><p>{arr.join(" · ")}</p></div>)}<div className="sc-detail-actions"><button className="sc-primary" onClick={()=>openPrice(selected!)}>{isOwned(selected)?"Edit purchase price":"Add to my shelf"} <ArrowRight size={17}/></button><button className="sc-secondary" onClick={()=>wish(selected!)}><Heart size={18} fill={wishIds.has(selected.id)?"currentColor":"none"}/>{wishIds.has(selected.id)?"Wishlisted":"Wishlist"}</button>{isOwned(selected)&&<><button className="sc-danger" onClick={()=>remove(selected!)}><Trash2 size={17}/> Remove</button></>}</div></div></section></div>}
-    {priceOpen&&<div className="sc-overlay" onMouseDown={e=>{if(e.target===e.currentTarget)setPriceOpen(null)}}><section className="sc-price-dialog" role="dialog" aria-modal="true" aria-label="Save perfume price"><button className="sc-modal-close" onClick={()=>setPriceOpen(null)} aria-label="Close"><X size={22}/></button><h2>{ownedMap.has(priceOpen.id)?"Update purchase price":"Add to my collection"}</h2><p>{priceOpen.brand} · <strong>{priceOpen.name}</strong></p><form onSubmit={savePrice}><label>HOW MUCH DID YOU PAY?</label><div className="sc-money-input"><select aria-label="Currency" value={currency} onChange={e=>setCurrency(e.target.value as Currency)}><option value="NGN">₦ NGN</option><option value="USD">$ USD</option></select><input autoFocus type="number" inputMode="decimal" min="0" step="0.01" required value={price} onChange={e=>setPrice(e.target.value)} placeholder="0.00" /></div><p className="sc-small-note"></p><button className="sc-primary" type="submit"><Check size={18}/> Save perfume</button></form></section></div>}
+    {priceOpen&&<div className="sc-overlay" onMouseDown={e=>{if(e.target===e.currentTarget)setPriceOpen(null)}}><section className="sc-price-dialog" role="dialog" aria-modal="true" aria-label="Save perfume price"><button className="sc-modal-close" onClick={()=>setPriceOpen(null)} aria-label="Close"><X size={22}/></button><h2>{ownedMap.has(priceOpen.id)?"Update purchase price":"Add to my collection"}</h2><p>{priceOpen.brand} · <strong>{priceOpen.name}</strong></p><form onSubmit={savePrice}><label>HOW MUCH DID YOU PAY?</label><div className="sc-money-input"><span className="sc-money-prefix">₦</span><input autoFocus type="number" inputMode="decimal" min="0" step="0.01" required value={price} onChange={e=>setPrice(e.target.value)} placeholder="0.00" /></div><p className="sc-small-note"></p><button className="sc-primary" type="submit"><Check size={18}/> Save perfume</button></form></section></div>}
     {backupOpen&&<div className="sc-overlay" onMouseDown={e=>{if(e.target===e.currentTarget)setBackupOpen(false)}}><section className="sc-price-dialog" role="dialog" aria-modal="true" aria-label="Backup your collection"><button className="sc-modal-close" onClick={()=>setBackupOpen(false)} aria-label="Close"><X size={22}/></button><h2>Backup & <em>restore.</em></h2><p>Your collection is saved in this browser. Export a backup before changing devices.</p><button className="sc-primary sc-block" onClick={exportBackup}><Download size={18}/> Download backup</button><button className="sc-secondary sc-block" onClick={()=>fileRef.current?.click()}><Upload size={18}/> Restore from JSON</button><input hidden ref={fileRef} type="file" accept="application/json,.json" onChange={importBackup}/><div className="sc-privacy-note"><CloudOff size={19}/><span>No automatic sync between devices.</span></div></section></div>}
   </main>;
 }
