@@ -219,7 +219,7 @@ function Fragrance(){
       </section>}
       {page==="worth"&&<section className="sc-section">
         <div className="sc-section-head"><div><h2>Collection worth</h2></div><button className="sc-primary" onClick={()=>go("discover")}><Plus size={17}/> Add a bottle</button></div>
-        <div className="sc-worth-summary"><div><span>₦ PURCHASE TOTAL</span><strong>{money(moneyNGN,"NGN")}</strong></div><div><span>$ PURCHASE TOTAL</span><strong>{money(moneyUSD,"USD")}</strong></div></div>
+        <div className="sc-worth-summary sc-worth-one"><div><span>₦ TOTAL PAID</span><strong>{money(moneyNGN,"NGN")}</strong></div></div>
 
         {legacyUSD>0&&<p className="sc-legacy-note">{legacyUSD} older dollar-priced bottle(s) are excluded until you enter a naira price.</p>}
         <div className="sc-worth-list"><h3>Purchase prices</h3>{store.collection.length?store.collection.map(x=><div key={x.perfume.id}><span>{x.perfume.brand} <strong>{x.perfume.name}</strong></span><strong>{x.currency==="NGN"?money(x.amount,"NGN"):"Set ₦ price"}</strong><button onClick={()=>openPrice(x.perfume)}>Edit</button></div>):<p>No fragrances added yet.</p>}</div>
