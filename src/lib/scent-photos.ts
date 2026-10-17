@@ -52,11 +52,12 @@ export function blobAsDataUrl(blob:Blob):Promise<string>{
 }
 export function dataUrlAsBlob(data:string):Blob{
   const match=/^data:(image\/(?:webp|jpeg|png));base64,([a-zA-Z0-9+/=]+)$/.exec(data);
-  if(!match||data.length>1_000_000)throw new Error("Invalid backup image.");
-  const binary=atob(match[2]);
+  const mime=match?.[1], encoded=match?.[2];
+  if(!mime||!encoded||data.length>1_000_000)throw new Error("Invalid backup image.");
+  const binary=atob(encoded);
   const bytes=new Uint8Array(binary.length);
   for(let i=0;i<binary.length;i++)bytes[i]=binary.charCodeAt(i);
-  return new Blob([bytes],{type:match[1]});
+  return new Blob([bytes],{type:mime});
 }
 /** Resize client-side for storage and backup; keep aspect ratio and cap output size. */
 export async function compressScentPhoto(file:File):Promise<Blob>{
