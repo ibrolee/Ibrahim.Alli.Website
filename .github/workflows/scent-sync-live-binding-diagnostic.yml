@@ -27,3 +27,5 @@ jobs:
           done
 
 # Recheck after direct Cloudflare runtime binding fix.
+
+# Check account initialization after first setup attempt.
