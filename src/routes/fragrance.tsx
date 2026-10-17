@@ -64,7 +64,7 @@ function sanitize(source: any): State {
 }
 function money(value:number,c:Currency) { return new Intl.NumberFormat("en-US",{style:"currency",currency:c,minimumFractionDigits:0,maximumFractionDigits:2}).format(value).replace("NGN","₦"); }
 function pic(p:Perfume,size="card",ownerPhoto?:string){
-  const verifiedImage = ownerPhoto || (p.id.startsWith("db:fragella:") && p.image?.startsWith("https://") ? p.image : undefined);
+  const verifiedImage = ownerPhoto || ((p.id.startsWith("db:fragella:") || p.id.startsWith("db:noteboxd:")) && p.image?.startsWith("https://") ? p.image : undefined);
   return <span className="sc-art sc-photo-only">
     <span className="sc-no-photo"><ImageOff size={size==="hero"?26:19} strokeWidth={1.35}/><small>No bottle photo</small></span>
     {verifiedImage && <img loading={size==="hero"?"eager":"lazy"} decoding="async" src={verifiedImage} alt={p.brand+" "+p.name+" fragrance bottle"} onError={e=>{e.currentTarget.style.display="none"}}/>}
@@ -250,7 +250,7 @@ function Fragrance(){
         try{response=await fetch(API+path+"?"+params,{signal:ctrl.signal,headers:{Accept:"application/json"}});}finally{clearTimeout(t);}
         if(!response.ok)throw Error("The fragrance database responded "+response.status);
         const payload=await response.json();
-        setCatalogueNotice(typeof payload.providerWarning==="string"?payload.providerWarning:payload.source==="starter"&&!payload.connected?"Full catalogue not connected yet. Showing starter selection.":"");
+        setCatalogueNotice(typeof payload.providerWarning==="string"?payload.providerWarning:"");
         const rows=Array.isArray(payload)?payload:payload.results||payload.fragrances||payload.items||payload.data?.results;
         if(!Array.isArray(rows))throw Error("Catalogue format not recognised");
         const items=rows.map(normalize).filter((p:Perfume|null):p is Perfume=>Boolean(p));
