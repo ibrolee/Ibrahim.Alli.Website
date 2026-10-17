@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { ArrowLeft, ArrowRight, Bookmark, Check, ChevronDown, CloudOff, Download, FlaskConical, Heart, Layers, Plus, Search, ShoppingBag, Sparkles, Trash2, Upload, Wallet, X } from "lucide-react";
+import { ArrowLeft, ArrowRight, Bookmark, Check, ChevronDown, CloudOff, Download, FlaskConical, Heart, ImageOff, Layers, Plus, Search, ShoppingBag, Sparkles, Trash2, Upload, Wallet, X } from "lucide-react";
 import { seedSearch } from "@/lib/scent-catalog-seed";
 import css from "../fragrance.css?url";
 
@@ -25,7 +25,7 @@ function bits(value: unknown): string[] {
   return String(value).split(/[,;|]/).map(s => s.trim()).filter(Boolean).slice(0, 35);
 }
 function imageFrom(d: Record<string, any>): string | undefined {
-  const candidates = [d["Image URL Transparent"],d["Image URL"],d["image_url"],d["image"],d["imageUrl"],d["photo"],d["thumbnail"],d["images"]];
+  const candidates = [d["Image URL"],d["Image URL Transparent"],d["image_url"],d["image"],d["imageUrl"],d["photo"],d["thumbnail"],d["images"]];
   for (const c of candidates) {
     const val = typeof c === "string" ? c : Array.isArray(c) ? c[0] : c?.url || c?.src;
     if (typeof val === "string" && /^https:\/\//i.test(val)) return val;
@@ -39,14 +39,14 @@ function normalize(row: any): Perfume | null {
   const rawBrand = d.Brand || d.brand || d.house || d.brand_name || "";
   const brand = typeof rawBrand === "object" ? String(rawBrand?.name || "Unknown house") : String(rawBrand || "Unknown house");
   if (!name) return null;
-  const top = bits(d.top_notes || d.top || d["Top Notes"] || d.Top);
-  const heart = bits(d.middle_notes || d.heart_notes || d.heart || d["Middle Notes"] || d.Heart);
-  const base = bits(d.base_notes || d.base || d["Base Notes"] || d.Base);
+  const top = bits(d["Notes"]?.["Top"] || d.top_notes || d.top || d["Top Notes"] || d.Top);
+  const heart = bits(d["Notes"]?.["Middle"] || d.middle_notes || d.heart_notes || d.heart || d["Middle Notes"] || d.Heart);
+  const base = bits(d["Notes"]?.["Base"] || d.base_notes || d.base || d["Base Notes"] || d.Base);
   return {
-    id: "db:" + String(row.id || d.id || brand + ":" + name),
+    id: "db:" + String(row.id || row._id || d.id || d._id || brand + ":" + name),
     name, brand, image: imageFrom(d), top, heart, base,
     notes: [...new Set([...bits(d.notes || d.Notes || d.note_pyramid),...top,...heart,...base])],
-    accords: bits(d.accords || d.Accords || d.main_accords || d["Main Accords"]),
+    accords: bits(d["Main Accords"] || d.accords || d.Accords || d.main_accords),
     year: String(d.year || d.Year || d.release_year || ""), family: String(d.family || d.Family || d.fragrance_family || ""),
     description: String(d.description || d.Description || "").slice(0, 900)
   };
@@ -63,13 +63,10 @@ function sanitize(source: any): State {
 }
 function money(value:number,c:Currency) { return new Intl.NumberFormat("en-US",{style:"currency",currency:c,minimumFractionDigits:0,maximumFractionDigits:2}).format(value).replace("NGN","₦"); }
 function pic(p:Perfume,size="card"){
-  // Branded bottle photographs come only from verified catalogue URLs.
-  // If none exists, draw clearly illustrative bottle artwork rather than a blank/broken photo.
-  const hue=Array.from(p.brand+" "+p.name).reduce((a,c)=>a+c.charCodeAt(0),0)%5;
-  const shortBrand=p.brand.replace(/\s*\(.*\)/,"");
-  return <span className={"sc-art sc-art-"+hue} aria-label={!p.image?"Bottle illustration, photo unavailable":undefined}>
-    <span className="sc-bottle"><span className="sc-bottle-cap"/><span className="sc-bottle-neck"/><span className="sc-bottle-glass"><span className="sc-bottle-label"><small>{shortBrand}</small><strong>{p.name}</strong></span></span></span>
-    {p.image&&<img loading={size==="hero"?"eager":"lazy"} decoding="async" src={p.image} alt={p.brand+" "+p.name+" perfume bottle"} onError={e=>{e.currentTarget.style.display="none"}}/>}
+  const verifiedImage = p.id.startsWith("db:fragella:") && p.image?.startsWith("https://") ? p.image : undefined;
+  return <span className="sc-art sc-photo-only">
+    <span className="sc-no-photo"><ImageOff size={size==="hero"?26:19} strokeWidth={1.35}/><small>No bottle photo</small></span>
+    {verifiedImage && <img loading={size==="hero"?"eager":"lazy"} decoding="async" src={verifiedImage} alt={p.brand+" "+p.name+" fragrance bottle"} onError={e=>{e.currentTarget.style.display="none"}}/>}
   </span>;
 }
 function today(){return new Date().toISOString().slice(0,10);}
@@ -97,8 +94,6 @@ function Fragrance(){
   const [searching,setSearching]=useState(false);
   const [error,setError]=useState("");
   const [catalogueNotice,setCatalogueNotice]=useState("");
-  const [photos,setPhotos]=useState<Record<string,string>>({});
-  const photoRequested=useRef(new Set<string>());
   const [refreshKey,setRefreshKey]=useState(0);
   const [selected,setSelected]=useState<Perfume|null>(null);
   const [priceOpen,setPriceOpen]=useState<Perfume|null>(null);
@@ -112,19 +107,6 @@ function Fragrance(){
   const searchId=useRef(0);
   useEffect(()=>{try{const s=localStorage.getItem(STORAGE);if(s)setStore(sanitize(JSON.parse(s)));}catch{}setReady(true)},[]);
   useEffect(()=>{if(ready)try{localStorage.setItem(STORAGE,JSON.stringify(store));}catch{setError("Your browser storage is full. Export your collection to keep a backup.");}},[store,ready]);
-  useEffect(()=>{
-    const source=page==="discover"?results:page==="collection"?store.collection.map(x=>x.perfume):page==="wishlist"?store.wishlist:[];
-    const missing=source.filter(p=>!p.image&&!photos[p.id]&&(p.id.startsWith("db:seed:")||p.id.startsWith("seed:"))&&!photoRequested.current.has(p.id)).slice(0,12);
-    if(!missing.length)return;
-    missing.forEach(p=>photoRequested.current.add(p.id));
-    const url=API+"/images?items="+encodeURIComponent(JSON.stringify(missing.map(p=>({id:p.id,brand:p.brand,name:p.name}))));
-    const ctrl=new AbortController();
-    fetch(url,{signal:ctrl.signal}).then(res=>res.ok?res.json():null).then(data=>{
-      if(data&&data.images&&typeof data.images==="object")setPhotos(current=>({...current,...data.images}));
-    }).catch(()=>{});
-    return()=>ctrl.abort();
-  },[page,results,store.collection,store.wishlist]);
-  function resolved(p:Perfume){return photos[p.id]?{...p,image:photos[p.id]}:p;}
   const ownedMap=useMemo(()=>new Map(store.collection.map(x=>[x.perfume.id,x])),[store.collection]);
   const wishIds=useMemo(()=>new Set(store.wishlist.map(x=>x.id)),[store.wishlist]);
   const moneyNGN=store.collection.filter(x=>x.currency==="NGN").reduce((s,x)=>s+x.amount,0);
@@ -132,8 +114,8 @@ function Fragrance(){
   const list=useMemo(()=>store.collection.filter(x=>(x.perfume.name+" "+x.perfume.brand).toLowerCase().includes(filter.toLowerCase())).sort((a,b)=>sort==="price"?b.amount-a.amount:sort==="alpha"?(a.perfume.name.localeCompare(b.perfume.name)):sort==="favorite"?Number(Boolean(b.favorite))-Number(Boolean(a.favorite)):b.added.localeCompare(a.added)),[store.collection,filter,sort]);
   function go(p:Page){setPage(p);setSelected(null);window.scrollTo({top:0,behavior:"smooth"});}
   function isOwned(p:Perfume){return ownedMap.has(p.id);}
-  function wish(p:Perfume){p=resolved(p);setStore(s=>({...s,wishlist:s.wishlist.some(x=>x.id===p.id)?s.wishlist.filter(x=>x.id!==p.id):[p,...s.wishlist]}));}
-  function openPrice(p:Perfume){p=resolved(p);setSelected(null);setPriceOpen(p);const old=ownedMap.get(p.id);setPrice(old?.currency==="NGN"?String(old.amount):"");}
+  function wish(p:Perfume){setStore(s=>({...s,wishlist:s.wishlist.some(x=>x.id===p.id)?s.wishlist.filter(x=>x.id!==p.id):[p,...s.wishlist]}));}
+  function openPrice(p:Perfume){setSelected(null);setPriceOpen(p);const old=ownedMap.get(p.id);setPrice(old?.currency==="NGN"?String(old.amount):"");}
   function savePrice(e:React.FormEvent){e.preventDefault();if(!priceOpen)return;const n=Number(price);if(!Number.isFinite(n)||n<0||price.trim()==="")return;const old=ownedMap.get(priceOpen.id);const item:Owned={perfume:priceOpen,amount:n,currency:"NGN",added:old?.added||new Date().toISOString(),favorite:old?.favorite||false};setStore(s=>({...s,collection:[item,...s.collection.filter(x=>x.perfume.id!==priceOpen.id)],wishlist:s.wishlist.filter(x=>x.id!==priceOpen.id)}));setPriceOpen(null);}
   function remove(p:Perfume){if(!window.confirm("Remove "+p.name+" from your collection?"))return;setStore(s=>({...s,collection:s.collection.filter(x=>x.perfume.id!==p.id)}));setSelected(null);}
   function favorite(p:Perfume){setStore(s=>({...s,collection:s.collection.map(x=>x.perfume.id===p.id?{...x,favorite:!x.favorite}:x)}));}
@@ -153,14 +135,14 @@ function Fragrance(){
         try{response=await fetch(API+path+"?"+params,{signal:ctrl.signal,headers:{Accept:"application/json"}});}finally{clearTimeout(t);}
         if(!response.ok)throw Error("The fragrance database responded "+response.status);
         const payload=await response.json();
-        setCatalogueNotice(typeof payload.providerWarning === "string" ? payload.providerWarning : payload.source === "curated" ? "Showing the built-in fragrance selection; search for more using the community catalogue." : "Community product images and names: Open Beauty Facts. Scent notes appear only when reliably available.");
+        setCatalogueNotice(typeof payload.providerWarning==="string"?payload.providerWarning:payload.source==="starter"&&!payload.connected?"Full catalogue not connected yet. Showing starter selection.":"");
         const rows=Array.isArray(payload)?payload:payload.results||payload.fragrances||payload.items||payload.data?.results;
         if(!Array.isArray(rows))throw Error("Catalogue format not recognised");
         const items=rows.map(normalize).filter((p:Perfume|null):p is Perfume=>Boolean(p));
         if(n!==searchId.current)return;
         setResults(old=>catalogPage===1?items:[...old,...items.filter(x=>!old.some(y=>x.id===y.id))]);
         const total=Number(payload.total);
-        setHasMore(Number.isFinite(total)&&total>0?catalogPage*20<total:rows.length===20);
+        setHasMore(typeof payload.hasMore==="boolean"?payload.hasMore:Number.isFinite(total)&&total>0?catalogPage*(payload.source==="fragella"?10:20)<total:false);
         try{sessionStorage.setItem("ia-scent-last-search",JSON.stringify({query,page:catalogPage,items,time:Date.now()}));}catch{}
       }catch(err){
         if(n!==searchId.current||ctrl.signal.aborted)return;
@@ -175,7 +157,7 @@ function Fragrance(){
   const item=(p:Perfume,context:Page)=>{
     const owned=ownedMap.get(p.id);
     return <article className="sc-perfume" key={p.id}>
-      <button className="sc-perfume-image" onClick={()=>setSelected(p)} aria-label={"Details for "+p.name}>{pic(resolved(p))}</button>
+      <button className="sc-perfume-image" onClick={()=>setSelected(p)} aria-label={"Details for "+p.name}>{pic(p)}</button>
       <div className="sc-perfume-info">
         <span className="sc-perfume-brand">{p.brand}</span>
         <button className="sc-name" onClick={()=>setSelected(p)}>{p.name}</button>
@@ -210,8 +192,8 @@ function Fragrance(){
         <div className="sc-chips">{["Qasida","Bakhur","Lattafa","Afnan","Dior","Tom Ford"].map(t=><button key={t} onClick={()=>{setQuery(t);setCatalogPage(1)}}>{t}</button>)}</div>
 
         {error&&<div className="sc-warning"><CloudOff size={19}/><span>{error}</span><button onClick={()=>setRefreshKey(k=>k+1)}>Retry</button></div>}
-        {catalogueNotice.includes("unavailable")&&<p className="sc-source-note">{catalogueNotice}</p>}
-        {results.length>0?<><div className="sc-grid">{results.map(p=>item(p,"discover"))}</div>{hasMore&&<button className="sc-loadmore" disabled={searching} onClick={()=>setCatalogPage(x=>x+1)}>{searching?"Loading...":"Load more fragrances"} <ChevronDown size={18}/></button>}</>:searching?<div className="sc-loading">Searching the fragrance library…</div>:!error?<div className="sc-empty"><Search size={40}/><h3>No matching fragrances.</h3><p>Try another spelling or brand name.</p></div>:null}
+        {catalogueNotice&&<p className="sc-source-note">{catalogueNotice}</p>}
+        {results.length>0?<><div className="sc-grid">{results.map(p=>item(p,"discover"))}</div>{hasMore&&<button className="sc-loadmore" disabled={searching} onClick={()=>setCatalogPage(x=>x+1)}>{searching?"Loading...":"Load more fragrances"} <ChevronDown size={18}/></button>}</>:searching?<div className="sc-loading">Searching the fragrance library…</div>:!error?<div className="sc-empty"><Search size={40}/><h3>No matching fragrances.</h3><p>Try a different name, or add a missing fragrance.</p></div>:null}
       </section>}
       {page==="wishlist"&&<section className="sc-section">
         <div className="sc-section-head"><div><h2>Wishlist</h2></div><button className="sc-primary" onClick={()=>go("discover")}><Plus size={17}/> Find fragrances</button></div>
@@ -231,7 +213,7 @@ function Fragrance(){
       <footer className="sc-footer"><span>SCENT / CABINET</span><button onClick={()=>setBackupOpen(true)}>Backup <ArrowRight size={15}/></button></footer>
     </div>
     <nav className="sc-mobile-nav" aria-label="Mobile fragrance navigation">{([["collection",ShoppingBag,"Shelf"],["discover",Search,"Discover"],["wishlist",Heart,"Wishlist"],["worth",Wallet,"Worth"],["layer",Layers,"Layer"]] as const).map(([key,Icon,text])=><button key={key} className={page===key?"active":""} onClick={()=>go(key)}><Icon size={21}/><span>{text}</span></button>)}</nav>
-    {selected&&<div className="sc-overlay" role="presentation" onMouseDown={e=>{if(e.target===e.currentTarget)setSelected(null)}}><section className="sc-detail" role="dialog" aria-modal="true" aria-label={selected.name}><button className="sc-modal-close" onClick={()=>setSelected(null)} aria-label="Close"><X size={22}/></button><div className="sc-detail-art">{pic(resolved(selected),"hero")}</div><div className="sc-detail-copy"><span className="sc-kicker">{selected.brand.toUpperCase()}</span><h2>{selected.name}</h2><p className="sc-detail-meta">{[selected.family,selected.year].filter(Boolean).join(" · ")||"Fragrance profile"}</p>{selected.description&&<p>{selected.description}</p>}{selected.accords.length>0&&<div className="sc-notes"><strong>MAIN ACCORDS</strong><p>{selected.accords.join(" · ")}</p></div>}{([["TOP NOTES",selected.top],["HEART NOTES",selected.heart],["BASE NOTES",selected.base],["OTHER NOTES",selected.notes]] as const).map(([label,arr])=>arr.length>0&&<div key={label} className="sc-notes"><strong>{label}</strong><p>{arr.join(" · ")}</p></div>)}<div className="sc-detail-actions"><button className="sc-primary" onClick={()=>openPrice(selected!)}>{isOwned(selected)?"Edit purchase price":"Add to my shelf"} <ArrowRight size={17}/></button><button className="sc-secondary" onClick={()=>wish(selected!)}><Heart size={18} fill={wishIds.has(selected.id)?"currentColor":"none"}/>{wishIds.has(selected.id)?"Wishlisted":"Wishlist"}</button>{isOwned(selected)&&<><button className="sc-danger" onClick={()=>remove(selected!)}><Trash2 size={17}/> Remove</button></>}</div></div></section></div>}
+    {selected&&<div className="sc-overlay" role="presentation" onMouseDown={e=>{if(e.target===e.currentTarget)setSelected(null)}}><section className="sc-detail" role="dialog" aria-modal="true" aria-label={selected.name}><button className="sc-modal-close" onClick={()=>setSelected(null)} aria-label="Close"><X size={22}/></button><div className="sc-detail-art">{pic(selected,"hero")}</div><div className="sc-detail-copy"><span className="sc-kicker">{selected.brand.toUpperCase()}</span><h2>{selected.name}</h2><p className="sc-detail-meta">{[selected.family,selected.year].filter(Boolean).join(" · ")||"Fragrance profile"}</p>{selected.description&&<p>{selected.description}</p>}{selected.accords.length>0&&<div className="sc-notes"><strong>MAIN ACCORDS</strong><p>{selected.accords.join(" · ")}</p></div>}{([["TOP NOTES",selected.top],["HEART NOTES",selected.heart],["BASE NOTES",selected.base],["OTHER NOTES",selected.notes]] as const).map(([label,arr])=>arr.length>0&&<div key={label} className="sc-notes"><strong>{label}</strong><p>{arr.join(" · ")}</p></div>)}<div className="sc-detail-actions"><button className="sc-primary" onClick={()=>openPrice(selected!)}>{isOwned(selected)?"Edit purchase price":"Add to my shelf"} <ArrowRight size={17}/></button><button className="sc-secondary" onClick={()=>wish(selected!)}><Heart size={18} fill={wishIds.has(selected.id)?"currentColor":"none"}/>{wishIds.has(selected.id)?"Wishlisted":"Wishlist"}</button>{isOwned(selected)&&<><button className="sc-danger" onClick={()=>remove(selected!)}><Trash2 size={17}/> Remove</button></>}</div></div></section></div>}
     {priceOpen&&<div className="sc-overlay" onMouseDown={e=>{if(e.target===e.currentTarget)setPriceOpen(null)}}><section className="sc-price-dialog" role="dialog" aria-modal="true" aria-label="Save perfume price"><button className="sc-modal-close" onClick={()=>setPriceOpen(null)} aria-label="Close"><X size={22}/></button><h2>{ownedMap.has(priceOpen.id)?"Update purchase price":"Add to my collection"}</h2><p>{priceOpen.brand} · <strong>{priceOpen.name}</strong></p><form onSubmit={savePrice}><label>HOW MUCH DID YOU PAY?</label><div className="sc-money-input"><span className="sc-money-prefix">₦</span><input autoFocus type="number" inputMode="decimal" min="0" step="0.01" required value={price} onChange={e=>setPrice(e.target.value)} placeholder="0.00" /></div><button className="sc-primary" type="submit"><Check size={18}/> Save perfume</button></form></section></div>}
     {backupOpen&&<div className="sc-overlay" onMouseDown={e=>{if(e.target===e.currentTarget)setBackupOpen(false)}}><section className="sc-price-dialog" role="dialog" aria-modal="true" aria-label="Backup your collection"><button className="sc-modal-close" onClick={()=>setBackupOpen(false)} aria-label="Close"><X size={22}/></button><h2>Backup & <em>restore.</em></h2><p>Your collection is saved in this browser. Export a backup before changing devices.</p><button className="sc-primary sc-block" onClick={exportBackup}><Download size={18}/> Download backup</button><button className="sc-secondary sc-block" onClick={()=>fileRef.current?.click()}><Upload size={18}/> Restore from JSON</button><input hidden ref={fileRef} type="file" accept="application/json,.json" onChange={importBackup}/><div className="sc-privacy-note"><CloudOff size={19}/><span>No automatic sync between devices.</span></div></section></div>}
   </main>;
