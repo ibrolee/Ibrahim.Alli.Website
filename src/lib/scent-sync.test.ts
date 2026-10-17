@@ -1,6 +1,6 @@
 import {describe,expect,test} from "bun:test";
 import {chooseCabinetSync,hasCabinetData} from "./scent-sync-client";
-import {scentSyncApi,type ScentD1} from "./scent-sync-server";
+import {scentSyncApi,SCENT_PBKDF2_ITERATIONS,type ScentD1} from "./scent-sync-server";
 const empty=()=>({collection:[],wishlist:[],combos:[],mixes:[],insights:{}});
 const withSix=()=>({...empty(),wishlist:Array.from({length:6},(_,i)=>({id:String(i),name:"Perfume "+i,brand:"Brand"}))});
 const url="https://ibrahimalli.com/api/fragrance/sync/";
@@ -44,6 +44,10 @@ class FakeD1 {
   }
 }
 describe("Scent Cabinet private sync",()=>{
+  test("PBKDF2 iteration count fits the Cloudflare Workers runtime ceiling",()=>{
+    expect(SCENT_PBKDF2_ITERATIONS).toBe(100000);
+    expect(SCENT_PBKDF2_ITERATIONS).toBeLessThanOrEqual(100000);
+  });
   test("empty Safari cannot overwrite six existing fragrances",()=>{
     expect(hasCabinetData(withSix())).toBe(true);
     expect(chooseCabinetSync(withSix(),null,0,null)).toBe("upload");
@@ -71,6 +75,7 @@ describe("Scent Cabinet private sync",()=>{
     const created=await scentSyncApi(request("setup","POST",{setupCode,password:"my-long-password-123"}),env);
     expect(created.status).toBe(201);
     expect(JSON.stringify(db.account)).not.toContain("my-long-password-123");
+    expect(db.account?.iterations).toBe(SCENT_PBKDF2_ITERATIONS);
     expect((await scentSyncApi(request("setup","POST",{setupCode,password:"second-password-123"}),env)).status).toBe(409);
     const bad=await scentSyncApi(request("login","POST",{password:"incorrect-password"}),env);
     expect(bad.status).toBe(401);
