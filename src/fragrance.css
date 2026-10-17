@@ -490,3 +490,26 @@
   .sc-cabinet-grid .sc-perfume .sc-name{font-size:17px}
   .sc-cabinet-grid .sc-perfume-actions button{font-size:9px}
 }
+
+/* Private Scent Cabinet cloud sync, using the existing site design. */
+.sc-top-controls{display:flex;align-items:center;gap:15px}
+.sc-topbar .sc-sync-trigger{display:inline-flex;align-items:center;gap:5px;min-height:39px}
+.sc-topbar .sc-sync-ok{color:#326d45}
+.sc-sync-dialog{max-height:min(92dvh,760px);overflow-y:auto}
+.sc-sync-dialog>svg{color:#41654c}
+.sc-sync-dialog h2{margin:5px 0 12px}
+.sc-sync-intro,.sc-sync-message{font-size:13px;line-height:1.6;color:#637568;margin:8px 0 17px}
+.sc-sync-state{display:flex;align-items:center;gap:9px;padding:11px 12px;background:#edf2ea;border:1px solid #d7e2d5;font-size:12px;color:#294b35;margin-bottom:12px}
+.sc-sync-dot{height:9px;width:9px;display:block;flex:none;border-radius:100%;background:#8b9d89}
+.sc-sync-synced{background:#2c8b4c}.sc-sync-syncing{background:#dc9a35}.sc-sync-error,.sc-sync-conflict{background:#ca7757}
+.sc-sync-form{display:flex;flex-direction:column;gap:8px;margin-top:16px}
+.sc-sync-form label{font-size:10px;color:#586f59;letter-spacing:.09em;font-weight:800}
+.sc-sync-form input{width:100%;min-height:46px;border:1px solid #cbd6c9;background:white;color:#213c2e;padding:10px 12px;font-size:16px}
+.sc-sync-form p,.sc-sync-conflict p{color:#68796a;font-size:12px;line-height:1.6}
+.sc-sync-form .sc-primary{margin-top:8px}
+.sc-sync-actions{display:flex;flex-wrap:wrap;gap:8px}
+.sc-sync-actions button{flex:1}
+.sc-sync-conflict{display:flex;flex-direction:column;gap:9px}
+.sc-sync-conflict small{color:#647466;font-size:11px;line-height:1.5}
+.sc-sync-footnote{color:#7a897d;font-size:11px;line-height:1.6;margin-top:18px;border-top:1px solid #e1e6df;padding-top:10px}
+@media(max-width:660px){.sc-top-controls{gap:12px}.sc-topbar .sc-sync-trigger{min-width:39px;justify-content:center}.sc-sync-dialog{padding-top:34px!important}}
