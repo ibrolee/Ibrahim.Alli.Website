@@ -28,6 +28,30 @@ jobs:
           echo "Worker entry exists; static assets were generated."
       - name: Wrangler packaging dry-run (no credentials or deployment)
         run: npx --yes wrangler@4.135.0 deploy --dry-run --outdir .cloudflare-dryrun
+      - name: Local Workers smoke tests (no Cloudflare deployment)
+        run: |
+          set -e
+          npx --yes wrangler@4.135.0 dev --local --ip 127.0.0.1 --port 8787 > worker-preview.log 2>&1 &
+          PID=$!
+          trap 'kill $PID 2>/dev/null || true' EXIT
+          ready=0
+          for i in $(seq 1 35); do
+            if curl -fsS --max-time 2 http://127.0.0.1:8787/ -o /tmp/portfolio-home.html; then
+              ready=1
+              break
+            fi
+            sleep 2
+          done
+          if [ "$ready" -ne 1 ]; then
+            tail -80 worker-preview.log
+            exit 1
+          fi
+          grep -qi 'Ibrahim' /tmp/portfolio-home.html
+          curl -fsS --max-time 20 http://127.0.0.1:8787/fragrance -o /tmp/fragrance-page.html
+          grep -qi 'Scent Cabinet' /tmp/fragrance-page.html
+          curl -fsS --max-time 10 http://127.0.0.1:8787/api/fragrance/browse -o /tmp/fragrance-browse.json
+          grep -q '"source":"starter"' /tmp/fragrance-browse.json
+          echo "Portfolio root, Scent Cabinet SSR, and fragrance API all responded under local workerd."
       - name: Summarize build output
         if: always()
         run: |
