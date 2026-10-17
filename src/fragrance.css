@@ -141,3 +141,19 @@
   .sc-detail-copy{padding-top:20px}
   .sc-detail-copy h2{font-size:37px}
 }
+
+.sc-stats-naira{grid-template-columns:.7fr .7fr 2.2fr}
+.sc-stats-naira>div:last-child{border-right:0}
+.sc-worth-one{grid-template-columns:minmax(0,1fr)}
+.sc-worth-one>div{max-width:100%}
+.sc-money-prefix{display:flex;align-items:center;justify-content:center;min-width:60px;background:#f5f5ee;border-right:1px solid #d8ddd5;font-size:22px;font-weight:700;color:#31553e}
+.sc-legacy-note{font-size:12px;line-height:1.45;color:#93682f;margin:7px 0;padding:8px 11px;border:1px solid #e4cda7;background:#fff9e9}
+@media(max-width:660px){
+ .sc-stats-naira{grid-template-columns:.7fr .7fr 2.2fr}
+ .sc-stats-naira>div{padding:5px 9px}
+ .sc-stats-naira>div:last-child span{font-size:9px;letter-spacing:.03em}
+ .sc-stats-naira>div:last-child strong{font-size:clamp(16px,4.3vw,23px)!important}
+ .sc-worth-one{grid-template-columns:minmax(0,1fr)}
+ .sc-worth-one strong{font-size:clamp(29px,9vw,46px)}
+ .sc-money-prefix{min-width:48px}
+}
