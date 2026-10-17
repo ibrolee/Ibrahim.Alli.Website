@@ -25,3 +25,5 @@ jobs:
             head -c 700 /tmp/scent_status_response 2>/dev/null || true
             echo
           done
+
+# Recheck after direct Cloudflare runtime binding fix.
