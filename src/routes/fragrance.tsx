@@ -160,7 +160,8 @@ function Fragrance(){
   const [error,setError]=useState("");
   const [catalogueNotice,setCatalogueNotice]=useState("");
   const [searchHint,setSearchHint]=useState("");
-  const [refreshKey,setRefreshKey]=useState(0);
+  // A null request means Discover is idle. Only a submitted search or Load more starts a fetch.
+  const [searchRequest,setSearchRequest]=useState<{term:string;source:CatalogSource;requestedPage:number}|null>(null);
   const [selected,setSelected]=useState<Perfume|null>(null);
   const [selectedBottleId,setSelectedBottleId]=useState<string|null>(null);
   const [selectedComboId,setSelectedComboId]=useState<string|null>(null);
@@ -301,10 +302,25 @@ function Fragrance(){
     if(submitted.length<3)return;
     setSearching(true);setError("");setCatalogueNotice("");setSearchHint("");
     setResults([]);setHasMore(false);setCatalogPage(1);setActiveSource(sourceChoice);
-    if(submitted===query&&sourceChoice===activeSource)setRefreshKey(k=>k+1);
-    else setQuery(submitted);
+    setQuery(submitted);
+    setSearchRequest({term:submitted,source:sourceChoice,requestedPage:1});
   }
-  function go(p:Page){setPage(p);setSelected(null);setSelectedBottleId(null);setSelectedComboId(null);setInsightEdit("closed");window.scrollTo({top:0,behavior:"smooth"});}
+  function clearDiscoverSearch(){
+    setSearchRequest(null);setSearching(false);
+    setDraftQuery("");setQuery("");setCatalogPage(1);setResults([]);setHasMore(false);
+    setError("");setSearchHint("");setCatalogueNotice("");setResultSource("");setResultSources([]);
+  }
+  function loadMoreDiscover(){
+    if(searching||!hasMore||!query.trim())return;
+    const requestedPage=catalogPage+1;
+    setCatalogPage(requestedPage);setSearching(true);
+    setSearchRequest({term:query,source:activeSource,requestedPage});
+  }
+  function go(p:Page){
+    // Leaving Discover cancels pending requests; returning never triggers a background search.
+    if(p!=="discover"){setSearchRequest(null);setSearching(false);}
+    setPage(p);setSelected(null);setSelectedBottleId(null);setSelectedComboId(null);setInsightEdit("closed");window.scrollTo({top:0,behavior:"smooth"});
+  }
   function openDetail(p:Perfume,bottle?:Owned,combo?:Combo){setSelected(p);setSelectedBottleId(bottle?.id||null);setSelectedComboId(combo?.id||null);setInsightEdit("closed");}
   function dateLabel(value:string){const d=new Date(value);return Number.isFinite(d.getTime())?d.toLocaleDateString("en-GB",{day:"numeric",month:"short",year:"numeric"}):"Date not recorded";}
   function editMyInsight(p:Perfume){
@@ -484,14 +500,15 @@ function Fragrance(){
     finally{e.target.value="";}
   }
   useEffect(()=>{
-    if(page!=="discover")return;
+    if(!searchRequest)return;
+    const {term,source,requestedPage}=searchRequest;
     const n=++searchId.current;const ctrl=new AbortController();
     const delay=setTimeout(async()=>{
       setSearching(true);setError("");setCatalogueNotice("");
       try{
-        const params=new URLSearchParams({page:String(catalogPage),per_page:"20",source:activeSource});
-        if(query.trim())params.set("q",query.trim());else params.set("sort","year_desc");
-        const path=query.trim()?"/search":"/browse";
+        const params=new URLSearchParams({page:String(requestedPage),per_page:"20",source});
+        params.set("q",term);
+        const path="/search";
         const t=setTimeout(()=>ctrl.abort(),18000);
         let response:Response;
         try{response=await fetch(API+path+"?"+params,{signal:ctrl.signal,headers:{Accept:"application/json"}});}finally{clearTimeout(t);}
@@ -507,19 +524,19 @@ function Fragrance(){
         if(!Array.isArray(rows))throw Error("Catalogue format not recognised");
         const items=rows.map(normalize).filter((p:Perfume|null):p is Perfume=>Boolean(p));
         if(n!==searchId.current)return;
-        setResults(old=>catalogPage===1?items:[...old,...items.filter(x=>!old.some(y=>sameScent(x,y)))]);
+        setResults(old=>requestedPage===1?items:[...old,...items.filter(x=>!old.some(y=>sameScent(x,y)))]);
         const total=Number(payload.total);
-        setHasMore(typeof payload.hasMore==="boolean"?payload.hasMore:Number.isFinite(total)&&total>0?catalogPage*(payload.source==="fragella"?10:20)<total:false);
-        try{sessionStorage.setItem("ia-scent-last-search",JSON.stringify({query,page:catalogPage,items,time:Date.now()}));}catch{}
+        setHasMore(typeof payload.hasMore==="boolean"?payload.hasMore:Number.isFinite(total)&&total>0?requestedPage*(payload.source==="fragella"?10:20)<total:false);
+        try{sessionStorage.setItem("ia-scent-last-search",JSON.stringify({query:term,page:requestedPage,items,time:Date.now()}));}catch{}
       }catch(err){
         if(n!==searchId.current)return;
         setError("Search unavailable. Please try again.");
-        setResults(old=>catalogPage===1?[]:old);
+        setResults(old=>requestedPage===1?[]:old);
         setHasMore(false);
       }finally{if(n===searchId.current)setSearching(false);}
     },40);
     return()=>{clearTimeout(delay);if(searchId.current===n)searchId.current++;ctrl.abort()};
-  },[page,query,catalogPage,refreshKey,activeSource]);
+  },[searchRequest]);
   // Keep both browsing and submitted searches photo-only, including free catalogues.
   // Preflight URLs using browser image loading
   // so broken provider photos never create empty product cards.
@@ -622,11 +639,12 @@ function Fragrance(){
       </section>}
       {page==="discover"&&<section className="sc-section">
         <div className="sc-section-head"><div><h2>Discover</h2></div><button className="sc-secondary sc-add-combo-discover" onClick={()=>startCombo("wishlist")}><Plus size={16}/> Combo</button></div>
-        <form className="sc-search" role="search" onSubmit={e=>{e.preventDefault();runDiscoverSearch(draftQuery)}}><Search size={20} aria-hidden="true"/><input autoFocus={false} value={draftQuery} onChange={e=>setDraftQuery(e.target.value)} placeholder="Perfume name or brand..." aria-label="Search perfumes" enterKeyHint="search"/>{draftQuery&&<button className="sc-search-clear" type="button" onClick={()=>{setDraftQuery("");setQuery("");setCatalogPage(1);setResults([]);setHasMore(false);setSearching(true);setSearchHint("");setRefreshKey(k=>k+1)}} aria-label="Clear search"><X size={18}/></button>}<button className="sc-search-submit" type="submit" disabled={draftQuery.trim().length<3||searching}>{searching?<><LoaderCircle className="sc-spin" size={16}/> Searching</>:<><Search size={16}/>{sourceChoice==="auto"?"Search all":"Search"}</>}</button></form>
+        <form className="sc-search" role="search" onSubmit={e=>{e.preventDefault();runDiscoverSearch(draftQuery)}}><Search size={20} aria-hidden="true"/><input autoFocus={false} value={draftQuery} onChange={e=>setDraftQuery(e.target.value)} placeholder="Perfume name or brand..." aria-label="Search perfumes" enterKeyHint="search"/>{draftQuery&&<button className="sc-search-clear" type="button" onClick={clearDiscoverSearch} aria-label="Clear search"><X size={18}/></button>}<button className="sc-search-submit" type="submit" disabled={draftQuery.trim().length<3||searching}>{searching?<><LoaderCircle className="sc-spin" size={16}/> Searching</>:<><Search size={16}/>{sourceChoice==="auto"?"Search all":"Search"}</>}</button></form>
         {searching&&<div className="sc-search-progress" role="status" aria-live="polite"><LoaderCircle className="sc-spin" size={18}/><div><strong>{catalogPage>1?"Loading more perfumes":query?"Searching for “"+query+"”":"Finding fragrances"}</strong><span>Checking available fragrance catalogues and matching names…</span></div></div>}
         {!searching&&searchHint&&<p className="sc-search-hint">{searchHint}</p>}
         <details className="sc-source-options"><summary>Choose a source (optional)</summary><div className="sc-source-picker"><label htmlFor="sc-search-source">Look in</label><select id="sc-search-source" value={sourceChoice} onChange={e=>setSourceChoice(e.target.value as CatalogSource)}>{SOURCES.map(s=><option key={s.id} value={s.id}>{s.name}</option>)}</select><span>Search all combines available sources and removes repeated perfumes. Then tap Search.</span></div></details>
-        <div className="sc-chips">{["Qasida","Bakhur","Lattafa","Afnan","Dior","Tom Ford"].map(t=><button key={t} onClick={()=>{setDraftQuery(t);runDiscoverSearch(t)}}>{t}</button>)}</div>
+        <div className="sc-chips">{["Qasida","Bakhur","Lattafa","Afnan","Dior","Tom Ford"].map(t=><button key={t} onClick={()=>setDraftQuery(t)}>{t}</button>)}</div>
+        <p className="sc-search-guidance">Choose a suggestion or type a perfume, then press Search. Nothing searches automatically.</p>
         <div className="sc-discover-tools"><button className="sc-filter-trigger" type="button" aria-expanded={showDiscoverFilters} onClick={()=>setShowDiscoverFilters(v=>!v)}> <Layers size={16}/> Filters & Sort {filterCount>0&&<span>{filterCount}</span>} <ChevronDown size={16} className={showDiscoverFilters?"sc-rotate":""}/></button>
           <span className="sc-filter-result-count">{filteredPhotographed.length} of {photographed.length} photographed results</span></div>
         {showDiscoverFilters&&<div className="sc-discover-filter-panel">
@@ -655,7 +673,7 @@ function Fragrance(){
         {error&&<div className="sc-warning"><CloudOff size={19}/><span>{error}</span><button onClick={()=>setRefreshKey(k=>k+1)}>Retry</button></div>}
         {catalogueNotice&&<p className="sc-source-note">{catalogueNotice}</p>}
         {photographed.length>0&&<div className="sc-catalogue-summary" aria-live="polite"><span>{photographed.length} perfumes{resultSources.length>1?" · combined without repeats":""}</span><details><summary>Sources & photo credits</summary><p>{resultSources.map(v=>SOURCES.find(x=>x.id===v)?.name.replace(/ · .*/,"")||v).join(" · ")}</p>{resultSources.some(v=>v==="beautyfacts"||v==="productsfacts")&&<p>Data © <a href="https://world.openbeautyfacts.org" target="_blank" rel="noreferrer">Open Facts contributors</a> (<a href="https://opendatacommons.org/licenses/odbl/1-0/" target="_blank" rel="noreferrer">ODbL</a>). Images belong to their contributors.</p>}{resultSources.includes("wikidata")&&<p>Wikidata data: CC0. Open a perfume to see its Wikimedia photo credit and licence.</p>}</details></div>}
-        {filteredPhotographed.length>0?<><div className="sc-grid">{filteredPhotographed.map(p=>item(p,"discover"))}</div>{hasMore&&<button className="sc-loadmore" disabled={searching} onClick={()=>setCatalogPage(x=>x+1)}>{searching?"Loading more…":"Load more"} <ChevronDown size={18}/></button>}</>:searching||checkingPhotos?<div className="sc-loading">{searching?"Results will appear here when the search finishes…":"Checking perfume photos…"}</div>:photographed.length>0?<div className="sc-no-results"><p>No perfumes match these filters yet. Perfumes with missing ratings or prices will not appear when you filter by those details.</p><button onClick={()=>setDiscoverFilters(DEFAULT_DISCOVER_FILTERS)}>Clear filters</button><p>Try Search all to find more perfumes and details.</p></div>:query.trim()?<p className="sc-no-results">No closely matching perfumes with verified photos found. Try another spelling, or <button onClick={()=>setManualOpen(true)}>add manually</button>.</p>:<p className="sc-discover-intro">Search a perfume or choose a brand above.</p>}
+        {filteredPhotographed.length>0?<><div className="sc-grid">{filteredPhotographed.map(p=>item(p,"discover"))}</div>{hasMore&&<button className="sc-loadmore" disabled={searching} onClick={loadMoreDiscover}>{searching?"Loading more…":"Load more"} <ChevronDown size={18}/></button>}</>:searching||checkingPhotos?<div className="sc-loading">{searching?"Results will appear here when the search finishes…":"Checking perfume photos…"}</div>:photographed.length>0?<div className="sc-no-results"><p>No perfumes match these filters yet. Perfumes with missing ratings or prices will not appear when you filter by those details.</p><button onClick={()=>setDiscoverFilters(DEFAULT_DISCOVER_FILTERS)}>Clear filters</button><p>Try Search all to find more perfumes and details.</p></div>:query.trim()?<p className="sc-no-results">No closely matching perfumes with verified photos found. Try another spelling, or <button onClick={()=>setManualOpen(true)}>add manually</button>.</p>:<p className="sc-discover-intro">Search a perfume or choose a brand above.</p>}
       </section>}
       {page==="wishlist"&&<section className="sc-section">
         <div className="sc-section-head"><div><h2>Wishlist</h2></div><div className="sc-combo-header-actions"><button className="sc-secondary" onClick={()=>startCombo("wishlist")}><Plus size={16}/> Add combo</button><button className="sc-primary" onClick={()=>go("discover")}><Plus size={16}/> Fragrance</button></div></div>
