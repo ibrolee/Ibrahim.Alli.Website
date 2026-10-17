@@ -199,3 +199,20 @@
 @media(max-width:660px){
  .sc-discover-intro,.sc-no-results{font-size:12px;margin:12px 0 18px}
 }
+
+/* Pre-publish mobile quality fixes, without increasing page length. */
+.sc-topbar .sc-wordmark{border:0;background:transparent;padding:0;color:var(--sc-ink);cursor:pointer;line-height:1.1}
+.sc-topbar .sc-top-action{min-width:42px;min-height:42px;display:flex;align-items:center;justify-content:center;padding:6px;gap:6px;border-radius:5px}
+.sc-topbar .sc-top-action:hover{background:#e7ebe4}
+.sc-storage-alert{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:9px 11px;background:#f9eedb;border:1px solid #e2c99e;color:#72552c;font-size:12px;line-height:1.4;margin:9px 0}
+.sc-storage-alert button{background:transparent;color:#735327;border:1px solid #d4b889;padding:5px 10px;font-size:12px;flex-shrink:0}
+@media(max-width:660px){
+  .sc-topbar{justify-content:space-between;padding:0 15px;gap:5px}
+  .sc-topbar .sc-wordmark{font-size:clamp(20px,6vw,26px);letter-spacing:0}
+  .sc-topbar .sc-top-action{width:44px;min-width:44px;min-height:44px}
+  .sc-topbar .sc-top-action span{display:none}
+  .sc-search input,.sc-filters input,.sc-manual-form>input,.sc-layer-panel select,.sc-price-dialog input:not([type=file]):not([type=radio]){font-size:16px}
+  .sc-storage-alert{font-size:11px;margin:8px 0}
+  .sc-price-dialog{padding-bottom:max(30px,env(safe-area-inset-bottom,0px))}
+  .sc-detail-copy{padding-bottom:max(34px,env(safe-area-inset-bottom,0px))}
+}
