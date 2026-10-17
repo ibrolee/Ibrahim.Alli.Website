@@ -5,6 +5,7 @@ on:
   pull_request:
     paths:
       - 'src/routes/fragrance.tsx'
+      - 'src/lib/scent-photos.ts'
       - 'src/fragrance.css'
       - 'src/server.ts'
       - 'src/routes/__root.tsx'
@@ -20,7 +21,7 @@ jobs:
       - name: Check new fragrance code types
         run: |
           bun x tsc --noEmit > type-errors.txt 2>&1 || true
-          if grep -E "src/routes/fragrance.tsx\\([0-9]+,[0-9]+\\): error TS" type-errors.txt; then
+          if grep -E "src/(routes/fragrance.tsx|lib/scent-photos.ts)\\([0-9]+,[0-9]+\\): error TS" type-errors.txt; then
             exit 1
           fi
           echo "No fragrance page type errors. Existing site type errors are outside this feature."
