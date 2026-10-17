@@ -216,3 +216,73 @@
   .sc-price-dialog{padding-bottom:max(30px,env(safe-area-inset-bottom,0px))}
   .sc-detail-copy{padding-bottom:max(34px,env(safe-area-inset-bottom,0px))}
 }
+
+/* Compact perfume combos: no extra pages, one grouped card and one bottom sheet. */
+.sc-combo-header-actions{display:flex;gap:7px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
+.sc-combo-header-actions .sc-primary,.sc-combo-header-actions .sc-secondary{display:inline-flex;align-items:center;gap:6px;min-height:39px;padding:9px 12px;font-size:12px;white-space:nowrap}
+.sc-combo-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin:0 0 23px}
+.sc-combo-card{display:grid;grid-template-columns:minmax(120px,37%) 1fr;border:1px solid #ccd7cb;background:#fdfcf7;overflow:hidden;min-width:0}
+.sc-combo-visual{position:relative;min-width:0;min-height:198px;background:#e6e8df}
+.sc-combo-cover{width:100%;height:100%;object-fit:contain;padding:9px;background:#f7f6f0;position:absolute;inset:0}
+.sc-combo-collage{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr));height:100%;min-height:198px;gap:2px;padding:2px}
+.sc-combo-collage>div{position:relative;overflow:hidden;min-width:0;min-height:0;background:#ecece5}
+.sc-combo-collage>div .sc-art{height:100%;width:100%}
+.sc-combo-collage .sc-no-photo small{font-size:8px}
+.sc-combo-count{position:absolute;bottom:7px;left:7px;background:#254638;color:#f9f7f0;padding:5px 8px;font-size:10px;border-radius:3px}
+.sc-combo-info{display:flex;flex-direction:column;gap:7px;padding:16px;min-width:0}
+.sc-combo-tag{font-size:9px;font-weight:800;letter-spacing:.12em;color:#7e957f}
+.sc-combo-info h3{font-family:Georgia,serif;font-size:clamp(20px,2.3vw,29px);color:#213e30;line-height:1.1;margin:0;overflow-wrap:anywhere}
+.sc-combo-info p{color:#67776a;font-size:11px;line-height:1.55;margin:0;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.sc-combo-cost{display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:16px;color:#264b36}
+.sc-combo-cost small{font-size:10px;font-weight:400;color:#6b7d70}
+.sc-combo-actions{display:flex;align-items:center;flex-wrap:wrap;gap:5px;margin-top:auto;padding-top:5px}
+.sc-combo-actions button{display:inline-flex;align-items:center;gap:3px;background:transparent;border:1px solid #bccabf;color:#325b42;padding:7px 8px;font-size:11px;font-weight:700;cursor:pointer}
+.sc-combo-actions .sc-combo-delete{margin-left:auto;color:#9c544e;padding:6px}
+.sc-combo-add-card{gap:2px!important;font-size:10px!important}
+.sc-add-combo-discover{min-height:39px;padding:9px 12px;display:inline-flex;align-items:center;gap:5px}
+.sc-combo-dialog{width:min(100%,590px);max-height:min(90dvh,860px);padding:24px!important;overscroll-behavior:contain;overflow-y:auto}
+.sc-combo-dialog h2{font-size:32px;margin:0 0 3px}
+.sc-combo-dialog .sc-combo-hint{font-size:12px;color:#708173;margin:3px 0 16px}
+.sc-combo-form{display:flex;flex-direction:column;gap:10px}
+.sc-combo-form>label{color:#5d705f;font-size:10px;font-weight:800;letter-spacing:.1em;margin:3px 0 0}
+.sc-combo-form>input,.sc-combo-manual>input,.sc-combo-search>input{min-width:0;min-height:43px;border:1px solid #cbd6c9;background:white;color:#304d38;padding:9px 11px;font-size:14px}
+.sc-combo-form .sc-manual-target{margin:0;gap:18px}
+.sc-combo-selected{display:flex;flex-direction:column;gap:4px;max-height:170px;overflow-y:auto}
+.sc-combo-selected>div{display:flex;align-items:center;justify-content:space-between;gap:8px;background:#e8ece4;padding:8px 9px;font-size:11px;color:#647465}
+.sc-combo-selected>div span{display:flex;flex-direction:column;gap:2px;min-width:0}
+.sc-combo-selected>div strong{font-size:13px;color:#294b36}
+.sc-combo-selected>div button{background:transparent;border:0;padding:5px;color:#7d4d48}
+.sc-combo-search{display:flex;gap:6px;align-items:stretch}
+.sc-combo-search>input{flex:1}
+.sc-combo-search>button,.sc-combo-manual>button{border:0;background:#2b5540;color:white;font-size:12px;font-weight:700;padding:7px 12px;display:inline-flex;gap:4px;align-items:center;justify-content:center;white-space:nowrap}
+.sc-combo-search>button:disabled,.sc-combo-manual>button:disabled{opacity:.45}
+.sc-combo-options{display:flex;flex-direction:column;gap:1px;max-height:180px;overflow-y:auto;border:1px solid #d6dfd2}
+.sc-combo-options>button{border:0;border-bottom:1px solid #e2e8df;background:#f9faf6;text-align:left;padding:8px 10px;display:flex;gap:7px;align-items:center;color:#3d6c4b;font-size:11px}
+.sc-combo-options>button span{display:flex;flex-direction:column;gap:2px;color:#687869}
+.sc-combo-options>button strong{font-size:12px;color:#2a4838}
+.sc-combo-help{font-size:10px;color:#6c796e;margin:2px 0 0}
+.sc-combo-manual{display:grid;grid-template-columns:1fr 1.35fr auto;gap:5px;min-width:0}
+.sc-combo-photo{min-height:86px}
+.sc-combo-photo img{max-height:124px}
+.sc-combo-form .sc-money-input{margin:0}
+.sc-combo-form>.sc-primary{min-height:44px}
+.sc-combo-form .sc-primary:disabled{opacity:.45;cursor:default}
+@media(max-width:950px){.sc-combo-grid{grid-template-columns:1fr 1fr}.sc-combo-card{grid-template-columns:35% 1fr}.sc-combo-visual,.sc-combo-collage{min-height:175px}}
+@media(max-width:660px){
+ .sc-combo-grid{grid-template-columns:1fr;gap:10px;margin-bottom:15px}
+ .sc-combo-card{grid-template-columns:37% 1fr}
+ .sc-combo-visual,.sc-combo-collage{min-height:168px}
+ .sc-combo-info{padding:11px;gap:5px}
+ .sc-combo-info h3{font-size:22px}
+ .sc-combo-cost{font-size:14px}
+ .sc-combo-header-actions{gap:5px}
+ .sc-combo-header-actions .sc-primary,.sc-combo-header-actions .sc-secondary{font-size:10px;padding:8px;min-height:36px}
+ .sc-combo-dialog{max-height:calc(100dvh - env(safe-area-inset-top,0px) - 12px);padding:22px 16px max(22px,env(safe-area-inset-bottom,0px))!important}
+ .sc-combo-dialog h2{font-size:28px}
+ .sc-combo-form>input,.sc-combo-manual>input,.sc-combo-search>input{font-size:16px}
+ .sc-combo-manual{grid-template-columns:1fr 1.1fr auto;gap:4px}
+ .sc-combo-manual>input{padding:8px 7px}
+ .sc-combo-manual>button{font-size:11px;padding:5px 8px}
+ .sc-combo-selected{max-height:140px}
+ .sc-combo-options{max-height:150px}
+}
