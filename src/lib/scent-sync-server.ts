@@ -24,6 +24,7 @@ function bucketFrom(env:unknown):ScentR2|undefined{
   if(!env||typeof env!=="object")return;
   const bucket=(env as {SCENT_PHOTOS_R2?:ScentR2}).SCENT_PHOTOS_R2;
   if(bucket&&typeof bucket.get==="function"&&typeof bucket.put==="function"&&typeof bucket.list==="function")return bucket;
+  return undefined;
 }
 async function readPhotoIndex(bucket:ScentR2){
   const entries:Record<string,{deleted:boolean;etag?:string}>={};
@@ -33,7 +34,7 @@ async function readPhotoIndex(bucket:ScentR2){
     for(const item of list.objects){
       let id:string;
       try{id=decodeURIComponent(item.key.slice(PHOTO_PREFIX.length));}catch{continue;}
-      if(validPhotoId(id))entries[id]={deleted:item.customMetadata?.["deleted"]==="1",etag:item.etag};
+      if(validPhotoId(id))entries[id]={deleted:item.customMetadata?.["deleted"]==="1",...(item.etag?{etag:item.etag}:{})};
     }
     if(!list.truncated)break;
     if(!list.cursor||list.cursor===cursor)throw new Error("Photo list incomplete");
