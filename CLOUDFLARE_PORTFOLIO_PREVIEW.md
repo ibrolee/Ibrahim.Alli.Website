@@ -35,3 +35,9 @@ This is an **isolated migration preview**. Do not change the production domain, 
 ## Rollback
 
 Keep the existing Vercel production deployment and its custom domain active until explicitly approved. If the Cloudflare preview has issues, fix only this migration branch. Do not point `ibrahimalli.com` to the preview Worker.
+
+## Preview rebuild after branch selection
+
+- Cloudflare preview Worker's production branch was switched in its dashboard to `migration/cloudflare-portfolio-2026-10-17`.
+- This commit intentionally triggers Git-connected build automation for the isolated preview Worker only.
+- Keep `ibrahimalli.com` on Vercel; do not add production domains to this Worker.
