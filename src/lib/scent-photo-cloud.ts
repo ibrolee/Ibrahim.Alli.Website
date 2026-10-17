@@ -63,7 +63,6 @@ export async function reconcilePhotos(keys:string[],onReceived:(id:string,blob:B
   const known=load<Record<string,string>>(ETAGS,{});
   let uploaded=0,downloaded=0,removed=0,conflicts=0;
   let remote=await photoIndex();
-  const localIds=new Set(wanted);
   // Process saved actions even for combos deleted since they were last synced.
   for(const [id,action] of Object.entries(queue)){
     if(!allowedPhotoKey(id)){delete queue[id];save(QUEUE,queue);continue;}
@@ -90,7 +89,9 @@ export async function reconcilePhotos(keys:string[],onReceived:(id:string,blob:B
       if(local){
         try{
           await upload(id,local,true);uploaded++;
-          // New upload is authoritative. Fetch its ETag on the next reconciliation.
+          // Track the initial upload ETag to distinguish later replacements.
+          const now=await photoIndex();
+          if(now[id]?.etag)known[id]=now[id].etag;
         }catch(err){
           if((err as PhotoError).status!==409)throw err; // Another device beat us to upload.
         }
