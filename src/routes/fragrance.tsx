@@ -694,7 +694,7 @@ function Fragrance(){
     <header className="sc-topbar"><button type="button" className="sc-wordmark" onClick={()=>go("collection")} aria-label="Ibrahim Alli home">IBRAHIM ALLI</button><div className="sc-top-controls"><button type="button" className={"sc-top-action sc-sync-trigger"+(sync.status==="synced"?" sc-sync-ok":"")} onClick={()=>setSyncOpen(true)} aria-label={"Cloud sync: "+sync.status} title="Private cloud sync">{sync.status==="offline"||sync.status==="unavailable"?<CloudOff size={18}/>:<Cloud size={18}/>}<span>Sync</span></button><button type="button" className="sc-top-action" onClick={()=>setBackupOpen(true)} aria-label="Backup and restore my collection" title="Backup and restore"><Download size={19}/><span>Backup</span></button></div></header>
     <div className="sc-inner">
       {storageError&&<div className="sc-storage-alert" role="alert"><span>{storageError==="corrupt"?"Your saved collection could not be read. Restore an earlier backup.":"Changes couldn't be saved in this browser. Export a backup now."}</span><button type="button" onClick={()=>setBackupOpen(true)}>{storageError==="corrupt"?"Restore":"Backup"}</button></div>}
-      {(page==="collection"||page==="worth")&&<div className={"sc-stats sc-stats-naira"+(page==="collection"?" sc-collection-stats":"")}><div><span>BOTTLES</span><strong>{bottleCount}</strong></div><div><span>WISHLIST</span><strong>{wishCount}</strong></div><div><span>COST ON SHELF</span><strong>{money(totals.shelfCost,"NGN")}</strong></div><div><span>TOTAL SPENT</span><strong>{money(totals.totalSpent,"NGN")}</strong></div></div>}
+      {page==="collection"&&<div className="sc-stats sc-stats-naira sc-collection-stats"><div><span>BOTTLES</span><strong>{bottleCount}</strong></div><div><span>WISHLIST</span><strong>{wishCount}</strong></div><div><span>COST ON SHELF</span><strong>{money(totals.shelfCost,"NGN")}</strong></div><div><span>TOTAL SPENT</span><strong>{money(totals.totalSpent,"NGN")}</strong></div></div>}
       {shelfNotice&&<div className="sc-shelf-notice" role="status"><span>{shelfNotice.text}</span><button onClick={()=>{shelfNotice.undo();setShelfNotice(null);}}>Undo</button><button aria-label="Dismiss update" onClick={()=>setShelfNotice(null)}><X size={16}/></button></div>}
       <nav className="sc-tabs" aria-label="Fragrance sections">
         {([["collection","My collection",ShoppingBag],["discover","Discover",Search],["wishlist","Wishlist",Heart],["worth","Spending",Wallet],["layer","Layer lab",Layers]] as const).map(([key,label,Icon])=><button key={key} className={page===key?"active":""} onClick={()=>go(key)}><Icon size={18}/>{label}</button>)}
@@ -751,10 +751,60 @@ function Fragrance(){
         <div className="sc-section-head"><div><h2>Wishlist</h2></div><div className="sc-combo-header-actions"><button className="sc-secondary" onClick={()=>startCombo("wishlist")}><Plus size={16}/> Add combo</button><button className="sc-primary" onClick={()=>go("discover")}><Plus size={16}/> Fragrance</button></div></div>
         {store.wishlist.length||wishCombos.length?<>{wishCombos.length>0&&<div className="sc-combo-grid">{wishCombos.map(c=>comboCard(c))}</div>}{store.wishlist.length>0&&<div className="sc-grid sc-cabinet-grid">{store.wishlist.map(p=>item(p,"wishlist"))}</div>}</>:<div className="sc-empty"><Heart size={45} strokeWidth={1}/><h3>A little room for desire.</h3><p>Save perfumes to buy later.</p><button className="sc-primary" onClick={()=>go("discover")}>Find my next scent <ArrowRight size={17}/></button></div>}
       </section>}
-      {page==="worth"&&<section className="sc-section sc-spending-section">
-        <div className="sc-section-head"><h2>Your fragrance collection</h2></div>
-        {legacyUSD>0&&<p className="sc-legacy-note">{legacyUSD} older dollar-priced bottle(s) are excluded from both naira totals until you enter a naira price.</p>}
-        <div className="sc-worth-list"><h3>Purchase history</h3>{store.collection.map(x=><div key={x.id}><span>{x.perfume.brand}<strong>{x.perfume.name}</strong><small>Bought {dateLabel(x.added)} · {x.finishedAt?"Finished "+dateLabel(x.finishedAt):"On my shelf"}</small></span><strong>{x.currency==="NGN"?money(x.amount,"NGN"):"Set ₦ price"}</strong><button onClick={()=>openPrice(x.perfume,x)}>Edit</button></div>)}{myCombos.map(c=><div key={c.id}><span>Perfume combo<strong>{c.name} · {c.perfumes.length} bottles</strong><small>Bought {dateLabel(c.added)} · {c.perfumes.filter(p=>c.finishedPerfumes?.[p.id]).length} finished</small></span><strong>{money(c.amount||0,"NGN")}</strong><button onClick={()=>editCombo(c)}>Edit</button></div>)}{!store.collection.length&&!myCombos.length&&<p>No purchases added yet.</p>}</div>
+      {page==="worth"&&<section className="sc-section sc-finance-section">
+        <div className="sc-finance-heading">
+          <div>
+            <span className="sc-finance-kicker"><span/> YOUR PERSONAL SCENT LEDGER</span>
+            <h2>Collection <em>finances.</em></h2>
+            <p>A clear picture of what you've spent on the fragrances you love.</p>
+          </div>
+          <button className="sc-finance-add" type="button" onClick={()=>go("discover")}><Plus size={17}/> Add a purchase</button>
+        </div>
+        <div className="sc-finance-overview">
+          <div className="sc-finance-hero">
+            <div className="sc-finance-hero-top"><span>TOTAL RECORDED SPENDING</span><span className="sc-finance-hero-symbol"><Wallet size={19}/></span></div>
+            <strong className="sc-finance-main-amount">{money(totals.totalSpent,"NGN")}</strong>
+            <p>All-time fragrance purchases</p>
+            <div className="sc-finance-hero-bottom">
+              <div className="sc-finance-balance"><span>Still on your shelf <small>· purchase cost</small></span><strong>{money(totals.shelfCost,"NGN")}</strong></div>
+              <div className="sc-finance-track" role="progressbar" aria-label="Share of spending on bottles still on your shelf" aria-valuemin={0} aria-valuemax={100} aria-valuenow={totals.totalSpent>0?Math.min(100,Math.round(totals.shelfCost/totals.totalSpent*100)):0}><span style={{width:(totals.totalSpent>0?Math.min(100,Math.round(totals.shelfCost/totals.totalSpent*100)):0)+"%"}}/></div>
+              <small className="sc-finance-hero-caption">Based on the amount paid, not resale value</small>
+            </div>
+          </div>
+          <div className="sc-finance-mini-grid" aria-label="Your collection at a glance">
+            <div className="sc-finance-mini">
+              <span className="sc-finance-mini-icon"><ShoppingBag size={17}/></span><span className="sc-finance-mini-label">ON YOUR SHELF</span><strong>{totals.onShelf}</strong><small>Active bottles</small>
+            </div>
+            <div className="sc-finance-mini">
+              <span className="sc-finance-mini-icon"><Check size={17}/></span><span className="sc-finance-mini-label">FINISHED</span><strong>{totals.finished}</strong><small>Bottles enjoyed</small>
+            </div>
+            <div className="sc-finance-mini">
+              <span className="sc-finance-mini-icon"><Heart size={17}/></span><span className="sc-finance-mini-label">WISHLIST</span><strong>{wishCount}</strong><small>Future favourites</small>
+            </div>
+          </div>
+        </div>
+        <div className="sc-finance-history">
+          <div className="sc-finance-history-heading"><div><span>YOUR RECORDS</span><h3>Purchase history</h3><p>A timeline of the bottles and combos you've bought.</p></div><span className="sc-finance-record-count">{store.collection.length+myCombos.length} {store.collection.length+myCombos.length===1?"purchase":"purchases"}</span></div>
+          {legacyUSD>0&&<p className="sc-legacy-note">{legacyUSD} older dollar-priced bottle(s) are excluded from both naira totals until you enter a naira price.</p>}
+          {store.collection.length||myCombos.length?<div className="sc-finance-transactions">
+            {store.collection.map(x=><div className="sc-finance-transaction" key={x.id}>
+              <span className="sc-finance-tx-icon"><ShoppingBag size={17}/></span>
+              <div className="sc-finance-tx-detail"><small>{x.perfume.brand}</small><strong>{x.perfume.name}</strong><span>{dateLabel(x.added)} · {x.finishedAt?"Finished "+dateLabel(x.finishedAt):"On my shelf"}</span></div>
+              <div className="sc-finance-tx-right"><strong>{x.currency==="NGN"?money(x.amount,"NGN"):"Set ₦ price"}</strong><button type="button" onClick={()=>openPrice(x.perfume,x)}>Edit <ArrowRight size={13}/></button></div>
+            </div>)}
+            {myCombos.map(c=><div className="sc-finance-transaction" key={c.id}>
+              <span className="sc-finance-tx-icon"><Layers size={17}/></span>
+              <div className="sc-finance-tx-detail"><small>FRAGRANCE COMBO</small><strong>{c.name}</strong><span>{dateLabel(c.added)} · {c.perfumes.length} bottles · {c.perfumes.filter(p=>c.finishedPerfumes?.[p.id]).length} finished</span></div>
+              <div className="sc-finance-tx-right"><strong>{money(c.amount||0,"NGN")}</strong><button type="button" onClick={()=>editCombo(c)}>Edit <ArrowRight size={13}/></button></div>
+            </div>)}
+          </div>:<div className="sc-finance-empty">
+            <div className="sc-finance-empty-art" aria-hidden="true"><Wallet size={30} strokeWidth={1.6}/></div>
+            <span className="sc-finance-empty-tag">YOUR FIRST ENTRY AWAITS</span>
+            <h4>Your collection story starts here.</h4>
+            <p>You haven't recorded a fragrance purchase yet. Add your first bottle to start tracking the spending behind your collection.</p>
+            <button className="sc-finance-empty-action" type="button" onClick={()=>go("discover")}>Explore fragrances <ArrowRight size={17}/></button>
+          </div>}
+        </div>
       </section>}
       {page==="layer"&&<section className="sc-section"><div className="sc-section-head"><div><span className="sc-kicker">05 / THE EXPERIMENTAL STUDIO</span><h2>Layer <em>lab.</em></h2><p>Pair two perfumes from your shelf and discover shared scent notes. Suggestions aren't verified performance predictions.</p></div></div>
         {allMyPerfumes.length<2?<div className="sc-empty"><Layers size={45}/><h3>Two bottles make a combination.</h3><p>Collect at least two fragrances to start mixing.</p><button className="sc-primary" onClick={()=>go("discover")}>Expand my shelf</button></div>:<div className="sc-layer-panel"><div className="sc-pair"><label>FIRST FRAGRANCE<select value={layerA} onChange={e=>setLayerA(e.target.value)}><option value="">Choose a bottle</option>{allMyPerfumes.map(p=><option key={p.id} value={p.id}>{p.brand} — {p.name}</option>)}</select></label><Plus size={22}/><label>SECOND FRAGRANCE<select value={layerB} onChange={e=>setLayerB(e.target.value)}><option value="">Choose another</option>{allMyPerfumes.filter(p=>p.id!==layerA).map(p=><option key={p.id} value={p.id}>{p.brand} — {p.name}</option>)}</select></label></div>{left&&right&&left.id!==right.id&&<div className="sc-layer-result"><Sparkles size={27}/><h3>{left.name} <span>×</span> {right.name}</h3><p>{match.length?"Shared notes / accords: "+[...new Set(match)].join(", "):"No shared notes were listed by the database. Try one spray of each and assess on your own skin."}</p><button className="sc-primary" onClick={()=>setStore(s=>({...s,mixes:[{id:id(),left:left.id,right:right.id,date:today()},...s.mixes]}))}>Save this combination <Bookmark size={16}/></button></div>}</div>}
