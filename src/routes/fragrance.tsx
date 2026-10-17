@@ -4,6 +4,7 @@ import { ArrowRight, Bookmark, Check, ChevronDown, Cloud, CloudOff, Download, Fl
 import { compressScentPhoto, saveScentPhoto, getScentPhoto, removeScentPhoto, blobAsDataUrl, dataUrlAsBlob } from "@/lib/scent-photos";
 import css from "../fragrance.css?url";
 import {useCabinetSync} from "@/lib/scent-sync-client";
+import {queuePhotoChange,photoBucketStatus,reconcilePhotos,type PhotoSyncState} from "@/lib/scent-photo-cloud";
 import { comboBottleCost, restoreBottleLife, savedFinishDate, setBottleFinished, setComboBottleFinished, shelfTotals } from "@/lib/scent-shelf";
 import { sameScent } from "@/lib/scent-identity";
 import type { CatalogSource } from "@/lib/scent-catalogue";
@@ -208,6 +209,10 @@ function Fragrance(){
   const photoFileRef=useRef<HTMLInputElement>(null);
   const [photoBusy,setPhotoBusy]=useState(false);
   const [photoError,setPhotoError]=useState("");
+  const [photoRevision,setPhotoRevision]=useState(0);
+  const [photoCloudStatus,setPhotoCloudStatus]=useState<PhotoSyncState>("idle");
+  const [photoCloudNote,setPhotoCloudNote]=useState("");
+  const photoRunning=useRef(false);
   const fileRef=useRef<HTMLInputElement>(null);
   const searchId=useRef(0);
   const [syncOpen,setSyncOpen]=useState(false);
@@ -231,6 +236,58 @@ function Fragrance(){
     storedUrls.current.set(key,url);
     setPhotoUrls(prev=>({...prev,[key]:url}));
   }
+  function hideStoredPhoto(key:string){
+    const prior=storedUrls.current.get(key);
+    if(prior)URL.revokeObjectURL(prior);
+    storedUrls.current.delete(key);
+    setPhotoUrls(prev=>{const next={...prev};delete next[key];return next;});
+  }
+  function photoSaved(key:string){
+    queuePhotoChange(key,"upsert");
+    setPhotoRevision(v=>v+1);
+  }
+  function photoDeleted(key:string){
+    queuePhotoChange(key,"delete");
+    setPhotoRevision(v=>v+1);
+  }
+  const photoKeys=useMemo(()=>[...new Set([
+    ...store.collection.map(x=>x.perfume.id),
+    ...store.wishlist.map(p=>p.id),
+    ...store.combos.map(c=>c.id),
+    ...store.combos.flatMap(c=>c.perfumes.map(p=>p.id))
+  ].filter(key=>key.startsWith("manual:")||key.startsWith("combo:")))],[
+    store.collection,store.wishlist,store.combos
+  ]);
+  async function syncOwnerPhotos(){
+    if(!ready||sync.status!=="synced"||photoRunning.current)return;
+    photoRunning.current=true;
+    setPhotoCloudStatus("checking");
+    try{
+      if(!await photoBucketStatus()){
+        setPhotoCloudStatus("unavailable");
+        setPhotoCloudNote("Fragrance details are synced. Connect Cloudflare R2 to sync uploaded photos.");
+        return;
+      }
+      setPhotoCloudStatus("syncing");
+      const report=await reconcilePhotos(photoKeys,showStoredPhoto,hideStoredPhoto);
+      setPhotoCloudStatus("ready");
+      setPhotoCloudNote(report.conflicts?
+        report.conflicts+" photo(s) differ between devices. Both local copies are preserved; replace a photo to choose one.":
+        report.remaining?"Some photo changes are waiting to upload.":
+        "Uploaded perfume photos are synced.");
+    }catch(e){
+      setPhotoCloudStatus("error");
+      setPhotoCloudNote(e instanceof Error?e.message:"Couldn't sync photos. Your local copies are safe.");
+    }finally{photoRunning.current=false;}
+  }
+  useEffect(()=>{
+    if(!ready||sync.status!=="synced"){setPhotoCloudStatus("idle");return;}
+    void syncOwnerPhotos();
+    const check=setInterval(()=>{if(document.visibilityState==="visible")void syncOwnerPhotos();},90000);
+    const onFocus=()=>{if(document.visibilityState==="visible")void syncOwnerPhotos();};
+    document.addEventListener("visibilitychange",onFocus);
+    return()=>{clearInterval(check);document.removeEventListener("visibilitychange",onFocus);};
+  },[ready,sync.status,photoRevision,photoKeys]);
   useEffect(()=>{
     if(!ready)return;
     let canceled=false;
@@ -268,6 +325,7 @@ function Fragrance(){
       const blob=await compressScentPhoto(file);
       await saveScentPhoto(key,blob);
       showStoredPhoto(key,blob);
+      photoSaved(key);
     }catch(err){setPhotoError(err instanceof Error?err.message:"Photo could not be saved.");}
     finally{setPhotoBusy(false);e.target.value="";}
   }
@@ -275,10 +333,8 @@ function Fragrance(){
     if(!selected||!window.confirm("Remove this photo?"))return;
     try{
       await removeScentPhoto(selected.id);
-      const old=storedUrls.current.get(selected.id);
-      if(old)URL.revokeObjectURL(old);
-      storedUrls.current.delete(selected.id);
-      setPhotoUrls(current=>{const next={...current};delete next[selected.id];return next;});
+      hideStoredPhoto(selected.id);
+      photoDeleted(selected.id);
     }catch(err){setPhotoError(err instanceof Error?err.message:"Could not remove photo.");}
   }
 
@@ -392,7 +448,7 @@ function Fragrance(){
     const perfume:Perfume={id:"manual:"+id(),brand,name,notes:[],top:[],heart:[],base:[],accords:[]};
     if(manualPhoto){
       setPhotoBusy(true);
-      try{await saveScentPhoto(perfume.id,manualPhoto);showStoredPhoto(perfume.id,manualPhoto);}
+      try{await saveScentPhoto(perfume.id,manualPhoto);showStoredPhoto(perfume.id,manualPhoto);photoSaved(perfume.id);}
       catch(err){setPhotoError(err instanceof Error?err.message:"Could not save the photo. Please try again.");return;}
       finally{setPhotoBusy(false);}
     }
@@ -458,7 +514,7 @@ function Fragrance(){
     setComboSaving(true);setComboError("");
     const finalId=comboId||"combo:"+id();
     try{
-      if(comboPhoto){await saveScentPhoto(finalId,comboPhoto);showStoredPhoto(finalId,comboPhoto);}
+      if(comboPhoto){await saveScentPhoto(finalId,comboPhoto);showStoredPhoto(finalId,comboPhoto);photoSaved(finalId);}
       const old=store.combos.find(c=>c.id===finalId);
       const combo:Combo={id:finalId,name:comboName.trim().slice(0,80)||comboPerfumes.map(p=>p.name).slice(0,2).join(" + "),
         perfumes:comboPerfumes,target:comboTarget,
@@ -472,7 +528,7 @@ function Fragrance(){
   function removeCombo(c:Combo){
     if(!window.confirm("Delete "+c.name+" combo and its purchase history? Its price will be removed from total spent. The individual perfumes stay in your other saved lists."))return;
     setStore(prev=>({...prev,combos:prev.combos.filter(x=>x.id!==c.id)}));
-    removeScentPhoto(c.id).catch(()=>{});
+    removeScentPhoto(c.id).then(()=>photoDeleted(c.id)).catch(()=>{});
     setComboOpen(false);
   }
   async function exportBackup(){
@@ -509,6 +565,7 @@ function Fragrance(){
         const blob=dataUrlAsBlob(payload);
         await saveScentPhoto(key,blob);
         showStoredPhoto(key,blob);
+        photoSaved(key);
       }
       setStore(restored);setReady(true);setStorageError("");setBackupOpen(false);
     }catch(err){alert("Could not import backup: "+(err instanceof Error?err.message:String(err)));}
@@ -745,10 +802,8 @@ function Fragrance(){
         {comboId&&!comboPreview&&photoUrls[comboId]&&<button type="button" className="sc-photo-clear" onClick={async()=>{
           try{
             await removeScentPhoto(comboId);
-            const existing=storedUrls.current.get(comboId);
-            if(existing)URL.revokeObjectURL(existing);
-            storedUrls.current.delete(comboId);
-            setPhotoUrls(prev=>{const next={...prev};delete next[comboId];return next;});
+            hideStoredPhoto(comboId);
+            photoDeleted(comboId);
           }catch{setComboError("Couldn't remove photo.");}
         }}>Remove combo photo</button>}
         {comboTarget==="collection"&&<><label>TOTAL PRICE PAID (₦)</label><div className="sc-money-input"><span className="sc-money-prefix">₦</span><input type="number" min="0" step="0.01" inputMode="decimal" required value={comboAmount} onChange={e=>setComboAmount(e.target.value)} placeholder="0.00"/></div></>}
@@ -761,7 +816,7 @@ function Fragrance(){
     {syncOpen&&<div className="sc-overlay" onMouseDown={e=>{if(e.target===e.currentTarget)setSyncOpen(false)}}><section className="sc-price-dialog sc-sync-dialog" role="dialog" aria-modal="true" aria-label="Private cloud sync">
       <button type="button" className="sc-modal-close" onClick={()=>setSyncOpen(false)} aria-label="Close cloud sync"><X size={22}/></button>
       <Cloud size={27}/><h2>Private <em>sync.</em></h2>
-      <p className="sc-sync-intro">Keep your wishlist, shelf, spending history and combos in sync between Safari and your Home Screen app.</p>
+      <p className="sc-sync-intro">Keep your wishlist, shelf, spending history, combos and uploaded perfume photos in sync between Safari and your Home Screen app.</p>
       <div className="sc-sync-state"><span className={"sc-sync-dot sc-sync-"+sync.status}/><strong>{({"loading":"Checking cloud connection","unavailable":"Cloud setup needed","setup":"Create your private account","signed-out":"Sign in to sync","synced":"Everything is synced","syncing":"Syncing your fragrances","offline":"Offline — local copy saved","conflict":"Choose which collection to keep","error":"Sync needs attention"} as Record<string,string>)[sync.status]}</strong></div>
       {sync.message&&<p className="sc-sync-message">{sync.message}</p>}
       {(sync.status==="signed-out"||sync.status==="setup")&&<form onSubmit={submitSync} className="sc-sync-form">
@@ -783,8 +838,13 @@ function Fragrance(){
         <button type="button" className="sc-secondary" onClick={()=>void sync.disconnect()}>Sign out</button>
       </div>}
       {(sync.status==="unavailable"||sync.status==="error"||sync.status==="loading")&&<button type="button" className="sc-secondary sc-block" onClick={()=>void sync.refresh()}>Check connection</button>}
-      <p className="sc-sync-footnote">Your collection also stays saved on this device. Uploaded personal photos currently remain device-only; use Backup for a copy containing your photos.</p>
+      {(sync.status==="synced"||sync.status==="syncing")&&<div className="sc-photo-cloud-box" role="status" aria-live="polite">
+        <span><Cloud size={17}/><strong>Uploaded perfume photos</strong></span>
+        <p>{photoCloudStatus==="syncing"?"Syncing photos…":photoCloudStatus==="checking"?"Checking photo storage…":photoCloudStatus==="ready"?photoCloudNote:photoCloudStatus==="unavailable"?photoCloudNote:photoCloudStatus==="error"?photoCloudNote:"Waiting for cloud photo sync."}</p>
+        {(photoCloudStatus==="ready"||photoCloudStatus==="error"||photoCloudStatus==="unavailable")&&<button type="button" className="sc-secondary" onClick={()=>void syncOwnerPhotos()}>Check photo sync</button>}
+      </div>}
+      <p className="sc-sync-footnote">Your collection and photos stay saved locally too. Keep downloadable JSON backups for an extra copy of everything.</p>
     </section></div>}
-    {backupOpen&&<div className="sc-overlay" onMouseDown={e=>{if(e.target===e.currentTarget)setBackupOpen(false)}}><section className="sc-price-dialog" role="dialog" aria-modal="true" aria-label="Backup your collection"><button className="sc-modal-close" onClick={()=>setBackupOpen(false)} aria-label="Close"><X size={22}/></button><h2>Backup & <em>restore.</em></h2><p>Your collection is saved in this browser. Export a backup before changing devices.</p><button className="sc-primary sc-block" onClick={exportBackup}><Download size={18}/> Download backup</button><button className="sc-secondary sc-block" onClick={()=>fileRef.current?.click()}><Upload size={18}/> Restore from JSON</button><input hidden ref={fileRef} type="file" accept="application/json,.json" onChange={importBackup}/><div className="sc-privacy-note"><Cloud size={19}/><span>Manual backups remain available. Cloud sync only starts after you connect your private account.</span></div></section></div>}
+    {backupOpen&&<div className="sc-overlay" onMouseDown={e=>{if(e.target===e.currentTarget)setBackupOpen(false)}}><section className="sc-price-dialog" role="dialog" aria-modal="true" aria-label="Backup your collection"><button className="sc-modal-close" onClick={()=>setBackupOpen(false)} aria-label="Close"><X size={22}/></button><h2>Backup & <em>restore.</em></h2><p>Export a complete backup of your collection and manually uploaded photos. This is separate from automatic cloud sync.</p><button className="sc-primary sc-block" onClick={exportBackup}><Download size={18}/> Download backup</button><button className="sc-secondary sc-block" onClick={()=>fileRef.current?.click()}><Upload size={18}/> Restore from JSON</button><input hidden ref={fileRef} type="file" accept="application/json,.json" onChange={importBackup}/><div className="sc-privacy-note"><Cloud size={19}/><span>Manual backups remain available. Cloud sync only starts after you connect your private account.</span></div></section></div>}
   </main>;
 }

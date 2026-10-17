@@ -8,6 +8,83 @@ type D1Statement={
   run:()=>Promise<{meta:{changes?:number}}>;
 };
 export type ScentD1={prepare:(sql:string)=>D1Statement};
+export type ScentR2Object={body?:ReadableStream<Uint8Array>;httpMetadata?:{contentType?:string};customMetadata?:Record<string,string>;etag?:string};
+export type ScentR2={
+  get:(key:string)=>Promise<ScentR2Object|null>;
+  put:(key:string,value:ArrayBuffer|Uint8Array,opts?:{httpMetadata?:{contentType:string};customMetadata?:Record<string,string>})=>Promise<unknown>;
+  list:(opts:{prefix:string;cursor?:string;limit?:number;include?:string[]})=>Promise<{objects:Array<{key:string;etag?:string;customMetadata?:Record<string,string>}>;truncated:boolean;cursor?:string}>;
+};
+const MAX_PHOTO_BYTES=500_000;
+const PHOTO_PREFIX="owner/photos/";
+function validPhotoId(id:string):boolean{
+  return /^(?:manual|combo):[a-zA-Z0-9._-]{1,140}$/.test(id);
+}
+function photoR2Key(id:string):string{return PHOTO_PREFIX+encodeURIComponent(id);}
+function bucketFrom(env:unknown):ScentR2|undefined{
+  if(!env||typeof env!=="object")return;
+  const bucket=(env as {SCENT_PHOTOS_R2?:ScentR2}).SCENT_PHOTOS_R2;
+  if(bucket&&typeof bucket.get==="function"&&typeof bucket.put==="function"&&typeof bucket.list==="function")return bucket;
+  return undefined;
+}
+async function readPhotoIndex(bucket:ScentR2){
+  const entries:Record<string,{deleted:boolean;etag?:string}>={};
+  let cursor:string|undefined;
+  for(let page=0;page<10;page++){
+    const list=await bucket.list({prefix:PHOTO_PREFIX,limit:500,include:["customMetadata"],...(cursor?{cursor}:{})});
+    for(const item of list.objects){
+      let id:string;
+      try{id=decodeURIComponent(item.key.slice(PHOTO_PREFIX.length));}catch{continue;}
+      if(validPhotoId(id))entries[id]={deleted:item.customMetadata?.["deleted"]==="1",...(item.etag?{etag:item.etag}:{})};
+    }
+    if(!list.truncated)break;
+    if(!list.cursor||list.cursor===cursor)throw new Error("Photo list incomplete");
+    cursor=list.cursor;
+    if(page===9)throw new Error("Too many private photos");
+  }
+  return entries;
+}
+async function photoApi(request:Request,env:unknown,db:ScentD1,path:string):Promise<Response>{
+  if(!await authed(db,request))return json({error:"Sign in to access photos"},401);
+  const bucket=bucketFrom(env);
+  if(path==="photos/status"&&request.method==="GET")return json({enabled:Boolean(bucket)});
+  if(!bucket)return json({error:"Cloudflare R2 photo storage not connected",code:"R2_SETUP_REQUIRED"},503);
+  if(path==="photos/index"&&request.method==="GET")return json({records:await readPhotoIndex(bucket)});
+  if(!path.startsWith("photos/item/"))return json({error:"Not found"},404);
+  let id:string;
+  try{id=decodeURIComponent(path.slice("photos/item/".length));}catch{return json({error:"Invalid photo"},400);}
+  if(!validPhotoId(id))return json({error:"Invalid photo"},400);
+  const key=photoR2Key(id),method=request.method;
+  if(method==="GET"){
+    const object=await bucket.get(key);
+    if(!object)return json({error:"No cloud photo"},404);
+    if(object.customMetadata?.["deleted"]==="1")return json({error:"Photo removed"},410);
+    if(!object.body)return json({error:"Photo unavailable"},503);
+    return new Response(object.body,{status:200,headers:{
+      "content-type":object.httpMetadata?.contentType||"image/jpeg",
+      "cache-control":"private, no-store","x-content-type-options":"nosniff"
+    }});
+  }
+  if(method==="PUT"){
+    const declared=Number(request.headers.get("content-length")||0);
+    if(declared>MAX_PHOTO_BYTES)return json({error:"Photo too large"},413);
+    const type=request.headers.get("content-type")||"";
+    if(!["image/jpeg","image/png","image/webp"].includes(type))return json({error:"JPEG, PNG or WebP required"},415);
+    const bytes=await request.arrayBuffer();
+    if(!bytes.byteLength||bytes.byteLength>MAX_PHOTO_BYTES)return json({error:"Photo too large or empty"},413);
+    // The first sync must never silently replace a photo already uploaded by another device.
+    if(request.headers.get("x-scent-create-only")==="1"&&await bucket.get(key))
+      return json({error:"Cloud photo already exists",code:"PHOTO_EXISTS"},409);
+    await bucket.put(key,bytes,{httpMetadata:{contentType:type},customMetadata:{deleted:"0"}});
+    return json({ok:true});
+  }
+  if(method==="DELETE"){
+    // Tombstone: stale, still-local copies must not automatically resurrect a deleted photo.
+    await bucket.put(key,new Uint8Array(),{httpMetadata:{contentType:"application/octet-stream"},customMetadata:{deleted:"1"}});
+    return json({ok:true});
+  }
+  return json({error:"Method not allowed"},405);
+}
+
 type Bindings={SCENT_SYNC_DB?:ScentD1;SCENT_SYNC_SETUP_KEY?:string};
 const COOKIE="__Host-scent_sync";
 /** workerd currently caps PBKDF2 at 100,000 iterations; higher values throw on live Workers. */
@@ -77,12 +154,13 @@ export async function scentSyncApi(request:Request,env:unknown):Promise<Response
   if(!url.pathname.startsWith(prefix))return json({error:"Not found"},404);
   const path=url.pathname.slice(prefix.length),db=dbFrom(env),method=request.method;
   if(!db)return json({enabled:false,reason:"Cloudflare D1 has not been connected"},method==="GET"&&path==="status"?200:503);
-  if(!["status","setup","login","logout","snapshot"].includes(path))return json({error:"Not found"},404);
+  if(!["status","setup","login","logout","snapshot","photos/status","photos/index"].includes(path)&&!path.startsWith("photos/item/"))return json({error:"Not found"},404);
   if(method!=="GET"){
     if(request.headers.get("origin")!==url.origin||request.headers.get("x-scent-request")!=="1")
       return json({error:"Request not allowed"},403);
   }
   try{
+    if(path.startsWith("photos/"))return await photoApi(request,env,db,path);
     if(path==="status"&&method==="GET"){
       const account=await db.prepare("SELECT id FROM scent_account WHERE id='owner'").first();
       return json({enabled:true,initialized:Boolean(account),authenticated:Boolean(account&&await authed(db,request))});
