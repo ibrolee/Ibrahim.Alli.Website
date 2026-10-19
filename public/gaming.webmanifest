@@ -1,0 +1,12 @@
+{
+  "id": "/gaming",
+  "name": "Player One — Ibrahim's Game Library",
+  "short_name": "Player One",
+  "description": "Ibrahim's personal gaming library",
+  "start_url": "/gaming",
+  "scope": "/gaming",
+  "display": "standalone",
+  "background_color": "#0b0d0e",
+  "theme_color": "#0b0d0e",
+  "orientation": "portrait"
+}
