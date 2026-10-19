@@ -1,123 +1,85 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
-import { ArrowDownRight, ArrowUpRight, Gamepad2, Search, SlidersHorizontal, Trophy } from "lucide-react";
+import { useEffect, useMemo, useState, type FormEvent } from "react";
+import { ArrowDownRight, Gamepad2, Search, Plus, Pencil, X, Library, CirclePlay, CheckCircle2, Bookmark, RotateCcw, Settings2 } from "lucide-react";
 import css from "../gaming.css?url";
 
 type GameStatus = "Playing now" | "Played" | "Want to play";
-type Game = { title: string; platform: string; genre: string; status: GameStatus; note: string; year: string; appId: string };
-
-const games: Game[] = [
-  { title: "Onimusha", platform: "ROG Ally", genre: "Action · Adventure", status: "Playing now", note: "Samurai action, puzzles, and demon-slaying.", year: "Classic", appId: "761600" },
-  { title: "EA SPORTS FC", platform: "ROG Ally · PC", genre: "Sports · Football", status: "Playing now", note: "Football, matches, and squad building.", year: "Series", appId: "3405690" },
-  { title: "Days Gone", platform: "PC", genre: "Action · Open world", status: "Played", note: "A personal favourite for its world, survival, and story.", year: "2019", appId: "1259420" },
-  { title: "Marvel's Spider-Man Remastered", platform: "PC", genre: "Action · Open world", status: "Played", note: "Swinging through the city with a great superhero story.", year: "2022", appId: "1817070" },
-  { title: "Red Dead Redemption 2", platform: "PC", genre: "Action · Open world", status: "Played", note: "A richly detailed western and an unforgettable journey.", year: "2018", appId: "1174180" },
-  { title: "The Last of Us Part I", platform: "PC", genre: "Action · Story", status: "Played", note: "A tense, character-driven survival story.", year: "2022", appId: "1888930" },
-  { title: "The Last of Us Part II", platform: "PlayStation", genre: "Action · Story", status: "Played", note: "An intense, emotionally driven continuation.", year: "2020", appId: "2531310" },
-  { title: "Detroit: Become Human", platform: "PC", genre: "Interactive drama", status: "Played", note: "Choices, consequences, and branching narratives.", year: "2018", appId: "1222140" },
-  { title: "Grand Theft Auto V", platform: "PC", genre: "Action · Open world", status: "Played", note: "A chaotic open world with three playable leads.", year: "2013", appId: "271590" },
-  { title: "Sleeping Dogs: Definitive Edition", platform: "PC", genre: "Action · Open world", status: "Played", note: "An undercover crime drama with satisfying hand-to-hand combat.", year: "2014", appId: "307690" },
-  { title: "God of War", platform: "PC", genre: "Action · Story", status: "Played", note: "Mythology, powerful combat, and a father-son journey.", year: "2018", appId: "1593500" },
-  { title: "Ghost of Tsushima Director's Cut", platform: "PlayStation · PC", genre: "Action · Adventure", status: "Played", note: "A cinematic samurai adventure across a beautiful island.", year: "2020", appId: "2215430" },
-  { title: "Horizon Zero Dawn Remastered", platform: "PC", genre: "Action · RPG", status: "Want to play", note: "A mysterious world, machine creatures, and a story to uncover.", year: "2024", appId: "2561580" },
-  { title: "Horizon Forbidden West", platform: "PC", genre: "Action · RPG", status: "Want to play", note: "A bigger adventure through a stunning post-apocalyptic world.", year: "2022", appId: "2420110" },
-  { title: "Cyberpunk 2077", platform: "PC · ROG Ally", genre: "RPG · Open world", status: "Want to play", note: "Explore Night City and its branching stories.", year: "2020", appId: "1091500" },
-  { title: "Uncharted: Legacy of Thieves Collection", platform: "PC · PlayStation", genre: "Action · Adventure", status: "Want to play", note: "Two cinematic treasure-hunting adventures.", year: "2022", appId: "1659420" },
-  { title: "Far Cry 6", platform: "PC · ROG Ally", genre: "Action · Open world", status: "Want to play", note: "Take on a dictatorship in a large open world.", year: "2021", appId: "2369390" },
-  { title: "Assassin's Creed Origins", platform: "PC · ROG Ally", genre: "Action · Adventure", status: "Want to play", note: "Explore ancient Egypt in a story-led open world.", year: "2017", appId: "582160" },
-  { title: "Mafia: Definitive Edition", platform: "PC", genre: "Action · Crime", status: "Want to play", note: "A cinematic gangster story set in a period city.", year: "2020", appId: "1030840" },
-  { title: "Marvel's Guardians of the Galaxy", platform: "PC", genre: "Action · Story", status: "Want to play", note: "A character-focused space adventure with humour.", year: "2021", appId: "1088850" },
-  { title: "Batman: Arkham Knight", platform: "PC", genre: "Action · Adventure", status: "Want to play", note: "A dark superhero story across Gotham City.", year: "2015", appId: "208650" },
+type Game = { id: string; title: string; platform: string; genre: string; status: GameStatus; note: string; year: string; appId: string; previouslyPlayed: boolean };
+type Section = "Home" | "Playing" | "Finished" | "Wishlist" | "Manage";
+const seed: Game[] = [
+  { id:"onimusha", title:"Onimusha: Way of the Sword", platform:"PC", genre:"Action · Adventure", status:"Playing now", note:"A dark samurai adventure set in Kyoto during the Edo period.", year:"Upcoming", appId:"", previouslyPlayed:false },
+  { id:"fc", title:"EA SPORTS FC", platform:"PC", genre:"Sports · Football", status:"Playing now", note:"Football, matches, and squad building.", year:"Series", appId:"3405690", previouslyPlayed:false },
+  { id:"days-gone", title:"Days Gone", platform:"PC", genre:"Action · Open world", status:"Played", note:"A personal favourite for its world, survival, and story.", year:"2019", appId:"1259420", previouslyPlayed:false },
+  { id:"spider-man", title:"Marvel's Spider-Man Remastered", platform:"PC", genre:"Action · Open world", status:"Played", note:"Swinging through the city with a great superhero story.", year:"2022", appId:"1817070", previouslyPlayed:false },
+  { id:"rdr2", title:"Red Dead Redemption 2", platform:"PC", genre:"Action · Open world", status:"Played", note:"A richly detailed western and an unforgettable journey.", year:"2018", appId:"1174180", previouslyPlayed:false },
+  { id:"tlou1", title:"The Last of Us Part I", platform:"PC", genre:"Action · Story", status:"Played", note:"A tense, character-driven survival story.", year:"2022", appId:"1888930", previouslyPlayed:false },
+  { id:"tlou2", title:"The Last of Us Part II", platform:"PC", genre:"Action · Story", status:"Played", note:"An intense, emotionally driven continuation.", year:"2020", appId:"2531310", previouslyPlayed:false },
+  { id:"detroit", title:"Detroit: Become Human", platform:"PC", genre:"Interactive drama", status:"Played", note:"Choices, consequences, and branching narratives.", year:"2018", appId:"1222140", previouslyPlayed:false },
+  { id:"gta5", title:"Grand Theft Auto V", platform:"PC", genre:"Action · Open world", status:"Played", note:"A chaotic open world with three playable leads.", year:"2013", appId:"271590", previouslyPlayed:false },
+  { id:"sleeping-dogs", title:"Sleeping Dogs: Definitive Edition", platform:"PC", genre:"Action · Open world", status:"Played", note:"An undercover crime drama with satisfying hand-to-hand combat.", year:"2014", appId:"307690", previouslyPlayed:false },
+  { id:"gow", title:"God of War", platform:"PC", genre:"Action · Story", status:"Played", note:"Mythology, powerful combat, and a father-son journey.", year:"2018", appId:"1593500", previouslyPlayed:false },
+  { id:"ghost-tsushima", title:"Ghost of Tsushima Director's Cut", platform:"PC", genre:"Action · Adventure", status:"Played", note:"A cinematic samurai adventure across a beautiful island.", year:"2020", appId:"2215430", previouslyPlayed:false },
+  { id:"horizon-zero", title:"Horizon Zero Dawn Remastered", platform:"PC", genre:"Action · RPG", status:"Want to play", note:"A mysterious world, machine creatures, and a story to uncover.", year:"2024", appId:"2561580", previouslyPlayed:false },
+  { id:"horizon-west", title:"Horizon Forbidden West", platform:"PC", genre:"Action · RPG", status:"Want to play", note:"A bigger adventure through a stunning post-apocalyptic world.", year:"2022", appId:"2420110", previouslyPlayed:false },
+  { id:"cyberpunk", title:"Cyberpunk 2077", platform:"PC", genre:"RPG · Open world", status:"Want to play", note:"Explore Night City and its branching stories.", year:"2020", appId:"1091500", previouslyPlayed:false },
+  { id:"uncharted", title:"Uncharted: Legacy of Thieves Collection", platform:"PC", genre:"Action · Adventure", status:"Want to play", note:"Two cinematic treasure-hunting adventures.", year:"2022", appId:"1659420", previouslyPlayed:false },
+  { id:"farcry6", title:"Far Cry 6", platform:"PC", genre:"Action · Open world", status:"Want to play", note:"Take on a dictatorship in a large open world.", year:"2021", appId:"2369390", previouslyPlayed:false },
+  { id:"ac-origins", title:"Assassin's Creed Origins", platform:"PC", genre:"Action · Adventure", status:"Want to play", note:"Explore ancient Egypt in a story-led open world.", year:"2017", appId:"582160", previouslyPlayed:false },
+  { id:"mafia", title:"Mafia: Definitive Edition", platform:"PC", genre:"Action · Crime", status:"Want to play", note:"A cinematic gangster story set in a period city.", year:"2020", appId:"1030840", previouslyPlayed:false },
+  { id:"guardians", title:"Marvel's Guardians of the Galaxy", platform:"PC", genre:"Action · Story", status:"Want to play", note:"A character-focused space adventure with humour.", year:"2021", appId:"1088850", previouslyPlayed:false },
+  { id:"batman", title:"Batman: Arkham Knight", platform:"PC", genre:"Action · Adventure", status:"Want to play", note:"A dark superhero story across Gotham City.", year:"2015", appId:"208650", previouslyPlayed:false },
 ];
-
-const statusOptions = ["All games", "Playing now", "Played", "Want to play"] as const;
-const steamArt = (appId: string) => `https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/${appId}/header.jpg`;
+const storageKey = "ibrahim-gaming-library-v1";
+const art = (id:string) => id ? `https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/${id}/header.jpg` : "";
+const blank = (): Omit<Game,"id"> => ({title:"",platform:"PC",genre:"Action · Adventure",status:"Want to play",note:"",year:"",appId:"",previouslyPlayed:false});
 
 export const Route = createFileRoute("/gaming")({
-  head: () => ({
-    meta: [
-      { title: "Gaming — Ibrahim Alli" },
-      { name: "description", content: "A personal gaming profile by Ibrahim Alli: games played, currently playing, and next on the list." },
-      { property: "og:title", content: "Gaming — Ibrahim Alli" },
-      { property: "og:description", content: "One player. Too many worlds to explore." },
-    ],
-    links: [{ rel: "stylesheet", href: css }],
-  }),
+  head: () => ({ meta: [
+    { title:"Player One — Ibrahim's Game Library" },
+    { name:"description", content:"Ibrahim's personal game library: playing, finished, replaying, and next up." },
+    { name:"theme-color", content:"#0b0d0e" },
+    { name:"apple-mobile-web-app-capable", content:"yes" },
+    { name:"mobile-web-app-capable", content:"yes" },
+    { name:"apple-mobile-web-app-title", content:"Player One" },
+    { name:"apple-mobile-web-app-status-bar-style", content:"black-translucent" },
+  ], links:[{rel:"stylesheet",href:css},{rel:"manifest",href:"/gaming.webmanifest"},{rel:"canonical",href:"https://ibrahimalli.com/gaming"}] }),
   component: GamingPage,
 });
 
-function GamingPage() {
-  const [query, setQuery] = useState("");
-  const [status, setStatus] = useState<(typeof statusOptions)[number]>("All games");
-  const [platform, setPlatform] = useState("All platforms");
-  const platforms = ["All platforms", ...Array.from(new Set(games.flatMap((game) => game.platform.split(" · "))))];
-  const filteredGames = useMemo(() => games.filter((game) => {
-    const matchesQuery = `${game.title} ${game.genre} ${game.platform}`.toLowerCase().includes(query.toLowerCase());
-    const matchesStatus = status === "All games" || game.status === status;
-    const matchesPlatform = platform === "All platforms" || game.platform.split(" · ").includes(platform);
-    return matchesQuery && matchesStatus && matchesPlatform;
-  }), [query, status, platform]);
-  const playingCount = games.filter((game) => game.status === "Playing now").length;
-  const playedCount = games.filter((game) => game.status === "Played").length;
-  const wishlistCount = games.filter((game) => game.status === "Want to play").length;
-
-  return (
-    <main className="gaming-page">
-      <section className="gaming-hero">
-        <img className="gaming-hero-image" src={steamArt("1259420")} alt="" fetchPriority="high" />
-        <div className="gaming-hero-shade" />
-        <div className="gaming-hero-grid" aria-hidden="true" />
-        <div className="gaming-hero-inner">
-          <p className="gaming-eyebrow"><Gamepad2 size={15} /> IBRAHIM ALLI <span>/</span> PLAYER PROFILE</p>
-          <p className="gaming-kicker">MY SAVE FILE · MY STORY</p>
-          <h1>Press start<span>.</span><br /><em>Stay awhile.</em></h1>
-          <p className="gaming-intro">The games I've played, the worlds I'm in right now, and the adventures still waiting for me.</p>
-          <a className="gaming-hero-link" href="#library">Explore my library <ArrowDownRight size={17} /></a>
-          <div className="gaming-hero-index"><span>PLAYER</span><strong>01</strong><span>EST. ALWAYS</span></div>
-        </div>
-        <div className="gaming-hero-bottom"><span>STORY FIRST. ALWAYS.</span><span>SCROLL TO EXPLORE ↓</span></div>
-      </section>
-
-      <section className="gaming-content" id="library">
-        <div className="gaming-section-heading">
-          <div><p className="gaming-eyebrow">THE PERSONAL ARCHIVE</p><h2>My game library<span>.</span></h2></div>
-          <p className="gaming-section-note">One player. Too many worlds to explore.</p>
-        </div>
-        <div className="gaming-stats" aria-label="Library summary">
-          <div><span className="gaming-stat-number">{games.length.toString().padStart(2, "0")}</span><span className="gaming-stat-label">Games collected</span></div>
-          <div><span className="gaming-stat-number">{playingCount.toString().padStart(2, "0")}</span><span className="gaming-stat-label">Playing now</span></div>
-          <div><span className="gaming-stat-number">{playedCount.toString().padStart(2, "0")}</span><span className="gaming-stat-label">Played & loved</span></div>
-          <div><span className="gaming-stat-number">{wishlistCount.toString().padStart(2, "0")}</span><span className="gaming-stat-label">On my wishlist</span></div>
-        </div>
-        <div className="gaming-toolbar">
-          <label className="gaming-search"><Search size={17} /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search titles, genres, platforms…" /></label>
-          <label className="gaming-select"><SlidersHorizontal size={16} /><select aria-label="Filter by status" value={status} onChange={(event) => setStatus(event.target.value as (typeof statusOptions)[number])}>{statusOptions.map((option) => <option key={option}>{option}</option>)}</select></label>
-          <label className="gaming-select"><select aria-label="Filter by platform" value={platform} onChange={(event) => setPlatform(event.target.value)}>{platforms.map((option) => <option key={option}>{option}</option>)}</select></label>
-        </div>
-        <div className="gaming-results-line"><span>SHOWING <b>{filteredGames.length.toString().padStart(2, "0")}</b> TITLES</span><span>CURATED BY IBRAHIM</span></div>
-        <div className="gaming-cards">
-          {filteredGames.map((game, index) => (
-            <article className="gaming-card" key={game.title}>
-              <div className="gaming-card-art">
-                <img src={steamArt(game.appId)} alt={`${game.title} cover art`} loading="lazy" onError={(event) => { event.currentTarget.style.display = "none"; }} />
-                <div className="gaming-card-art-shade" />
-                <span className="gaming-card-index">{String(index + 1).padStart(2, "0")}</span>
-                <span className="gaming-art-platform">{game.platform}</span>
-                <span className="gaming-art-open"><ArrowUpRight size={18} /></span>
-              </div>
-              <div className="gaming-card-body">
-                <div className="gaming-card-meta"><span>{game.genre}</span><span className={`gaming-status gaming-status-${game.status === "Playing now" ? "playing" : game.status === "Want to play" ? "backlog" : "completed"}`}>{game.status}</span></div>
-                <h3>{game.title}</h3>
-                <p>{game.note}</p>
-                <div className="gaming-card-foot"><span>{game.year}</span><span>IBRAHIM'S LIBRARY <ArrowUpRight size={13} /></span></div>
-              </div>
-            </article>
-          ))}
-          {filteredGames.length === 0 && <div className="gaming-empty"><Trophy size={24} /><h3>No games found</h3><p>Try another title, platform, or status.</p></div>}
-        </div>
-        <p className="gaming-disclaimer">A living collection — games I've finished, games I'm playing, and stories I can't wait to get into.</p>
-      </section>
-      <footer className="gaming-footer"><span>GG, THANKS FOR PLAYING.</span><span>IBRAHIM ALLI © {new Date().getFullYear()}</span><a href="#top" onClick={(event) => { event.preventDefault(); window.scrollTo({ top: 0, behavior: "smooth" }); }}>BACK TO TOP ↑</a></footer>
-    </main>
-  );
+function GamingPage(){
+  const [games,setGames] = useState<Game[]>(seed);
+  const [ready,setReady] = useState(false);
+  const [section,setSection] = useState<Section>("Home");
+  const [query,setQuery] = useState("");
+  const [editing,setEditing] = useState<string|null>(null);
+  const [draft,setDraft] = useState<Omit<Game,"id">>(blank());
+  const [formOpen,setFormOpen] = useState(false);
+  const [notice,setNotice] = useState("");
+  useEffect(()=>{ try { const saved=localStorage.getItem(storageKey); if(saved){const parsed=JSON.parse(saved);if(Array.isArray(parsed))setGames(parsed);} } catch {} setReady(true); },[]);
+  useEffect(()=>{if(ready){try{localStorage.setItem(storageKey,JSON.stringify(games));}catch{setNotice("Could not save on this device. Check available storage.");}}},[games,ready]);
+  const counts = useMemo(()=>({playing:games.filter(g=>g.status==="Playing now").length,finished:games.filter(g=>g.status==="Played").length,wishlist:games.filter(g=>g.status==="Want to play").length}),[games]);
+  const visible = useMemo(()=>games.filter(g=>{
+    const sectionMatch=section==="Playing"?g.status==="Playing now":section==="Finished"?g.status==="Played":section==="Wishlist"?g.status==="Want to play":true;
+    return sectionMatch && `${g.title} ${g.genre} ${g.platform}`.toLowerCase().includes(query.toLowerCase());
+  }),[games,section,query]);
+  function openAdd(){setEditing(null);setDraft(blank());setFormOpen(true);}
+  function openEdit(game:Game){setEditing(game.id);setDraft({...game});setFormOpen(true);}
+  function save(event:FormEvent){event.preventDefault();if(!draft.title.trim())return;const game:Game={...draft,id:editing||`game-${Date.now()}`,title:draft.title.trim(),platform:draft.platform.trim()||"PC",appId:draft.appId.trim()};setGames(old=>editing?old.map(g=>g.id===editing?game:g):[game,...old]);setFormOpen(false);setNotice(editing?"Game updated":"Game added to your library");}
+  function remove(id:string){setGames(old=>old.filter(g=>g.id!==id));setNotice("Game removed");}
+  const nav: {label:Section;icon:typeof Library}[]=[{label:"Home",icon:Gamepad2},{label:"Playing",icon:CirclePlay},{label:"Finished",icon:CheckCircle2},{label:"Wishlist",icon:Bookmark},{label:"Manage",icon:Settings2}];
+  return <main className="player-app">
+    <header className="player-topbar"><a className="player-brand" href="#top" onClick={e=>{e.preventDefault();setSection("Home");window.scrollTo({top:0,behavior:"smooth"});}}><span className="player-brand-mark"><Gamepad2 size={19}/></span><span>PLAYER<span className="player-brand-accent">ONE</span><small>IBRAHIM'S GAME SPACE</small></span></a><span className="player-top-tag">PERSONAL SAVE FILE <i/></span></header>
+    <section className="player-hero" id="top"><img className="player-hero-art" src={art("1259420")} alt="" /><div className="player-hero-overlay"/><div className="player-hero-content"><p className="player-eyebrow">PLAYER 01 <span>•</span> MY WORLD, MY RULES</p><h1>Every world<br/>has a <em>story.</em></h1><p className="player-hero-copy">The stories I've lived, the worlds I'm exploring, and the adventures waiting in my queue.</p><button className="player-primary" onClick={()=>{setSection("Playing");document.getElementById("library")?.scrollIntoView({behavior:"smooth"});}}>Continue playing <ArrowDownRight size={17}/></button><div className="player-hero-record"><span><b>{games.length.toString().padStart(2,"0")}</b><small>IN THE LIBRARY</small></span><span><b>{counts.playing.toString().padStart(2,"0")}</b><small>IN PROGRESS</small></span><span><b>{counts.finished.toString().padStart(2,"0")}</b><small>FINISHED</small></span></div></div><span className="player-hero-caption">STORY FIRST. ALWAYS.</span></section>
+    <section className="player-library" id="library">
+      <div className="player-section-title"><div><p className="player-eyebrow">THE PERSONAL ARCHIVE</p><h2>{section==="Home"?"My game library":section==="Playing"?"Currently playing":section==="Finished"?"Finished stories":section==="Wishlist"?"Up next":"Manage library"}<span>.</span></h2><p>{section==="Playing"?"Active adventures, including the stories I'm returning to.":section==="Finished"?"Every completed journey stays on my shelf.":section==="Wishlist"?"The worlds I want to explore next.":"A living collection, organised my way."}</p></div><button className="player-add" onClick={openAdd}><Plus size={17}/> Add a game</button></div>
+      <div className="player-metrics"><button onClick={()=>setSection("Playing")}><span className="metric-icon"><CirclePlay size={18}/></span><b>{counts.playing.toString().padStart(2,"0")}</b><small>PLAYING</small></button><button onClick={()=>setSection("Finished")}><span className="metric-icon"><CheckCircle2 size={18}/></span><b>{counts.finished.toString().padStart(2,"0")}</b><small>FINISHED</small></button><button onClick={()=>setSection("Wishlist")}><span className="metric-icon"><Bookmark size={18}/></span><b>{counts.wishlist.toString().padStart(2,"0")}</b><small>WISHLIST</small></button></div>
+      <div className="player-tools"><label className="player-search"><Search size={17}/><input value={query} onChange={e=>setQuery(e.target.value)} placeholder="Find a game in your library…"/></label><span>{visible.length} {visible.length===1?"GAME":"GAMES"}</span></div>
+      {section==="Manage"&&<div className="player-manage-tip"><Settings2 size={18}/><div><b>Your library, your rules</b><p>Add a new game or use the pencil on any card to update its status, platform, notes, or replay flag. Changes save on this device.</p></div></div>}
+      <div className="player-game-grid">{visible.map((game,index)=><article className="player-game-card" key={game.id}><div className="player-game-image">{game.appId?<img src={art(game.appId)} alt={game.title+" artwork"} loading="lazy" onError={e=>{e.currentTarget.style.display="none";}}/>:<div className="player-no-art"><Gamepad2 size={34}/><span>{game.title}</span></div>}<div className="player-image-shade"/><span className="player-card-number">{String(index+1).padStart(2,"0")}</span><button className="player-edit" aria-label={"Edit "+game.title} onClick={()=>openEdit(game)}><Pencil size={15}/></button><span className={"player-status "+(game.status==="Playing now"?"is-playing":game.status==="Played"?"is-finished":"is-wishlist")}>{game.status==="Playing now"?"PLAYING":game.status==="Played"?"FINISHED":"UP NEXT"}</span></div><div className="player-card-info"><div className="player-card-meta"><span>{game.genre}</span><span>{game.platform||"PC"}</span></div><h3>{game.title}</h3><p>{game.note||"A new chapter in the library."}</p>{game.status==="Playing now"&&game.previouslyPlayed&&<div className="player-replay"><RotateCcw size={13}/> REPLAY RUN <span>Played before</span></div>}<div className="player-card-bottom"><span>{game.year||"IN THE LIBRARY"}</span><button onClick={()=>openEdit(game)}>UPDATE <Pencil size={12}/></button></div></div></article>)}{visible.length===0&&<div className="player-empty"><Gamepad2 size={28}/><h3>Nothing on this screen yet</h3><p>Add a game or try another search.</p><button className="player-primary" onClick={openAdd}><Plus size={16}/> Add a game</button></div>}</div>
+      <p className="player-storage-note">Your library saves locally on this device. Use the same browser to keep your edits.</p>
+    </section>
+    <nav className="player-bottom-nav" aria-label="Game library navigation">{nav.map(({label,icon:Icon})=><button key={label} className={section===label?"active":""} onClick={()=>{setSection(label);setQuery("");if(label==="Manage")setNotice("");document.getElementById("library")?.scrollIntoView({behavior:"smooth"});}}><Icon size={19}/><span>{label}</span></button>)}</nav>
+    {notice&&<div className="player-toast" role="status">{notice}<button onClick={()=>setNotice("")} aria-label="Dismiss"><X size={14}/></button></div>}
+    {formOpen&&<div className="player-modal-backdrop" onClick={e=>{if(e.target===e.currentTarget)setFormOpen(false);}}><form className="player-modal" onSubmit={save}><div className="player-modal-head"><div><p className="player-eyebrow">{editing?"EDIT ENTRY":"EXPAND YOUR LIBRARY"}</p><h2>{editing?"Update game":"Add a game"}<span>.</span></h2></div><button type="button" className="player-modal-close" onClick={()=>setFormOpen(false)} aria-label="Close"><X/></button></div><label>Game title<input required value={draft.title} onChange={e=>setDraft({...draft,title:e.target.value})} placeholder="e.g. Cyberpunk 2077"/></label><div className="player-form-row"><label>Platform<select value={draft.platform} onChange={e=>setDraft({...draft,platform:e.target.value})}><option>PC</option><option>PlayStation</option><option>Xbox</option><option>Nintendo Switch</option><option>Other</option></select></label><label>Status<select value={draft.status} onChange={e=>setDraft({...draft,status:e.target.value as GameStatus,previouslyPlayed:e.target.value==="Playing now"?draft.previouslyPlayed:false})}><option>Playing now</option><option>Played</option><option>Want to play</option></select></label></div><label>Genre<input value={draft.genre} onChange={e=>setDraft({...draft,genre:e.target.value})} placeholder="Action · Adventure"/></label><label>Short note<textarea rows={3} value={draft.note} onChange={e=>setDraft({...draft,note:e.target.value})} placeholder="What makes this game special to you?"/></label><div className="player-form-row"><label>Year / era<input value={draft.year} onChange={e=>setDraft({...draft,year:e.target.value})} placeholder="2026"/></label><label>Steam app ID <span>(optional artwork)</span><input value={draft.appId} onChange={e=>setDraft({...draft,appId:e.target.value})} placeholder="e.g. 1091500"/></label></div>{draft.status==="Playing now"&&<label className="player-check"><input type="checkbox" checked={draft.previouslyPlayed} onChange={e=>setDraft({...draft,previouslyPlayed:e.target.checked})}/><span><b>Replay run</b><small>I've played and finished this game before.</small></span></label>}<div className="player-modal-actions">{editing&&<button type="button" className="player-delete" onClick={()=>{remove(editing);setFormOpen(false);}}>Remove game</button>}<button type="button" className="player-cancel" onClick={()=>setFormOpen(false)}>Cancel</button><button type="submit" className="player-primary">{editing?"Save changes":"Add to library"}</button></div><p className="player-form-footnote">Edits are saved in this browser on this device.</p></form></div>}
+  </main>;
 }
