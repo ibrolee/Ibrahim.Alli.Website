@@ -158,3 +158,64 @@
  .player-store-search{align-items:stretch;flex-direction:column}
  .player-store-search .player-primary{width:100%}
 }
+
+
+/* Compact first-screen library layout */
+.player-topbar{height:58px}
+.player-hero{min-height:250px}
+.player-hero-content{padding:27px 32px 30px}
+.player-hero h1{font-size:clamp(40px,5.5vw,60px);margin:12px 0 8px;line-height:.9}
+.player-hero-copy{font-size:11px;line-height:1.5;max-width:370px}
+.player-hero .player-primary{margin-top:11px;padding:10px 13px;font-size:10px}
+.player-eyebrow{font-size:8px;letter-spacing:.15em}
+.player-hero-caption{font-size:7px;bottom:9px}
+.player-library{padding-top:23px}
+.player-section-title{margin-bottom:13px}
+.player-section-title h2{font-size:clamp(28px,3.7vw,38px);margin:6px 0}
+.player-section-title p:last-child{font-size:10px;line-height:1.5}
+.player-add{padding:10px 12px;font-size:10px}
+.player-metrics{margin-bottom:13px;gap:7px}
+.player-metrics button{padding:8px 10px}
+.player-tools{margin-bottom:12px}
+.player-game-grid{gap:11px}
+.player-game-image{height:155px}
+.player-card-info{padding:12px}
+.player-card-info h3{font-size:15px;margin:9px 0 5px}
+.player-card-info>p{font-size:9px;line-height:1.5;min-height:28px}
+.player-card-bottom{margin-top:10px;padding-top:9px}
+@media(max-width:560px){
+ .player-topbar{height:53px;padding:0 12px}
+ .player-brand-mark{width:30px;height:30px}
+ .player-brand{font-size:13px;gap:8px}
+ .player-brand small{font-size:7px;margin-top:4px}
+ .player-top-tag{font-size:6px;letter-spacing:.08em}
+ .player-hero{min-height:210px}
+ .player-hero-content{padding:23px 17px 25px}
+ .player-hero h1{font-size:clamp(38px,10.2vw,51px);margin:10px 0 7px}
+ .player-hero-copy{max-width:270px;font-size:10px;line-height:1.45}
+ .player-hero .player-primary{margin-top:10px;padding:9px 11px;font-size:9px}
+ .player-hero-caption{right:10px;bottom:7px;font-size:5px}
+ .player-library{padding:19px 12px 20px}
+ .player-section-title{gap:8px;margin-bottom:11px}
+ .player-section-title h2{font-size:27px;margin:5px 0}
+ .player-section-title p:last-child{font-size:9px}
+ .player-add{min-height:36px;padding:8px 10px;font-size:9px}
+ .player-metrics{gap:5px;margin-bottom:10px}
+ .player-metrics button{padding:7px 3px;gap:4px}
+ .metric-icon{width:25px;height:25px}
+ .player-metrics b{font-size:17px}
+ .player-metrics small{font-size:6px}
+ .player-tools{gap:7px;margin-bottom:10px}
+ .player-search{min-height:36px;padding:0 9px;gap:7px}
+ .player-search input{font-size:9px}
+ .player-tools>span{font-size:7px}
+ .player-game-grid{gap:8px}
+ .player-game-image{height:108px}
+ .player-card-info{padding:9px 8px}
+ .player-card-meta{font-size:6px}
+ .player-card-info h3{font-size:12px;margin:8px 0 4px}
+ .player-card-info>p{font-size:8px;line-height:1.45;min-height:34px}
+ .player-card-bottom{font-size:6px;margin-top:8px;padding-top:7px}
+ .player-card-bottom button{font-size:6px}
+ .player-status{font-size:6px}
+}
