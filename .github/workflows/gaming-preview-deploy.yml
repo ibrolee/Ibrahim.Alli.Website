@@ -1,8 +1,7 @@
 name: Gaming portfolio preview deploy
 
 on:
-  push:
-    branches: [feature/gaming-portfolio-2026-10-19]
+  workflow_dispatch:
 
 permissions:
   contents: read
