@@ -23,5 +23,5 @@ jobs:
       - name: Confirm gaming route is included
         run: |
           test -d .output/public
-          grep -R -q "Press start" .output
+          grep -R -q "Every world" .output
           echo "Gaming portfolio build completed and route content was emitted."
