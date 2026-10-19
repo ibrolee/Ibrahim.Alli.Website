@@ -1,6 +1,8 @@
 name: Gaming portfolio preview deploy
 
 on:
+  push:
+    branches: [feature/gaming-portfolio-2026-10-19]
   workflow_dispatch:
 
 permissions:
@@ -27,4 +29,4 @@ jobs:
             echo "::notice::Preview build succeeded, but deployment was skipped because CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID repository secrets are not configured."
             exit 0
           fi
-          npx --yes wrangler@4.135.0 deploy
+          npx --yes wrangler@4.135.0 deploy --config wrangler.preview.jsonc
