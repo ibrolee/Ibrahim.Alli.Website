@@ -2,7 +2,7 @@ import { JisScreenGallery } from "@/components/jis-screen-gallery";
 import { SuperplusScreenGallery } from "@/components/superplus-screen-gallery";
 import { SuperplusProjectVisual } from "@/components/superplus-project-visual";
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { ArrowLeft, ArrowRight, ExternalLink, Check, Smartphone, Users, QrCode, CreditCard } from "lucide-react";
+import { ArrowLeft, ArrowRight, ExternalLink, Check, Smartphone, Users, QrCode, CreditCard, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { projects } from "@/lib/portfolio-content";
 import { JisProjectVisual } from "@/components/jis-project-visual";
@@ -61,7 +61,10 @@ function ProjectPage() {
               <p className="text-xs font-semibold uppercase tracking-[0.14em] text-accent-mark">{project.type}</p>
               <p className="mt-5 max-w-2xl text-base leading-7 text-muted-foreground md:text-lg md:leading-8">{project.summary}</p>
               {project.url && (
-                <Button asChild className="mt-7"><a href={project.url} target="_blank" rel="noopener noreferrer">{isConcept ? "View Concept" : isFitness ? "Visit Live Gym Website" : "View Developed Storefront"} <ExternalLink aria-hidden="true" /></a></Button>
+                <div className="mt-7 flex flex-wrap gap-3">
+                  <Button asChild><a href={project.url} target="_blank" rel="noopener noreferrer">{isConcept ? "View Concept" : isFitness ? "Visit Live Gym Website" : "View Developed Storefront"} <ExternalLink aria-hidden="true" /></a></Button>
+                  {isFitness && <Button asChild variant="outline"><a href="https://apps.apple.com/ng/app/sp-fitness/id6820107696" target="_blank" rel="noopener noreferrer">Get SP Fitness on the App Store <Download aria-hidden="true" /></a></Button>}
+                </div>
               )}
             </div>
           </div>
@@ -200,7 +203,10 @@ function ProjectPage() {
               </div>
               <div className="mt-10 flex flex-wrap items-center justify-between gap-6 border-t border-paper/20 pt-8">
                 <p className="flex items-center gap-2 text-sm text-paper/75"><Check className="size-4 shrink-0 text-accent" aria-hidden="true" /> Ongoing development and management</p>
-                <a href="https://www.superplusfitness.com" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 border-b border-accent pb-2 text-sm font-semibold text-accent transition-opacity hover:opacity-70">Explore the live website <ExternalLink className="size-4" aria-hidden="true" /></a>
+                <div className="flex flex-wrap gap-5">
+                  <a href="https://www.superplusfitness.com" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 border-b border-accent pb-2 text-sm font-semibold text-accent transition-opacity hover:opacity-70">Explore the live website <ExternalLink className="size-4" aria-hidden="true" /></a>
+                  <a href="https://apps.apple.com/ng/app/sp-fitness/id6820107696" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 border-b border-accent pb-2 text-sm font-semibold text-accent transition-opacity hover:opacity-70">Download SP Fitness <Download className="size-4" aria-hidden="true" /></a>
+                </div>
               </div>
             </div>
           </section>
