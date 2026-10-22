@@ -46,10 +46,10 @@ const screens = [
     label: "Member app",
     title: "The member experience continues on the phone.",
     description:
-      "The SP Fitness app brings together memberships, workouts, bookings, SP Points, rewards, streaks and challenges.",
+      "The SP Fitness iPhone app brings together a digital membership card, visit tracking, SP Points, weekly spin, badges, rewards and challenges. Open the official App Store listing to install it.",
     image: "app-page",
-    url: "https://www.superplusfitness.com/app",
-    note: "Live app page · Illustrated app preview from the official website",
+    url: "https://apps.apple.com/ng/app/sp-fitness/id6820107696",
+    note: "Official SP Fitness iOS app · Available on the Apple App Store",
   },
 ] as const;
 
@@ -61,7 +61,7 @@ export function SuperplusScreenGallery() {
       domain="superplusfitness.com"
       imagePrefix="spf"
       id="spf-gallery"
-      introduction="Explore the public website, membership journey, team access and member app. Select a view to take a closer look."
+      introduction="Explore the public website, membership journey, team access and SP Fitness member app. Select a view to take a closer look; the app link opens the official App Store listing."
     />
   );
 }
