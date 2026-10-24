@@ -1,5 +1,4 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { track } from "@vercel/analytics";
 import { ArrowLeft, ArrowRight, ArrowUpRight, Check, ClipboardCheck, Clock3 } from "lucide-react";
 import { getInsight,insights } from "@/lib/insight-content";
 
@@ -34,10 +33,6 @@ export const Route=createFileRoute("/insights/$slug")({
 function InsightPage(){
   const insight=Route.useLoaderData();
   const related=insights.filter(item=>item.slug!==insight.slug).slice(0,2);
-  const trackClick=(placement:"sidebar"|"end")=>{
-    // This event represents navigating to the form, not a delivered message or qualified enquiry.
-    track("portfolio_insight_cta_click",{guide:insight.slug,placement});
-  };
   const articleSchema={
     "@context":"https://schema.org",
     "@type":"Article",
@@ -90,7 +85,7 @@ function InsightPage(){
             <p className="p-label">Need help planning?</p>
             <h2>Your next step should be clearer.</h2>
             <p>Tell me what you're building and I'll help define a practical scope before preparing a quote.</p>
-            <Link to="/start-project" search={{service:insight.service,insight:insight.slug}} onClick={()=>trackClick("sidebar")}>Discuss your project <ArrowUpRight size={17} aria-hidden="true"/></Link>
+            <Link to="/start-project" search={{service:insight.service,insight:insight.slug}}>Discuss your project <ArrowUpRight size={17} aria-hidden="true"/></Link>
           </div>
           <div className="ia-4d-related">
             <h3>Keep reading</h3>
@@ -102,7 +97,7 @@ function InsightPage(){
     <section className="ia-stage-end">
       <div className="p-container ia-stage-end-inner">
         <div><p className="p-label">From reading to doing</p><h2>Ready to discuss<br/><em>your own project?</em></h2></div>
-        <Link to="/start-project" search={{service:insight.service,insight:insight.slug}} onClick={()=>trackClick("end")} className="ia-stage-primary">{insight.action} <ArrowUpRight size={18} aria-hidden="true"/></Link>
+        <Link to="/start-project" search={{service:insight.service,insight:insight.slug}} className="ia-stage-primary">{insight.action} <ArrowUpRight size={18} aria-hidden="true"/></Link>
       </div>
     </section>
   </main>

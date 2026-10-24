@@ -1,18 +1,35 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { ArrowRight, Bookmark, Check, ChevronDown, CloudOff, Download, FlaskConical, Heart, ImageOff, Layers, Plus, Search, ShoppingBag, Sparkles, Trash2, Upload, Wallet, X } from "lucide-react";
+import { ArrowRight, Bookmark, Check, ChevronDown, Cloud, CloudOff, Download, FlaskConical, Heart, ImageOff, LoaderCircle, Layers, Plus, Search, ShoppingBag, Sparkles, Trash2, Upload, Wallet, X } from "lucide-react";
 import { compressScentPhoto, saveScentPhoto, getScentPhoto, removeScentPhoto, blobAsDataUrl, dataUrlAsBlob } from "@/lib/scent-photos";
 import css from "../fragrance.css?url";
+import {useCabinetSync} from "@/lib/scent-sync-client";
+import {queuePhotoChange,photoBucketStatus,reconcilePhotos,type PhotoSyncState} from "@/lib/scent-photo-cloud";
+import { comboBottleCost, restoreBottleLife, savedFinishDate, setBottleFinished, setComboBottleFinished, shelfTotals } from "@/lib/scent-shelf";
+import { sameScent } from "@/lib/scent-identity";
+import type { CatalogSource } from "@/lib/scent-catalogue";
+import { filterAndSortDiscover, type DiscoverFilters, DEFAULT_DISCOVER_FILTERS, valueForLongevity, valueForProjection } from "@/lib/scent-filters";
 
 type Currency = "NGN" | "USD";
 type Page = "collection" | "discover" | "wishlist" | "worth" | "layer";
-type Perfume = { id: string; name: string; brand: string; image?: string | undefined; year?: string | undefined; family?: string | undefined; description?: string | undefined; notes: string[]; top: string[]; heart: string[]; base: string[]; accords: string[] };
-type Owned = { perfume: Perfume; amount: number; currency: Currency; added: string; favorite?: boolean };
+const SOURCES:{id:CatalogSource;name:string}[]=[
+  {id:"auto",name:"Search all"},
+  {id:"free",name:"Free sources only"},
+  {id:"beautyfacts",name:"Open Beauty Facts · free"},
+  {id:"productsfacts",name:"Open Products Facts · free"},
+  {id:"noteboxd",name:"Noteboxd"},
+  {id:"fragella",name:"Fragella"},
+  {id:"wikidata",name:"Wikidata · free"}
+];
+type Perfume = { id: string; name: string; brand: string; image?: string | undefined; year?: string | undefined; family?: string | undefined; description?: string | undefined; notes: string[]; top: string[]; heart: string[]; base: string[]; accords: string[];
+ longevity?:string|undefined;projection?:string|undefined;rating?:number|undefined;gender?:string|undefined;popularity?:string|undefined;bestSeasons?:string[]|undefined;bestOccasions?:string[]|undefined; aliases?:string[]|undefined; imageCredit?:string|undefined;imageSource?:string|undefined;imageLicense?:string|undefined;imageLicenseUrl?:string|undefined };
+type Owned = { id: string; perfume: Perfume; amount: number; currency: Currency; added: string; favorite?: boolean; finishedAt?: string };
 type Mix = { id: string; left: string; right: string; date: string };
-type Combo = { id:string; name:string; perfumes:Perfume[]; target:"collection"|"wishlist"; amount?:number; added:string };
-type State = { collection: Owned[]; wishlist: Perfume[]; mixes: Mix[]; combos: Combo[] };
+type Combo = { id:string; name:string; perfumes:Perfume[]; target:"collection"|"wishlist"; amount?:number; added:string; finishedPerfumes?:Record<string,string> };
+type MyInsight={priceNGN?:number;longevity?:string;projection?:string};
+type State = { collection: Owned[]; wishlist: Perfume[]; mixes: Mix[]; combos: Combo[]; insights:Record<string,MyInsight> };
 const STORAGE = "ia-scent-cabinet-v1";
-const initial: State = { collection: [], wishlist: [], mixes: [], combos: [] };
+const initial: State = { collection: [], wishlist: [], mixes: [], combos: [], insights:{} };
 const API = "/api/fragrance";
 
 function bits(value: unknown): string[] {
@@ -49,15 +66,39 @@ function normalize(row: any): Perfume | null {
     notes: [...new Set([...bits(d.notes || d.Notes || d.note_pyramid),...top,...heart,...base])],
     accords: bits(d["Main Accords"] || d.accords || d.Accords || d.main_accords),
     year: String(d.year || d.Year || d.release_year || ""), family: String(d.family || d.Family || d.fragrance_family || ""),
-    description: String(d.description || d.Description || "").slice(0, 900)
+    description: String(d.description || d.Description || "").slice(0, 900),
+    longevity:typeof d.longevity==="string"?d.longevity:typeof d.Longevity==="string"?d.Longevity:undefined,
+    projection:typeof d.projection==="string"?d.projection:typeof d.Sillage==="string"?d.Sillage:undefined,
+    rating:Number.isFinite(Number(d.rating))&&Number(d.rating)>0&&Number(d.rating)<=5?Number(d.rating):undefined,
+    gender:typeof d.gender==="string"?d.gender:typeof d.Gender==="string"?d.Gender:undefined,
+    popularity:typeof d.popularity==="string"?d.popularity:typeof d.Popularity==="string"?d.Popularity:undefined,
+    bestSeasons:bits(d.bestSeasons||d["Season Ranking"]),
+    bestOccasions:bits(d.bestOccasions||d["Occasion Ranking"]),
+    aliases:Array.isArray(d.aliases)?d.aliases.filter((v:unknown)=>typeof v==="string").map((v:string)=>"db:"+v):[],
+    imageCredit:typeof d.imageCredit==="string"?d.imageCredit:undefined,
+    imageSource:typeof d.imageSource==="string"&&d.imageSource.startsWith("https://")?d.imageSource:undefined,
+    imageLicense:typeof d.imageLicense==="string"?d.imageLicense:undefined,
+    imageLicenseUrl:typeof d.imageLicenseUrl==="string"&&d.imageLicenseUrl.startsWith("https://")?d.imageLicenseUrl:undefined
   };
 }
 function sanitize(source: any): State {
   if (!source || typeof source !== "object") return initial;
   const valid = (p: any) => p && typeof p.id === "string" && typeof p.name === "string" && typeof p.brand === "string";
-  const perfume = (p: any): Perfume => ({ id:p.id, name:p.name, brand:p.brand, image:typeof p.image==="string" ? p.image : undefined, year:p.year, family:p.family, description:p.description, notes:bits(p.notes), top:bits(p.top),heart:bits(p.heart),base:bits(p.base),accords:bits(p.accords) });
+  const perfume = (p: any): Perfume => ({ id:p.id, name:p.name, brand:p.brand, image:typeof p.image==="string" ? p.image : undefined, year:p.year, family:p.family, description:p.description, notes:bits(p.notes), top:bits(p.top),heart:bits(p.heart),base:bits(p.base),accords:bits(p.accords),
+    longevity:typeof p.longevity==="string"?p.longevity.slice(0,45):undefined,
+    projection:typeof p.projection==="string"?p.projection.slice(0,45):undefined,
+    rating:typeof p.rating==="number"&&p.rating>=0&&p.rating<=5?p.rating:undefined,
+    gender:typeof p.gender==="string"?p.gender.slice(0,40):undefined,
+    popularity:typeof p.popularity==="string"?p.popularity.slice(0,35):undefined,
+    bestSeasons:bits(p.bestSeasons),bestOccasions:bits(p.bestOccasions),
+    aliases:Array.isArray(p.aliases)?p.aliases.filter((v:unknown)=>typeof v==="string").slice(0,20):[],
+    imageCredit:typeof p.imageCredit==="string"?p.imageCredit.slice(0,250):undefined,
+    imageSource:typeof p.imageSource==="string"&&p.imageSource.startsWith("https://")?p.imageSource:undefined,
+    imageLicense:typeof p.imageLicense==="string"?p.imageLicense.slice(0,100):undefined,
+    imageLicenseUrl:typeof p.imageLicenseUrl==="string"&&p.imageLicenseUrl.startsWith("https://")?p.imageLicenseUrl:undefined
+  });
   return {
-    collection: (Array.isArray(source.collection)?source.collection:[]).filter((x:any)=>valid(x?.perfume)).slice(0,5000).map((x:any)=>({perfume:perfume(x.perfume), amount:Math.max(0,Number(x.amount)||0),currency:x.currency==="USD"?"USD":"NGN",added:String(x.added||new Date().toISOString()),favorite:Boolean(x.favorite)})),
+    collection: (Array.isArray(source.collection)?source.collection:[]).filter((x:any)=>valid(x?.perfume)).slice(0,5000).map((x:any,i:number)=>({...restoreBottleLife(x,i),perfume:perfume(x.perfume), amount:Math.max(0,Number(x.amount)||0),currency:x.currency==="USD"?"USD":"NGN",added:String(x.added||new Date().toISOString()),favorite:Boolean(x.favorite)})),
     wishlist: (Array.isArray(source.wishlist)?source.wishlist:[]).filter(valid).slice(0,5000).map(perfume),
     mixes: (Array.isArray(source.mixes)?source.mixes:[]).filter((m:any)=>m&&typeof m.left==="string"&&typeof m.right==="string").slice(0,1000),
     combos: (Array.isArray(source.combos)?source.combos:[]).filter((c:any)=>c&&typeof c.id==="string"&&c.id.startsWith("combo:")&&Array.isArray(c.perfumes)&&c.perfumes.length>=2).slice(0,400).map((c:any)=>({
@@ -65,13 +106,23 @@ function sanitize(source: any): State {
       target:c.target==="collection"&&Number.isFinite(Number(c.amount))&&Number(c.amount)>=0?"collection":"wishlist",
       amount:c.target==="collection"&&Number.isFinite(Number(c.amount))&&Number(c.amount)>=0?Number(c.amount):undefined,
       added:String(c.added||new Date().toISOString()),
-      perfumes:c.perfumes.filter(valid).slice(0,12).map(perfume)
-    })).filter((c:Combo)=>c.perfumes.length>=2)
+      perfumes:c.perfumes.filter(valid).slice(0,12).map(perfume),
+      finishedPerfumes:Object.fromEntries(c.perfumes.filter(valid).flatMap((p:any)=>{const date=savedFinishDate(c.finishedPerfumes?.[p.id]);return date?[[p.id,date]]:[]}))
+    })).filter((c:Combo)=>c.perfumes.length>=2),
+    insights:Object.fromEntries(Object.entries(source.insights&&typeof source.insights==="object"&&!Array.isArray(source.insights)?source.insights:{}).slice(0,1200).filter(([key])=>typeof key==="string"&&key.length<300).map(([key,value])=>{
+      const x=value&&typeof value==="object"?value as Record<string,unknown>:{};
+      const number=typeof x["priceNGN"]==="number"?x["priceNGN"]:NaN;
+      const entry:MyInsight={};
+      if(Number.isFinite(number)&&number>=0&&number<=100_000_000)entry.priceNGN=number;
+      if(typeof x["longevity"]==="string")entry.longevity=x["longevity"].slice(0,45);
+      if(typeof x["projection"]==="string")entry.projection=x["projection"].slice(0,45);
+      return [key,entry];
+    }))
   };
 }
 function money(value:number,c:Currency) { return new Intl.NumberFormat("en-US",{style:"currency",currency:c,minimumFractionDigits:0,maximumFractionDigits:2}).format(value).replace("NGN","₦"); }
 function pic(p:Perfume,size="card",ownerPhoto?:string,onPhotoError?:()=>void){
-  const verifiedImage = ownerPhoto || ((p.id.startsWith("db:fragella:") || p.id.startsWith("db:noteboxd:")) && p.image?.startsWith("https://") ? p.image : undefined);
+  const verifiedImage = ownerPhoto || ((p.id.startsWith("db:fragella:") || p.id.startsWith("db:noteboxd:") || p.id.startsWith("db:beautyfacts:") || p.id.startsWith("db:productsfacts:") || p.id.startsWith("db:wikidata:")) && p.image?.startsWith("https://") ? p.image : undefined);
   return <span className="sc-art sc-photo-only">
     <span className="sc-no-photo"><ImageOff size={size==="hero"?26:19} strokeWidth={1.35}/><small>No bottle photo</small></span>
     {verifiedImage && <img loading={size==="hero"?"eager":"lazy"} decoding="async" src={verifiedImage} alt={p.brand+" "+p.name+" fragrance bottle"} onError={e=>{e.currentTarget.style.display="none";onPhotoError?.();}}/>}
@@ -97,6 +148,11 @@ function Fragrance(){
   const [ready,setReady]=useState(false);
   const [storageError,setStorageError]=useState<""|"corrupt"|"write">("");
   const [query,setQuery]=useState("");
+  const [sourceChoice,setSourceChoice]=useState<CatalogSource>("auto");
+  const [activeSource,setActiveSource]=useState<CatalogSource>("auto");
+  const [resultSource,setResultSource]=useState("");
+  const [resultSources,setResultSources]=useState<string[]>([]);
+  const [comboSource,setComboSource]=useState<CatalogSource>("auto");
   const [draftQuery,setDraftQuery]=useState("");
   const [results,setResults]=useState<Perfume[]>([]);
   const [checkedPhotos,setCheckedPhotos]=useState<Record<string,"ready"|"missing">>({});
@@ -105,14 +161,27 @@ function Fragrance(){
   const [searching,setSearching]=useState(false);
   const [error,setError]=useState("");
   const [catalogueNotice,setCatalogueNotice]=useState("");
-  const [refreshKey,setRefreshKey]=useState(0);
+  const [searchHint,setSearchHint]=useState("");
+  // A null request means Discover is idle. Only a submitted search or Load more starts a fetch.
+  const [searchRequest,setSearchRequest]=useState<{term:string;source:CatalogSource;requestedPage:number}|null>(null);
   const [selected,setSelected]=useState<Perfume|null>(null);
+  const [selectedBottleId,setSelectedBottleId]=useState<string|null>(null);
+  const [selectedComboId,setSelectedComboId]=useState<string|null>(null);
+  const [shelfView,setShelfView]=useState<"shelf"|"finished">("shelf");
+  const [shelfNotice,setShelfNotice]=useState<{text:string;undo:()=>void}|null>(null);
+  const [priceBottleId,setPriceBottleId]=useState<string|null>(null);
   const [priceOpen,setPriceOpen]=useState<Perfume|null>(null);
   const [price,setPrice]=useState("");
   const [layerA,setLayerA]=useState("");
   const [layerB,setLayerB]=useState("");
   const [sort,setSort]=useState("newest");
   const [filter,setFilter]=useState("");
+  const [showDiscoverFilters,setShowDiscoverFilters]=useState(false);
+  const [discoverFilters,setDiscoverFilters]=useState<DiscoverFilters>(DEFAULT_DISCOVER_FILTERS);
+  const [insightEdit,setInsightEdit]=useState<"closed"|"open">("closed");
+  const [insightPrice,setInsightPrice]=useState("");
+  const [insightLongevity,setInsightLongevity]=useState("");
+  const [insightProjection,setInsightProjection]=useState("");
   const [backupOpen,setBackupOpen]=useState(false);
   const [comboOpen,setComboOpen]=useState(false);
   const [comboId,setComboId]=useState<string|null>(null);
@@ -140,8 +209,26 @@ function Fragrance(){
   const photoFileRef=useRef<HTMLInputElement>(null);
   const [photoBusy,setPhotoBusy]=useState(false);
   const [photoError,setPhotoError]=useState("");
+  const [photoRevision,setPhotoRevision]=useState(0);
+  const [photoCloudStatus,setPhotoCloudStatus]=useState<PhotoSyncState>("idle");
+  const [photoCloudNote,setPhotoCloudNote]=useState("");
+  const photoRunning=useRef(false);
   const fileRef=useRef<HTMLInputElement>(null);
   const searchId=useRef(0);
+  const [syncOpen,setSyncOpen]=useState(false);
+  const [syncPassword,setSyncPassword]=useState("");
+  const [syncSetupCode,setSyncSetupCode]=useState("");
+  const [syncSubmitting,setSyncSubmitting]=useState(false);
+  const [syncFormError,setSyncFormError]=useState("");
+  const sync=useCabinetSync(store,ready,value=>setStore(sanitize(value)));
+  async function submitSync(e:React.FormEvent){
+    e.preventDefault();setSyncSubmitting(true);setSyncFormError("");
+    try{
+      await sync.connect(syncPassword,sync.isSetUp?undefined:syncSetupCode);
+      setSyncPassword("");setSyncSetupCode("");
+    }catch(err){setSyncFormError(err instanceof Error?err.message:"Couldn't connect. Please try again.");}
+    finally{setSyncSubmitting(false);}
+  }
   function showStoredPhoto(key:string,blob:Blob){
     const url=URL.createObjectURL(blob);
     const prior=storedUrls.current.get(key);
@@ -149,6 +236,58 @@ function Fragrance(){
     storedUrls.current.set(key,url);
     setPhotoUrls(prev=>({...prev,[key]:url}));
   }
+  function hideStoredPhoto(key:string){
+    const prior=storedUrls.current.get(key);
+    if(prior)URL.revokeObjectURL(prior);
+    storedUrls.current.delete(key);
+    setPhotoUrls(prev=>{const next={...prev};delete next[key];return next;});
+  }
+  function photoSaved(key:string){
+    queuePhotoChange(key,"upsert");
+    setPhotoRevision(v=>v+1);
+  }
+  function photoDeleted(key:string){
+    queuePhotoChange(key,"delete");
+    setPhotoRevision(v=>v+1);
+  }
+  const photoKeys=useMemo(()=>[...new Set([
+    ...store.collection.map(x=>x.perfume.id),
+    ...store.wishlist.map(p=>p.id),
+    ...store.combos.map(c=>c.id),
+    ...store.combos.flatMap(c=>c.perfumes.map(p=>p.id))
+  ].filter(key=>key.startsWith("manual:")||key.startsWith("combo:")))],[
+    store.collection,store.wishlist,store.combos
+  ]);
+  async function syncOwnerPhotos(){
+    if(!ready||sync.status!=="synced"||photoRunning.current)return;
+    photoRunning.current=true;
+    setPhotoCloudStatus("checking");
+    try{
+      if(!await photoBucketStatus()){
+        setPhotoCloudStatus("unavailable");
+        setPhotoCloudNote("Fragrance details are synced. Connect Cloudflare R2 to sync uploaded photos.");
+        return;
+      }
+      setPhotoCloudStatus("syncing");
+      const report=await reconcilePhotos(photoKeys,showStoredPhoto,hideStoredPhoto);
+      setPhotoCloudStatus("ready");
+      setPhotoCloudNote(report.conflicts?
+        report.conflicts+" photo(s) differ between devices. Both local copies are preserved; replace a photo to choose one.":
+        report.remaining?"Some photo changes are waiting to upload.":
+        "Uploaded perfume photos are synced.");
+    }catch(e){
+      setPhotoCloudStatus("error");
+      setPhotoCloudNote(e instanceof Error?e.message:"Couldn't sync photos. Your local copies are safe.");
+    }finally{photoRunning.current=false;}
+  }
+  useEffect(()=>{
+    if(!ready||sync.status!=="synced"){setPhotoCloudStatus("idle");return;}
+    void syncOwnerPhotos();
+    const check=setInterval(()=>{if(document.visibilityState==="visible")void syncOwnerPhotos();},600000);
+    const onFocus=()=>{if(document.visibilityState==="visible")void syncOwnerPhotos();};
+    document.addEventListener("visibilitychange",onFocus);
+    return()=>{clearInterval(check);document.removeEventListener("visibilitychange",onFocus);};
+  },[ready,sync.status,photoRevision,photoKeys]);
   useEffect(()=>{
     if(!ready)return;
     let canceled=false;
@@ -186,6 +325,7 @@ function Fragrance(){
       const blob=await compressScentPhoto(file);
       await saveScentPhoto(key,blob);
       showStoredPhoto(key,blob);
+      photoSaved(key);
     }catch(err){setPhotoError(err instanceof Error?err.message:"Photo could not be saved.");}
     finally{setPhotoBusy(false);e.target.value="";}
   }
@@ -193,10 +333,8 @@ function Fragrance(){
     if(!selected||!window.confirm("Remove this photo?"))return;
     try{
       await removeScentPhoto(selected.id);
-      const old=storedUrls.current.get(selected.id);
-      if(old)URL.revokeObjectURL(old);
-      storedUrls.current.delete(selected.id);
-      setPhotoUrls(current=>{const next={...current};delete next[selected.id];return next;});
+      hideStoredPhoto(selected.id);
+      photoDeleted(selected.id);
     }catch(err){setPhotoError(err instanceof Error?err.message:"Could not remove photo.");}
   }
 
@@ -217,22 +355,91 @@ function Fragrance(){
       setStorageError(prev=>prev==="write"?"":prev);
     }catch{setStorageError("write");}
   },[store,ready]);
-  const ownedMap=useMemo(()=>new Map(store.collection.map(x=>[x.perfume.id,x])),[store.collection]);
+  const activeBottles=useMemo(()=>store.collection.filter(x=>!x.finishedAt),[store.collection]);
+  const ownedMap=useMemo(()=>new Map(activeBottles.map(x=>[x.perfume.id,x])),[activeBottles]);
+  const selectedBottle=store.collection.find(x=>x.id===selectedBottleId)||(selectedComboId?undefined:selected?ownedMap.get(selected.id):undefined);
+  const selectedCombo=store.combos.find(c=>c.id===selectedComboId);
   const wishIds=useMemo(()=>new Set(store.wishlist.map(x=>x.id)),[store.wishlist]);
   const myCombos=store.combos.filter(x=>x.target==="collection");
   const wishCombos=store.combos.filter(x=>x.target==="wishlist");
-  const bottleCount=store.collection.length+myCombos.reduce((n,x)=>n+x.perfumes.length,0);
+  const totals=useMemo(()=>shelfTotals(store.collection,store.combos),[store.collection,store.combos]);
+  const bottleCount=totals.onShelf;
   const wishCount=store.wishlist.length+wishCombos.reduce((n,x)=>n+x.perfumes.length,0);
-  const moneyNGN=store.collection.filter(x=>x.currency==="NGN").reduce((s,x)=>s+x.amount,0)+myCombos.reduce((s,x)=>s+(x.amount||0),0);
   const legacyUSD=store.collection.filter(x=>x.currency==="USD").length;
-  const list=useMemo(()=>store.collection.filter(x=>(x.perfume.name+" "+x.perfume.brand).toLowerCase().includes(filter.toLowerCase())).sort((a,b)=>sort==="price"?b.amount-a.amount:sort==="alpha"?(a.perfume.name.localeCompare(b.perfume.name)):sort==="favorite"?Number(Boolean(b.favorite))-Number(Boolean(a.favorite)):b.added.localeCompare(a.added)),[store.collection,filter,sort]);
-  function go(p:Page){setPage(p);setSelected(null);window.scrollTo({top:0,behavior:"smooth"});}
-  function isOwned(p:Perfume){return ownedMap.has(p.id);}
+  const list=useMemo(()=>store.collection.filter(x=>Boolean(x.finishedAt)===(shelfView==="finished")).filter(x=>(x.perfume.name+" "+x.perfume.brand).toLowerCase().includes(filter.toLowerCase())).sort((a,b)=>sort==="price"?b.amount-a.amount:sort==="alpha"?a.perfume.name.localeCompare(b.perfume.name):sort==="favorite"?Number(Boolean(b.favorite))-Number(Boolean(a.favorite)):(shelfView==="finished"?(b.finishedAt||b.added).localeCompare(a.finishedAt||a.added):b.added.localeCompare(a.added))),[store.collection,filter,sort,shelfView]);
+  const visibleCombos=myCombos.filter(c=>c.perfumes.some(p=>Boolean(c.finishedPerfumes?.[p.id])===(shelfView==="finished"))).filter(c=>(c.name+" "+c.perfumes.map(p=>p.brand+" "+p.name).join(" ")).toLowerCase().includes(filter.toLowerCase()));
+  function runDiscoverSearch(text:string){
+    const submitted=text.trim().replace(/\s+/g," ");
+    if(submitted.length<3)return;
+    setSearching(true);setError("");setCatalogueNotice("");setSearchHint("");
+    setResults([]);setHasMore(false);setCatalogPage(1);setActiveSource(sourceChoice);
+    setQuery(submitted);
+    setSearchRequest({term:submitted,source:sourceChoice,requestedPage:1});
+  }
+  function clearDiscoverSearch(){
+    setSearchRequest(null);setSearching(false);
+    setDraftQuery("");setQuery("");setCatalogPage(1);setResults([]);setHasMore(false);
+    setError("");setSearchHint("");setCatalogueNotice("");setResultSource("");setResultSources([]);
+  }
+  function loadMoreDiscover(){
+    if(searching||!hasMore||!query.trim())return;
+    const requestedPage=catalogPage+1;
+    setCatalogPage(requestedPage);setSearching(true);
+    setSearchRequest({term:query,source:activeSource,requestedPage});
+  }
+  function go(p:Page){
+    // Leaving Discover cancels pending requests; returning never triggers a background search.
+    if(p!=="discover"){setSearchRequest(null);setSearching(false);}
+    setPage(p);setSelected(null);setSelectedBottleId(null);setSelectedComboId(null);setInsightEdit("closed");window.scrollTo({top:0,behavior:"smooth"});
+  }
+  function openDetail(p:Perfume,bottle?:Owned,combo?:Combo){setSelected(p);setSelectedBottleId(bottle?.id||null);setSelectedComboId(combo?.id||null);setInsightEdit("closed");}
+  function dateLabel(value:string){const d=new Date(value);return Number.isFinite(d.getTime())?d.toLocaleDateString("en-GB",{day:"numeric",month:"short",year:"numeric"}):"Date not recorded";}
+  function editMyInsight(p:Perfume){
+    const current=store.insights[p.id];
+    setInsightPrice(current?.priceNGN===undefined?"":String(current.priceNGN));
+    setInsightLongevity(current?.longevity||"");
+    setInsightProjection(current?.projection||"");
+    setInsightEdit("open");
+  }
+  function saveMyInsight(e:React.FormEvent){
+    e.preventDefault();if(!selected)return;
+    const newPrice=insightPrice.trim()===""?undefined:Number(insightPrice);
+    if(newPrice!==undefined&&(!Number.isFinite(newPrice)||newPrice<0||newPrice>100_000_000))return;
+    const entry:MyInsight={...(newPrice!==undefined?{priceNGN:newPrice}:{}),
+      ...(insightLongevity?{longevity:insightLongevity}:{}),
+      ...(insightProjection?{projection:insightProjection}:{})};
+    setStore(prev=>{
+      const insights={...prev.insights};
+      if(Object.keys(entry).length)insights[selected.id]=entry;
+      else delete insights[selected.id];
+      return {...prev,insights};
+    });
+    setInsightEdit("closed");
+  }
   function wish(p:Perfume){setStore(s=>({...s,wishlist:s.wishlist.some(x=>x.id===p.id)?s.wishlist.filter(x=>x.id!==p.id):[p,...s.wishlist]}));}
-  function openPrice(p:Perfume){setSelected(null);setPriceOpen(p);const old=ownedMap.get(p.id);setPrice(old?.currency==="NGN"?String(old.amount):"");}
-  function savePrice(e:React.FormEvent){e.preventDefault();if(!priceOpen)return;const n=Number(price);if(!Number.isFinite(n)||n<0||price.trim()==="")return;const old=ownedMap.get(priceOpen.id);const item:Owned={perfume:priceOpen,amount:n,currency:"NGN",added:old?.added||new Date().toISOString(),favorite:old?.favorite||false};setStore(s=>({...s,collection:[item,...s.collection.filter(x=>x.perfume.id!==priceOpen.id)],wishlist:s.wishlist.filter(x=>x.id!==priceOpen.id)}));setPriceOpen(null);}
-  function remove(p:Perfume){if(!window.confirm("Remove "+p.name+" from your collection?"))return;setStore(s=>({...s,collection:s.collection.filter(x=>x.perfume.id!==p.id)}));setSelected(null);}
-  function favorite(p:Perfume){setStore(s=>({...s,collection:s.collection.map(x=>x.perfume.id===p.id?{...x,favorite:!x.favorite}:x)}));}
+  function openPrice(p:Perfume,bottle?:Owned,buyAgain=false){
+    const old=buyAgain?undefined:bottle||ownedMap.get(p.id);
+    setSelected(null);setPriceOpen(p);setPriceBottleId(old?.id||null);setPrice(old?.currency==="NGN"?String(old.amount):"");
+  }
+  function savePrice(e:React.FormEvent){
+    e.preventDefault();if(!priceOpen)return;const n=Number(price);if(!Number.isFinite(n)||n<0||price.trim()==="")return;
+    const perfume=priceOpen,bottleId=priceBottleId||"bottle:"+id();
+    setStore(prev=>{const old=prev.collection.find(x=>x.id===bottleId);const item:Owned={...old,id:bottleId,perfume,amount:n,currency:"NGN",added:old?.added||new Date().toISOString(),favorite:old?.favorite||false};return {...prev,collection:[item,...prev.collection.filter(x=>x.id!==bottleId)],wishlist:prev.wishlist.filter(x=>x.id!==perfume.id)};});
+    setPriceOpen(null);if(!priceBottleId)setShelfView("shelf");
+  }
+  function remove(bottle:Owned){
+    if(!window.confirm("Delete this purchase of "+bottle.perfume.name+"? Its price will also be removed from total spent. To keep your history, use Mark finished instead."))return;
+    setStore(prev=>({...prev,collection:prev.collection.filter(x=>x.id!==bottle.id)}));setSelected(null);
+  }
+  function favorite(bottle:Owned){setStore(prev=>({...prev,collection:prev.collection.map(x=>x.id===bottle.id?{...x,favorite:!x.favorite}:x)}));}
+  function changeBottleStatus(bottle:Owned,date?:string){
+    setStore(prev=>({...prev,collection:setBottleFinished(prev.collection,bottle.id,date)}));setSelected(null);
+    setShelfNotice({text:bottle.perfume.name+(date?" moved to Finished.":" returned to your shelf."),undo:()=>setStore(prev=>({...prev,collection:setBottleFinished(prev.collection,bottle.id,bottle.finishedAt)}))});
+  }
+  function changeComboStatus(combo:Combo,p:Perfume,date?:string){
+    setStore(prev=>({...prev,combos:prev.combos.map(c=>c.id===combo.id?setComboBottleFinished(c,p.id,date):c)}));setSelected(null);
+    setShelfNotice({text:p.name+(date?" moved to Finished.":" returned to your shelf."),undo:()=>setStore(prev=>({...prev,combos:prev.combos.map(c=>c.id===combo.id?setComboBottleFinished(c,p.id,combo.finishedPerfumes?.[p.id]):c)}))});
+  }
   async function addUnlisted(e:React.FormEvent){
     e.preventDefault();
     if(photoBusy)return;
@@ -241,7 +448,7 @@ function Fragrance(){
     const perfume:Perfume={id:"manual:"+id(),brand,name,notes:[],top:[],heart:[],base:[],accords:[]};
     if(manualPhoto){
       setPhotoBusy(true);
-      try{await saveScentPhoto(perfume.id,manualPhoto);showStoredPhoto(perfume.id,manualPhoto);}
+      try{await saveScentPhoto(perfume.id,manualPhoto);showStoredPhoto(perfume.id,manualPhoto);photoSaved(perfume.id);}
       catch(err){setPhotoError(err instanceof Error?err.message:"Could not save the photo. Please try again.");return;}
       finally{setPhotoBusy(false);}
     }
@@ -251,13 +458,13 @@ function Fragrance(){
   }
   function startCombo(target:"collection"|"wishlist",first?:Perfume){
     setComboId(null);setComboName("");setComboPerfumes(first?[first]:[]);
-    setComboTarget(target);setComboAmount("");setComboFilter("");setComboManualBrand("");setComboManualName("");
+    setComboTarget(target);setComboSource("auto");setComboAmount("");setComboFilter("");setComboManualBrand("");setComboManualName("");
     setComboPhoto(null);setComboPreview(null);setComboError("");setComboSearchResults([]);
     setSelected(null);setComboOpen(true);
   }
   function editCombo(c:Combo,moveTo?: "collection"|"wishlist"){
     setComboId(c.id);setComboName(c.name);setComboPerfumes(c.perfumes);
-    setComboTarget(moveTo||c.target);setComboAmount(c.amount===undefined?"":String(c.amount));
+    setComboTarget(moveTo||c.target);setComboSource("auto");setComboAmount(c.amount===undefined?"":String(c.amount));
     setComboFilter("");setComboManualBrand("");setComboManualName("");
     setComboPhoto(null);setComboPreview(null);setComboError("");setComboSearchResults([]);
     setComboOpen(true);
@@ -279,7 +486,7 @@ function Fragrance(){
     e?.preventDefault();const search=comboFilter.trim().slice(0,90);if(search.length<3)return;
     setComboSearching(true);setComboError("");
     try{
-      const response=await fetch(API+"/search?q="+encodeURIComponent(search)+"&page=1",{headers:{Accept:"application/json"},signal:AbortSignal.timeout(13000)});
+      const response=await fetch(API+"/search?q="+encodeURIComponent(search)+"&page=1&source="+encodeURIComponent(comboSource),{headers:{Accept:"application/json"},signal:AbortSignal.timeout(16000)});
       if(!response.ok)throw Error("Search failed");
       const payload=await response.json();
       const entries=Array.isArray(payload.results)?payload.results:[];
@@ -307,11 +514,11 @@ function Fragrance(){
     setComboSaving(true);setComboError("");
     const finalId=comboId||"combo:"+id();
     try{
-      if(comboPhoto){await saveScentPhoto(finalId,comboPhoto);showStoredPhoto(finalId,comboPhoto);}
+      if(comboPhoto){await saveScentPhoto(finalId,comboPhoto);showStoredPhoto(finalId,comboPhoto);photoSaved(finalId);}
       const old=store.combos.find(c=>c.id===finalId);
       const combo:Combo={id:finalId,name:comboName.trim().slice(0,80)||comboPerfumes.map(p=>p.name).slice(0,2).join(" + "),
         perfumes:comboPerfumes,target:comboTarget,
-        ...(comboTarget==="collection"?{amount}:{}),added:old?.added||new Date().toISOString()};
+        ...(comboTarget==="collection"?{amount,finishedPerfumes:Object.fromEntries(Object.entries(old?.finishedPerfumes||{}).filter(([key])=>comboPerfumes.some(p=>p.id===key)))}:{}),added:old?.added||new Date().toISOString()};
       setStore(prev=>({...prev,combos:[combo,...prev.combos.filter(c=>c.id!==finalId)]}));
       setComboOpen(false);setComboPhoto(null);setComboPreview(null);
       go(comboTarget==="collection"?"collection":"wishlist");
@@ -319,9 +526,9 @@ function Fragrance(){
     finally{setComboSaving(false);}
   }
   function removeCombo(c:Combo){
-    if(!window.confirm("Delete "+c.name+" combo? The individual perfumes stay in your other saved lists."))return;
+    if(!window.confirm("Delete "+c.name+" combo and its purchase history? Its price will be removed from total spent. The individual perfumes stay in your other saved lists."))return;
     setStore(prev=>({...prev,combos:prev.combos.filter(x=>x.id!==c.id)}));
-    removeScentPhoto(c.id).catch(()=>{});
+    removeScentPhoto(c.id).then(()=>photoDeleted(c.id)).catch(()=>{});
     setComboOpen(false);
   }
   async function exportBackup(){
@@ -332,7 +539,7 @@ function Fragrance(){
       ].filter(k=>k.startsWith("manual:")||k.startsWith("combo:")))];
       const ownerPhotos:Record<string,string>={};
       for(const key of allIds){const photo=await getScentPhoto(key);if(photo)ownerPhotos[key]=await blobAsDataUrl(photo);}
-      const contents=JSON.stringify({app:"Scent Cabinet",version:3,exportedAt:new Date().toISOString(),...store,ownerPhotos},null,2);
+      const contents=JSON.stringify({app:"Scent Cabinet",version:5,exportedAt:new Date().toISOString(),...store,ownerPhotos},null,2);
       const blob=new Blob([contents],{type:"application/json"});
       const href=URL.createObjectURL(blob);const a=document.createElement("a");
       a.href=href;a.download="scent-cabinet-backup-"+today()+".json";
@@ -358,47 +565,55 @@ function Fragrance(){
         const blob=dataUrlAsBlob(payload);
         await saveScentPhoto(key,blob);
         showStoredPhoto(key,blob);
+        photoSaved(key);
       }
       setStore(restored);setReady(true);setStorageError("");setBackupOpen(false);
     }catch(err){alert("Could not import backup: "+(err instanceof Error?err.message:String(err)));}
     finally{e.target.value="";}
   }
   useEffect(()=>{
-    if(page!=="discover")return;
+    if(!searchRequest)return;
+    const {term,source,requestedPage}=searchRequest;
     const n=++searchId.current;const ctrl=new AbortController();
     const delay=setTimeout(async()=>{
       setSearching(true);setError("");setCatalogueNotice("");
       try{
-        const params=new URLSearchParams({page:String(catalogPage),per_page:"20"});
-        if(query.trim())params.set("q",query.trim());else params.set("sort","year_desc");
-        const path=query.trim()?"/search":"/browse";
-        const t=setTimeout(()=>ctrl.abort(),14000);
+        const params=new URLSearchParams({page:String(requestedPage),per_page:"20",source});
+        params.set("q",term);
+        const path="/search";
+        const t=setTimeout(()=>ctrl.abort(),18000);
         let response:Response;
         try{response=await fetch(API+path+"?"+params,{signal:ctrl.signal,headers:{Accept:"application/json"}});}finally{clearTimeout(t);}
         if(!response.ok)throw Error("The fragrance database responded "+response.status);
         const payload=await response.json();
-        setCatalogueNotice("");
+        if(n!==searchId.current)return;
+        const sourceName=String(payload.source||"");
+        setSearchHint(typeof payload.searchHint==="string"?payload.searchHint:"");
+        setResultSource(sourceName);
+        setResultSources(Array.isArray(payload.sources)?payload.sources.filter((v:unknown)=>typeof v==="string"):[sourceName]);
+        setCatalogueNotice(typeof payload.providerWarning==="string"?payload.providerWarning:"");
         const rows=Array.isArray(payload)?payload:payload.results||payload.fragrances||payload.items||payload.data?.results;
         if(!Array.isArray(rows))throw Error("Catalogue format not recognised");
         const items=rows.map(normalize).filter((p:Perfume|null):p is Perfume=>Boolean(p));
         if(n!==searchId.current)return;
-        setResults(old=>catalogPage===1?items:[...old,...items.filter(x=>!old.some(y=>x.id===y.id))]);
+        setResults(old=>requestedPage===1?items:[...old,...items.filter(x=>!old.some(y=>sameScent(x,y)))]);
         const total=Number(payload.total);
-        setHasMore(typeof payload.hasMore==="boolean"?payload.hasMore:Number.isFinite(total)&&total>0?catalogPage*(payload.source==="fragella"?10:20)<total:false);
-        try{sessionStorage.setItem("ia-scent-last-search",JSON.stringify({query,page:catalogPage,items,time:Date.now()}));}catch{}
+        setHasMore(typeof payload.hasMore==="boolean"?payload.hasMore:Number.isFinite(total)&&total>0?requestedPage*(payload.source==="fragella"?10:20)<total:false);
+        try{sessionStorage.setItem("ia-scent-last-search",JSON.stringify({query:term,page:requestedPage,items,time:Date.now()}));}catch{}
       }catch(err){
-        if(n!==searchId.current||ctrl.signal.aborted)return;
+        if(n!==searchId.current)return;
         setError("Search unavailable. Please try again.");
-        setResults(old=>catalogPage===1?[]:old);
+        setResults(old=>requestedPage===1?[]:old);
         setHasMore(false);
       }finally{if(n===searchId.current)setSearching(false);}
     },40);
-    return()=>{clearTimeout(delay);ctrl.abort()};
-  },[page,query,catalogPage,refreshKey]);
-  // Keep Discover photo-only. Preflight URLs using browser image loading
+    return()=>{clearTimeout(delay);if(searchId.current===n)searchId.current++;ctrl.abort()};
+  },[searchRequest]);
+  // Keep explicitly searched results photo-only, including free catalogues.
+  // Preflight URLs using browser image loading
   // so broken provider photos never create empty product cards.
   useEffect(()=>{
-    if(page!=="discover" || !query.trim())return;
+    if(page!=="discover")return;
     const candidates=results.filter(p=>p.image?.startsWith("https://") && checkedPhotos[p.id]===undefined);
     if(!candidates.length)return;
     const pending:HTMLImageElement[]=[];
@@ -414,19 +629,34 @@ function Fragrance(){
     return()=>{disposed=true;for(const p of pending){p.onload=null;p.onerror=null;}};
   },[page,query,results]);
   const photographed=results.filter(p=>p.image?.startsWith("https://") && checkedPhotos[p.id]==="ready");
+  const filteredPhotographed=filterAndSortDiscover(photographed,discoverFilters,store.insights,(perfumeId)=>{
+    const purchased=ownedMap.get(perfumeId);
+    return purchased?.currency==="NGN"?purchased.amount:undefined;
+  });
+  const filterCount=(Object.keys(DEFAULT_DISCOVER_FILTERS) as (keyof DiscoverFilters)[]).filter(k=>discoverFilters[k]!==DEFAULT_DISCOVER_FILTERS[k]).length;
+  const availableLongevity=photographed.filter(p=>Boolean(valueForLongevity(store.insights[p.id]?.longevity||p.longevity))).length;
+  const availableProjection=photographed.filter(p=>Boolean(valueForProjection(store.insights[p.id]?.projection||p.projection))).length;
+  const availablePrice=photographed.filter(p=>store.insights[p.id]?.priceNGN!==undefined||ownedMap.get(p.id)?.currency==="NGN").length;
   const checkingPhotos=results.some(p=>p.image?.startsWith("https://") && checkedPhotos[p.id]===undefined);
-  const item=(p:Perfume,context:Page)=>{
-    const owned=ownedMap.get(p.id);
-    return <article className="sc-perfume" key={p.id}>
-      <button className="sc-perfume-image" onClick={()=>setSelected(p)} aria-label={"Details for "+p.name}>{pic(p,"card",photoUrls[p.id],context==="discover"?()=>setCheckedPhotos(v=>({...v,[p.id]:"missing"})):undefined)}</button>
+  const item=(p:Perfume,context:Page,bottle?:Owned)=>{
+    const owned=bottle||ownedMap.get(p.id);
+    return <article className="sc-perfume" key={bottle?.id||p.id}>
+      <button className="sc-perfume-image" onClick={()=>openDetail(p,bottle)} aria-label={"Details for "+p.name}>{pic(p,"card",photoUrls[p.id],context==="discover"?()=>setCheckedPhotos(v=>({...v,[p.id]:"missing"})):undefined)}</button>
       <div className="sc-perfume-info">
         <span className="sc-perfume-brand">{p.brand}</span>
-        <button className="sc-name" onClick={()=>setSelected(p)}>{p.name}</button>
+        <button className="sc-name" onClick={()=>openDetail(p,bottle)}>{p.name}</button>
         <span className="sc-perfume-meta">{p.family||p.accords.slice(0,2).join(" · ")||"Fragrance"}</span>
+        {context==="discover"&&<div className="sc-performance-tags">
+          {(store.insights[p.id]?.longevity||p.longevity)&&<span><strong>Lasts</strong> {store.insights[p.id]?.longevity||p.longevity}</span>}
+          {(store.insights[p.id]?.projection||p.projection)&&<span><strong>Projects</strong> {store.insights[p.id]?.projection||p.projection}</span>}
+          {p.rating!==undefined&&<span><strong>Rating</strong> {p.rating.toFixed(1)}/5</span>}
+          {store.insights[p.id]?.priceNGN!==undefined&&<span><strong>My price</strong> {money(store.insights[p.id]?.priceNGN??0,"NGN")}</span>}
+        </div>}
+        {bottle&&<span className="sc-bottle-date">{bottle.finishedAt?"Finished "+dateLabel(bottle.finishedAt):"Bought "+dateLabel(bottle.added)}</span>}
         {owned?<strong className="sc-price">{owned.currency==="NGN"?money(owned.amount,"NGN"):"Set ₦ price"}</strong>:null}
         <div className="sc-perfume-actions">
-          {context==="collection"?
-          <><button onClick={()=>openPrice(p)}>Edit price</button><button onClick={()=>favorite(p)} title="Favourite" aria-label="Toggle favourite"><Heart size={17} fill={owned?.favorite?"currentColor":"none"}/></button></>:
+          {context==="collection"&&bottle?
+          <><button onClick={()=>bottle.finishedAt?openPrice(p,undefined,true):changeBottleStatus(bottle,new Date().toISOString())}>{bottle.finishedAt?"Buy again":"Mark finished"}</button><button onClick={()=>openDetail(p,bottle)} aria-label={"More options for "+p.name}>Details</button></>:
           <><button onClick={()=>openPrice(p)}>{owned?"Owned · Edit price":"+ My shelf"}</button><button onClick={()=>wish(p)} title={wishIds.has(p.id)?"Remove from wishlist":"Add to wishlist"} aria-label="Toggle wishlist"><Heart size={17} fill={wishIds.has(p.id)?"currentColor":"none"}/></button>{context==="discover"&&<button className="sc-combo-add-card" onClick={()=>startCombo("wishlist",p)} title="Start combo with this fragrance"><Plus size={14}/> Combo</button>}</>}
         </div>
       </div>
@@ -439,78 +669,176 @@ function Fragrance(){
     const q=comboFilter.trim().toLowerCase();
     return !q||((p.brand+" "+p.name).toLowerCase().includes(q));
   }).slice(0,30);
-  const comboCard=(c:Combo)=>{
-    const four=c.perfumes.slice(0,4);
+  const comboCard=(c:Combo,finishedView=false)=>{
+    const four=c.perfumes.slice(0,4),members=c.target==="wishlist"?c.perfumes:c.perfumes.filter(p=>Boolean(c.finishedPerfumes?.[p.id])===finishedView);
     return <article className="sc-combo-card" key={c.id}>
       <div className="sc-combo-visual">{photoUrls[c.id]?<img className="sc-combo-cover" src={photoUrls[c.id]} alt={c.name+" combo photo"}/>:
         <div className="sc-combo-collage">{four.map((p,i)=><div key={p.id+":"+i}>{pic(p,"card",photoUrls[p.id])}</div>)}</div>}
-        <span className="sc-combo-count">{c.perfumes.length} bottles</span>
+        <span className="sc-combo-count">{members.length} {finishedView?"finished":"bottles"}</span>
       </div>
-      <div className="sc-combo-info"><span className="sc-combo-tag">PERFUME COMBO</span>
-      <h3>{c.name}</h3>
-      <div className="sc-combo-members">{c.perfumes.slice(0,4).map(p=><button type="button" key={p.id} onClick={()=>setSelected(p)}>{p.name}</button>)}{c.perfumes.length>4&&<span>+{c.perfumes.length-4} more</span>}</div>
-      {c.target==="collection"&&<strong className="sc-combo-cost">{money(c.amount||0,"NGN")} <small>total paid</small></strong>}
-      <div className="sc-combo-actions">
-        <button type="button" onClick={()=>editCombo(c)}>Edit combo</button>
+      <div className="sc-combo-info"><span className="sc-combo-tag">PERFUME COMBO</span><h3>{c.name}</h3>
+      <div className="sc-combo-bottle-list">{members.map(p=><div key={p.id}><button type="button" className="sc-combo-bottle-name" onClick={()=>openDetail(p,undefined,c)}>{p.name}<small>{c.finishedPerfumes?.[p.id]?"Finished "+dateLabel(c.finishedPerfumes[p.id]!):"On my shelf"}</small></button>{c.target==="collection"&&<button type="button" onClick={()=>finishedView?openPrice(p,undefined,true):changeComboStatus(c,p,new Date().toISOString())}>{finishedView?"Buy again":"Mark finished"}</button>}</div>)}</div>
+      {c.target==="collection"&&<strong className="sc-combo-cost">{money(c.amount||0,"NGN")} <small>original combo price</small></strong>}
+      <div className="sc-combo-actions"><button type="button" onClick={()=>editCombo(c)}>Edit combo</button>
         {c.target==="wishlist"&&<button type="button" onClick={()=>editCombo(c,"collection")}>Purchased <ArrowRight size={13}/></button>}
         <button type="button" className="sc-combo-delete" aria-label={"Delete "+c.name} onClick={()=>removeCombo(c)}><Trash2 size={16}/></button>
       </div></div>
     </article>;
   };
-  const allMyPerfumes=[...new Map([...store.collection.map(x=>x.perfume),...myCombos.flatMap(x=>x.perfumes)].map(p=>[p.id,p])).values()];
+  const allKnownPerfumes=[...new Map([...store.collection.map(x=>x.perfume),...myCombos.flatMap(c=>c.perfumes)].map(p=>[p.id,p])).values()];
+  const allMyPerfumes=[...new Map([...activeBottles.map(x=>x.perfume),...myCombos.flatMap(c=>c.perfumes.filter(p=>!c.finishedPerfumes?.[p.id]))].map(p=>[p.id,p])).values()];
   const left=allMyPerfumes.find(x=>x.id===layerA),right=allMyPerfumes.find(x=>x.id===layerB);
   const aAcc=new Set([...(left?.notes||[]),...(left?.accords||[])].map(s=>s.toLowerCase()));
   const match=[...(right?.notes||[]),...(right?.accords||[])].filter(n=>aAcc.has(n.toLowerCase()));
   return <main id="main-content" className="sc-app">
-    <header className="sc-topbar"><button type="button" className="sc-wordmark" onClick={()=>go("collection")} aria-label="Scent Cabinet home">SCENT<span> / </span>CABINET</button><button type="button" className="sc-top-action" onClick={()=>setBackupOpen(true)} aria-label="Backup and restore my collection" title="Backup and restore"><Download size={19}/><span>Backup</span></button></header>
+    <header className="sc-topbar"><button type="button" className="sc-wordmark" onClick={()=>go("collection")} aria-label="Ibrahim Alli home">IBRAHIM ALLI</button><div className="sc-top-controls"><button type="button" className={"sc-top-action sc-sync-trigger"+(sync.status==="synced"?" sc-sync-ok":"")} onClick={()=>setSyncOpen(true)} aria-label={"Cloud sync: "+sync.status} title="Private cloud sync">{sync.status==="offline"||sync.status==="unavailable"?<CloudOff size={18}/>:<Cloud size={18}/>}<span>Sync</span></button><button type="button" className="sc-top-action" onClick={()=>setBackupOpen(true)} aria-label="Backup and restore my collection" title="Backup and restore"><Download size={19}/><span>Backup</span></button></div></header>
     <div className="sc-inner">
       {storageError&&<div className="sc-storage-alert" role="alert"><span>{storageError==="corrupt"?"Your saved collection could not be read. Restore an earlier backup.":"Changes couldn't be saved in this browser. Export a backup now."}</span><button type="button" onClick={()=>setBackupOpen(true)}>{storageError==="corrupt"?"Restore":"Backup"}</button></div>}
-      {(page==="collection"||page==="worth")&&<div className="sc-stats sc-stats-naira"><div><span>BOTTLES</span><strong>{bottleCount}</strong></div><div><span>WISHLIST</span><strong>{wishCount}</strong></div><div><span>COLLECTION WORTH</span><strong>{money(moneyNGN,"NGN")}</strong></div></div>}
+      {page==="collection"&&<div className="sc-stats sc-stats-naira sc-collection-stats"><div><span>BOTTLES</span><strong>{bottleCount}</strong></div><div><span>WISHLIST</span><strong>{wishCount}</strong></div><div><span>COST ON SHELF</span><strong>{money(totals.shelfCost,"NGN")}</strong></div><div><span>TOTAL SPENT</span><strong>{money(totals.totalSpent,"NGN")}</strong></div></div>}
+      {shelfNotice&&<div className="sc-shelf-notice" role="status"><span>{shelfNotice.text}</span><button onClick={()=>{shelfNotice.undo();setShelfNotice(null);}}>Undo</button><button aria-label="Dismiss update" onClick={()=>setShelfNotice(null)}><X size={16}/></button></div>}
       <nav className="sc-tabs" aria-label="Fragrance sections">
-        {([["collection","My collection",ShoppingBag],["discover","Discover",Search],["wishlist","Wishlist",Heart],["worth","Collection worth",Wallet],["layer","Layer lab",Layers]] as const).map(([key,label,Icon])=><button key={key} className={page===key?"active":""} onClick={()=>go(key)}><Icon size={18}/>{label}</button>)}
+        {([["collection","My collection",ShoppingBag],["discover","Discover",Search],["wishlist","Wishlist",Heart],["worth","Spending",Wallet],["layer","Layer lab",Layers]] as const).map(([key,label,Icon])=><button key={key} className={page===key?"active":""} onClick={()=>go(key)}><Icon size={18}/>{label}</button>)}
       </nav>
-      {page==="collection"&&<section className="sc-section">
+      {page==="collection"&&<section className="sc-section sc-cabinet-section">
         <div className="sc-section-head"><div><h2>My collection</h2></div><div className="sc-combo-header-actions"><button className="sc-secondary" onClick={()=>startCombo("collection")}><Plus size={16}/> Add combo</button><button className="sc-primary" onClick={()=>go("discover")}><Plus size={16}/> Fragrance</button></div></div>
-        {store.collection.length>0||myCombos.length>0?<>{myCombos.length>0&&<div className="sc-combo-grid">{myCombos.map(comboCard)}</div>}{store.collection.length>0&&<><div className="sc-filters"><label><Search size={17}/><input value={filter} onChange={e=>setFilter(e.target.value)} placeholder="Find a bottle on my shelf" /></label><select aria-label="Sort collection" value={sort} onChange={e=>setSort(e.target.value)}><option value="newest">Recently added</option><option value="alpha">A — Z</option><option value="price">Price paid</option><option value="favorite">Favourites</option></select></div><div className="sc-grid">{list.map(x=>item(x.perfume,"collection"))}</div></>}</>:<div className="sc-empty"><FlaskConical size={48} strokeWidth={1}/><h3>Begin with your first bottle.</h3><p>Search a perfume, then enter the price you paid.</p><button className="sc-primary" onClick={()=>go("discover")}>Explore fragrances <ArrowRight size={17}/></button></div>}
+        <div className="sc-shelf-switch" role="group" aria-label="Show bottles"><button aria-pressed={shelfView==="shelf"} onClick={()=>setShelfView("shelf")}>On my shelf · {totals.onShelf}</button><button aria-pressed={shelfView==="finished"} onClick={()=>setShelfView("finished")}>Finished · {totals.finished}</button></div>
+        <p className="sc-shelf-explain">{shelfView==="shelf"?"Bottles you still use. Mark a bottle finished to keep its history.":"Your empty bottles, saved for the memories. Buy again adds a new bottle."}</p>
+        <div className="sc-filters"><label><Search size={17}/><input value={filter} onChange={e=>setFilter(e.target.value)} placeholder={shelfView==="finished"?"Find a finished bottle":"Find a bottle on my shelf"} /></label><select aria-label="Sort collection" value={sort} onChange={e=>setSort(e.target.value)}><option value="newest">{shelfView==="finished"?"Recently finished":"Recently added"}</option><option value="alpha">A — Z</option><option value="price">Price paid</option><option value="favorite">Favourites</option></select></div>
+        {visibleCombos.length>0&&<div className="sc-combo-grid">{visibleCombos.map(c=>comboCard(c,shelfView==="finished"))}</div>}
+        {list.length>0&&<div className="sc-grid sc-cabinet-grid">{list.map(x=>item(x.perfume,"collection",x))}</div>}
+        {!list.length&&!visibleCombos.length&&<div className="sc-empty"><FlaskConical size={48} strokeWidth={1}/><h3>{filter?"No matching bottles.":shelfView==="finished"?"No finished bottles yet.":"Room for your next bottle."}</h3><p>{filter?"Try a different name.":shelfView==="finished"?"When a bottle is empty, mark it finished. Its history stays here.":"Search a perfume, then enter the price you paid."}</p>{shelfView==="shelf"&&!filter&&<button className="sc-primary" onClick={()=>go("discover")}>Explore fragrances <ArrowRight size={17}/></button>}</div>}
+
       </section>}
       {page==="discover"&&<section className="sc-section">
         <div className="sc-section-head"><div><h2>Discover</h2></div><button className="sc-secondary sc-add-combo-discover" onClick={()=>startCombo("wishlist")}><Plus size={16}/> Combo</button></div>
-        <form className="sc-search" onSubmit={e=>{e.preventDefault();const v=draftQuery.trim();if(v.length<3)return;setCatalogPage(1);if(v===query)setRefreshKey(k=>k+1);else setQuery(v)}}><Search size={20}/><input autoFocus={false} value={draftQuery} onChange={e=>setDraftQuery(e.target.value)} placeholder="Search perfume or brand..." aria-label="Search perfumes"/>{draftQuery&&<button type="button" onClick={()=>{setDraftQuery("");setQuery("");setCatalogPage(1)}} aria-label="Clear search"><X size={19}/></button>}<button className="sc-search-submit" type="submit" disabled={draftQuery.trim().length<3||searching}>Search</button></form>
-        <div className="sc-chips">{["Qasida","Bakhur","Lattafa","Afnan","Dior","Tom Ford"].map(t=><button key={t} onClick={()=>{setDraftQuery(t);setCatalogPage(1);if(query===t)setRefreshKey(k=>k+1);else setQuery(t)}}>{t}</button>)}</div>
+        <form className="sc-search" role="search" onSubmit={e=>{e.preventDefault();runDiscoverSearch(draftQuery)}}><Search size={20} aria-hidden="true"/><input autoFocus={false} value={draftQuery} onChange={e=>setDraftQuery(e.target.value)} placeholder="Perfume name or brand..." aria-label="Search perfumes" enterKeyHint="search"/>{draftQuery&&<button className="sc-search-clear" type="button" onClick={clearDiscoverSearch} aria-label="Clear search"><X size={18}/></button>}<button className="sc-search-submit" type="submit" disabled={draftQuery.trim().length<3||searching}>{searching?<><LoaderCircle className="sc-spin" size={16}/> Searching</>:<><Search size={16}/>{sourceChoice==="auto"?"Search all":"Search"}</>}</button></form>
+        {searching&&<div className="sc-search-progress" role="status" aria-live="polite"><LoaderCircle className="sc-spin" size={18}/><div><strong>{catalogPage>1?"Loading more perfumes":query?"Searching for “"+query+"”":"Finding fragrances"}</strong><span>Checking available fragrance catalogues and matching names…</span></div></div>}
+        {!searching&&searchHint&&<p className="sc-search-hint">{searchHint}</p>}
+        <details className="sc-source-options"><summary>Choose a source (optional)</summary><div className="sc-source-picker"><label htmlFor="sc-search-source">Look in</label><select id="sc-search-source" value={sourceChoice} onChange={e=>setSourceChoice(e.target.value as CatalogSource)}>{SOURCES.map(s=><option key={s.id} value={s.id}>{s.name}</option>)}</select><span>Search all combines available sources and removes repeated perfumes. Then tap Search.</span></div></details>
+        <div className="sc-chips">{["Qasida","Bakhur","Lattafa","Afnan","Dior","Tom Ford"].map(t=><button key={t} onClick={()=>setDraftQuery(t)}>{t}</button>)}</div>
+        <p className="sc-search-guidance">Choose a suggestion or type a perfume, then press Search. Suggestions only fill the box; searching starts when you press Search.</p>
+        <div className="sc-discover-tools"><button className="sc-filter-trigger" type="button" aria-expanded={showDiscoverFilters} onClick={()=>setShowDiscoverFilters(v=>!v)}> <Layers size={16}/> Filters & Sort {filterCount>0&&<span>{filterCount}</span>} <ChevronDown size={16} className={showDiscoverFilters?"sc-rotate":""}/></button>
+          <span className="sc-filter-result-count">{filteredPhotographed.length} of {photographed.length} photographed results</span></div>
+        {showDiscoverFilters&&<div className="sc-discover-filter-panel">
+          <div className="sc-filter-grid">
+            <label>Sort by<select aria-label="Sort fragrances" value={discoverFilters.sort} onChange={e=>setDiscoverFilters(v=>({...v,sort:e.target.value as DiscoverFilters["sort"]}))}>
+              <option value="relevance">Best match</option><option value="name">Brand / A–Z</option><option value="rating">Highest rated</option><option value="longevity">Longest lasting</option><option value="projection">Strongest projection</option><option value="price-low">Lowest ₦ price</option><option value="price-high">Highest ₦ price</option><option value="newest">Newest release</option></select></label>
+            <label>How long it lasts<select aria-label="Minimum longevity" value={discoverFilters.longevity} onChange={e=>setDiscoverFilters(v=>({...v,longevity:e.target.value as DiscoverFilters["longevity"]}))}>
+              <option value="any">Any · {availableLongevity} rated</option><option value="4">8+ hours · long lasting</option><option value="5">12+ hours · very long lasting</option></select></label>
+            <label>How noticeable it is<select aria-label="Minimum projection" value={discoverFilters.projection} onChange={e=>setDiscoverFilters(v=>({...v,projection:e.target.value as DiscoverFilters["projection"]}))}>
+              <option value="any">Any · {availableProjection} rated</option><option value="4">Strong · beyond arm's length</option><option value="5">Enormous · fills a room</option></select></label>
+            <label>My ₦ price limit<select aria-label="Maximum saved naira price" value={discoverFilters.budget} onChange={e=>setDiscoverFilters(v=>({...v,budget:e.target.value as DiscoverFilters["budget"]}))}>
+              <option value="">Any · {availablePrice} priced</option><option value="20000">Under ₦20,000</option><option value="40000">Under ₦40,000</option><option value="60000">Under ₦60,000</option><option value="100000">Under ₦100,000</option></select></label>
+            <label>Smell / scent style<select aria-label="Filter accords" value={discoverFilters.accord} onChange={e=>setDiscoverFilters(v=>({...v,accord:e.target.value}))}>
+              <option value="all">All scents</option>{["Oud","Vanilla","Woody","Fresh","Citrus","Amber","Floral","Musk","Spicy","Gourmand","Sweet","Leather","Aquatic","Rose"].map(x=><option value={x.toLowerCase()} key={x}>{x}</option>)}</select></label>
+            <label>Rating<select aria-label="Minimum fragrance rating" value={discoverFilters.minRating} onChange={e=>setDiscoverFilters(v=>({...v,minRating:e.target.value as DiscoverFilters["minRating"]}))}>
+              <option value="any">Any rating</option><option value="4">4.0+ out of 5</option><option value="4.5">4.5+ out of 5</option></select></label>
+            <label>Gender profile<select aria-label="Fragrance target profile" value={discoverFilters.gender} onChange={e=>setDiscoverFilters(v=>({...v,gender:e.target.value as DiscoverFilters["gender"]}))}>
+              <option value="all">All</option><option value="men">Men</option><option value="women">Women</option><option value="unisex">Unisex</option></select></label>
+            <label>Top-ranked season<select aria-label="Filter season" value={discoverFilters.season} onChange={e=>setDiscoverFilters(v=>({...v,season:e.target.value}))}>
+              <option value="all">Any season</option>{["Summer","Winter","Spring","Fall"].map(x=><option value={x.toLowerCase()} key={x}>{x}</option>)}</select></label>
+          </div>
+          <div className="sc-filter-foot"><p>Filters use the perfumes already loaded. Wear ratings are other people’s experiences, so yours may differ. ₦ prices are the amounts you saved. Unknown details stay blank.</p><button type="button" onClick={()=>setDiscoverFilters(DEFAULT_DISCOVER_FILTERS)}>Reset filters</button></div>
+        </div>}
         <button className="sc-add-missing" onClick={()=>setManualOpen(true)}><Plus size={14}/> Not listed? Add it</button>
 
-        {error&&<div className="sc-warning"><CloudOff size={19}/><span>{error}</span><button onClick={()=>setRefreshKey(k=>k+1)}>Retry</button></div>}
+        {error&&<div className="sc-warning"><CloudOff size={19}/><span>{error}</span><button onClick={()=>runDiscoverSearch(query)}>Retry</button></div>}
         {catalogueNotice&&<p className="sc-source-note">{catalogueNotice}</p>}
-        {photographed.length>0?<><div className="sc-grid">{photographed.map(p=>item(p,"discover"))}</div>{hasMore&&<button className="sc-loadmore" disabled={searching} onClick={()=>setCatalogPage(x=>x+1)}>{searching?"Loading...":"Load more"} <ChevronDown size={18}/></button>}</>:searching||checkingPhotos?<div className="sc-loading">Loading photos…</div>:query.trim()?<p className="sc-no-results">No perfumes with verified photos found. Try another search or <button onClick={()=>setManualOpen(true)}>add manually</button>.</p>:<p className="sc-discover-intro">Search a perfume or choose a brand above.</p>}
+        {photographed.length>0&&<div className="sc-catalogue-summary" aria-live="polite"><span>{photographed.length} perfumes{resultSources.length>1?" · combined without repeats":""}</span><details><summary>Sources & photo credits</summary><p>{resultSources.map(v=>SOURCES.find(x=>x.id===v)?.name.replace(/ · .*/,"")||v).join(" · ")}</p>{resultSources.some(v=>v==="beautyfacts"||v==="productsfacts")&&<p>Data © <a href="https://world.openbeautyfacts.org" target="_blank" rel="noreferrer">Open Facts contributors</a> (<a href="https://opendatacommons.org/licenses/odbl/1-0/" target="_blank" rel="noreferrer">ODbL</a>). Images belong to their contributors.</p>}{resultSources.includes("wikidata")&&<p>Wikidata data: CC0. Open a perfume to see its Wikimedia photo credit and licence.</p>}</details></div>}
+        {filteredPhotographed.length>0?<><div className="sc-grid">{filteredPhotographed.map(p=>item(p,"discover"))}</div>{hasMore&&<button className="sc-loadmore" disabled={searching} onClick={loadMoreDiscover}>{searching?"Loading more…":"Load more"} <ChevronDown size={18}/></button>}</>:searching||checkingPhotos?<div className="sc-loading">{searching?"Results will appear here when the search finishes…":"Checking perfume photos…"}</div>:photographed.length>0?<div className="sc-no-results"><p>No perfumes match these filters yet. Perfumes with missing ratings or prices will not appear when you filter by those details.</p><button onClick={()=>setDiscoverFilters(DEFAULT_DISCOVER_FILTERS)}>Clear filters</button><p>Try Search all to find more perfumes and details.</p></div>:query.trim()?<p className="sc-no-results">No closely matching perfumes with verified photos found. Try another spelling, or <button onClick={()=>setManualOpen(true)}>add manually</button>.</p>:<p className="sc-discover-intro">Search a perfume or choose a brand above.</p>}
       </section>}
-      {page==="wishlist"&&<section className="sc-section">
+      {page==="wishlist"&&<section className="sc-section sc-cabinet-section">
         <div className="sc-section-head"><div><h2>Wishlist</h2></div><div className="sc-combo-header-actions"><button className="sc-secondary" onClick={()=>startCombo("wishlist")}><Plus size={16}/> Add combo</button><button className="sc-primary" onClick={()=>go("discover")}><Plus size={16}/> Fragrance</button></div></div>
-        {store.wishlist.length||wishCombos.length?<>{wishCombos.length>0&&<div className="sc-combo-grid">{wishCombos.map(comboCard)}</div>}{store.wishlist.length>0&&<div className="sc-grid">{store.wishlist.map(p=>item(p,"wishlist"))}</div>}</>:<div className="sc-empty"><Heart size={45} strokeWidth={1}/><h3>A little room for desire.</h3><p>Save perfumes to buy later.</p><button className="sc-primary" onClick={()=>go("discover")}>Find my next scent <ArrowRight size={17}/></button></div>}
+        {store.wishlist.length||wishCombos.length?<>{wishCombos.length>0&&<div className="sc-combo-grid">{wishCombos.map(c=>comboCard(c))}</div>}{store.wishlist.length>0&&<div className="sc-grid sc-cabinet-grid">{store.wishlist.map(p=>item(p,"wishlist"))}</div>}</>:<div className="sc-empty"><Heart size={45} strokeWidth={1}/><h3>A little room for desire.</h3><p>Save perfumes to buy later.</p><button className="sc-primary" onClick={()=>go("discover")}>Find my next scent <ArrowRight size={17}/></button></div>}
       </section>}
-      {page==="worth"&&<section className="sc-section">
-        <div className="sc-section-head"><div><h2>Collection worth</h2></div><button className="sc-primary" onClick={()=>go("discover")}><Plus size={17}/> Add a bottle</button></div>
-        <div className="sc-worth-summary sc-worth-one"><div><span>₦ TOTAL PAID</span><strong>{money(moneyNGN,"NGN")}</strong></div></div>
-
-        {legacyUSD>0&&<p className="sc-legacy-note">{legacyUSD} older dollar-priced bottle(s) are excluded until you enter a naira price.</p>}
-        <div className="sc-worth-list"><h3>Purchase prices</h3>{store.collection.length||myCombos.length?store.collection.map(x=><div key={x.perfume.id}><span>{x.perfume.brand} <strong>{x.perfume.name}</strong></span><strong>{x.currency==="NGN"?money(x.amount,"NGN"):"Set ₦ price"}</strong><button onClick={()=>openPrice(x.perfume)}>Edit</button></div>):null}{myCombos.map(c=><div key={c.id}><span>Perfume combo <strong>{c.name} · {c.perfumes.length} bottles</strong></span><strong>{money(c.amount||0,"NGN")}</strong><button onClick={()=>editCombo(c)}>Edit</button></div>)}{store.collection.length===0&&myCombos.length===0&&<p>No fragrances added yet.</p>}</div>
+      {page==="worth"&&<section className="sc-section sc-finance-section">
+        <div className="sc-finance-heading">
+          <div>
+            <span className="sc-finance-kicker"><span/> YOUR PERSONAL SCENT LEDGER</span>
+            <h2>Collection <em>finances.</em></h2>
+            <p>A clear picture of what you've spent on the fragrances you love.</p>
+          </div>
+          <button className="sc-finance-add" type="button" onClick={()=>go("discover")} aria-label="Add a fragrance purchase"><Plus size={17}/> Add a purchase</button>
+        </div>
+        <div className="sc-finance-overview">
+          <div className="sc-finance-hero">
+            <div className="sc-finance-hero-top"><span>TOTAL RECORDED SPENDING</span><span className="sc-finance-hero-symbol"><Wallet size={19}/></span></div>
+            <strong className="sc-finance-main-amount">{money(totals.totalSpent,"NGN")}</strong>
+            <p>All-time fragrance purchases</p>
+            <div className="sc-finance-hero-bottom">
+              <div className="sc-finance-balance"><span>Still on your shelf <small>· purchase cost</small></span><strong>{money(totals.shelfCost,"NGN")}</strong></div>
+              <div className="sc-finance-track" role="progressbar" aria-label="Share of spending on bottles still on your shelf" aria-valuemin={0} aria-valuemax={100} aria-valuenow={totals.totalSpent>0?Math.min(100,Math.round(totals.shelfCost/totals.totalSpent*100)):0}><span style={{width:(totals.totalSpent>0?Math.min(100,Math.round(totals.shelfCost/totals.totalSpent*100)):0)+"%"}}/></div>
+              <small className="sc-finance-hero-caption">Based on the amount paid, not resale value</small>
+            </div>
+          </div>
+          <div className="sc-finance-mini-grid" aria-label="Your collection at a glance">
+            <div className="sc-finance-mini">
+              <span className="sc-finance-mini-icon"><ShoppingBag size={17}/></span><span className="sc-finance-mini-label">ON YOUR SHELF</span><strong>{totals.onShelf}</strong><small>Active bottles</small>
+            </div>
+            <div className="sc-finance-mini">
+              <span className="sc-finance-mini-icon"><Check size={17}/></span><span className="sc-finance-mini-label">FINISHED</span><strong>{totals.finished}</strong><small>Bottles enjoyed</small>
+            </div>
+            <div className="sc-finance-mini">
+              <span className="sc-finance-mini-icon"><Heart size={17}/></span><span className="sc-finance-mini-label">WISHLIST</span><strong>{wishCount}</strong><small>Future favourites</small>
+            </div>
+          </div>
+        </div>
+        <div className="sc-finance-history">
+          <div className="sc-finance-history-heading"><div><span>YOUR RECORDS</span><h3>Purchase history</h3><p>A timeline of the bottles and combos you've bought.</p></div><span className="sc-finance-record-count">{store.collection.length+myCombos.length} {store.collection.length+myCombos.length===1?"purchase":"purchases"}</span></div>
+          {legacyUSD>0&&<p className="sc-legacy-note">{legacyUSD} older dollar-priced bottle(s) are excluded from both naira totals until you enter a naira price.</p>}
+          {store.collection.length||myCombos.length?<div className="sc-finance-transactions">
+            {store.collection.map(x=><div className="sc-finance-transaction" key={x.id}>
+              <span className="sc-finance-tx-icon"><ShoppingBag size={17}/></span>
+              <div className="sc-finance-tx-detail"><small>{x.perfume.brand}</small><strong>{x.perfume.name}</strong><span>{dateLabel(x.added)} · {x.finishedAt?"Finished "+dateLabel(x.finishedAt):"On my shelf"}</span></div>
+              <div className="sc-finance-tx-right"><strong>{x.currency==="NGN"?money(x.amount,"NGN"):"Set ₦ price"}</strong><button type="button" onClick={()=>openPrice(x.perfume,x)}>Edit <ArrowRight size={13}/></button></div>
+            </div>)}
+            {myCombos.map(c=><div className="sc-finance-transaction" key={c.id}>
+              <span className="sc-finance-tx-icon"><Layers size={17}/></span>
+              <div className="sc-finance-tx-detail"><small>FRAGRANCE COMBO</small><strong>{c.name}</strong><span>{dateLabel(c.added)} · {c.perfumes.length} bottles · {c.perfumes.filter(p=>c.finishedPerfumes?.[p.id]).length} finished</span></div>
+              <div className="sc-finance-tx-right"><strong>{money(c.amount||0,"NGN")}</strong><button type="button" onClick={()=>editCombo(c)}>Edit <ArrowRight size={13}/></button></div>
+            </div>)}
+          </div>:<div className="sc-finance-empty">
+            <div className="sc-finance-empty-art" aria-hidden="true"><Wallet size={30} strokeWidth={1.6}/></div>
+            <span className="sc-finance-empty-tag">YOUR FIRST ENTRY AWAITS</span>
+            <h4>Your collection story starts here.</h4>
+            <p>You haven't recorded a fragrance purchase yet. Add your first bottle to start tracking the spending behind your collection.</p>
+            <button className="sc-finance-empty-action" type="button" onClick={()=>go("discover")}>Explore fragrances <ArrowRight size={17}/></button>
+          </div>}
+        </div>
       </section>}
       {page==="layer"&&<section className="sc-section"><div className="sc-section-head"><div><span className="sc-kicker">05 / THE EXPERIMENTAL STUDIO</span><h2>Layer <em>lab.</em></h2><p>Pair two perfumes from your shelf and discover shared scent notes. Suggestions aren't verified performance predictions.</p></div></div>
         {allMyPerfumes.length<2?<div className="sc-empty"><Layers size={45}/><h3>Two bottles make a combination.</h3><p>Collect at least two fragrances to start mixing.</p><button className="sc-primary" onClick={()=>go("discover")}>Expand my shelf</button></div>:<div className="sc-layer-panel"><div className="sc-pair"><label>FIRST FRAGRANCE<select value={layerA} onChange={e=>setLayerA(e.target.value)}><option value="">Choose a bottle</option>{allMyPerfumes.map(p=><option key={p.id} value={p.id}>{p.brand} — {p.name}</option>)}</select></label><Plus size={22}/><label>SECOND FRAGRANCE<select value={layerB} onChange={e=>setLayerB(e.target.value)}><option value="">Choose another</option>{allMyPerfumes.filter(p=>p.id!==layerA).map(p=><option key={p.id} value={p.id}>{p.brand} — {p.name}</option>)}</select></label></div>{left&&right&&left.id!==right.id&&<div className="sc-layer-result"><Sparkles size={27}/><h3>{left.name} <span>×</span> {right.name}</h3><p>{match.length?"Shared notes / accords: "+[...new Set(match)].join(", "):"No shared notes were listed by the database. Try one spray of each and assess on your own skin."}</p><button className="sc-primary" onClick={()=>setStore(s=>({...s,mixes:[{id:id(),left:left.id,right:right.id,date:today()},...s.mixes]}))}>Save this combination <Bookmark size={16}/></button></div>}</div>}
-        {store.mixes.length>0&&<div className="sc-mix-list"><h3>Saved combinations</h3>{store.mixes.map(m=><div key={m.id}><span>{allMyPerfumes.find(x=>x.id===m.left)?.name||"Removed"} × {allMyPerfumes.find(x=>x.id===m.right)?.name||"Removed"}</span><button aria-label="Delete saved combination" onClick={()=>setStore(s=>({...s,mixes:s.mixes.filter(x=>x.id!==m.id)}))}><X size={17}/></button></div>)}</div>}
+        {store.mixes.length>0&&<div className="sc-mix-list"><h3>Saved combinations</h3>{store.mixes.map(m=><div key={m.id}><span>{allKnownPerfumes.find(x=>x.id===m.left)?.name||"Removed"} × {allKnownPerfumes.find(x=>x.id===m.right)?.name||"Removed"}</span><button aria-label="Delete saved combination" onClick={()=>setStore(s=>({...s,mixes:s.mixes.filter(x=>x.id!==m.id)}))}><X size={17}/></button></div>)}</div>}
       </section>}
-      <footer className="sc-footer"><span>SCENT / CABINET</span><button onClick={()=>setBackupOpen(true)}>Backup <ArrowRight size={15}/></button></footer>
     </div>
-    <nav className="sc-mobile-nav" aria-label="Mobile fragrance navigation">{([["collection",ShoppingBag,"Shelf"],["discover",Search,"Discover"],["wishlist",Heart,"Wishlist"],["worth",Wallet,"Worth"],["layer",Layers,"Layer"]] as const).map(([key,Icon,text])=><button key={key} className={page===key?"active":""} onClick={()=>go(key)}><Icon size={21}/><span>{text}</span></button>)}</nav>
-    {selected&&<div className="sc-overlay" role="presentation" onMouseDown={e=>{if(e.target===e.currentTarget)setSelected(null)}}><section className="sc-detail" role="dialog" aria-modal="true" aria-label={selected.name}><button className="sc-modal-close" onClick={()=>setSelected(null)} aria-label="Close"><X size={22}/></button><div className="sc-detail-art">{pic(selected,"hero",photoUrls[selected.id])}</div><div className="sc-detail-copy"><span className="sc-kicker">{selected.brand.toUpperCase()}</span><h2>{selected.name}</h2><p className="sc-detail-meta">{[selected.family,selected.year].filter(Boolean).join(" · ")||"Fragrance profile"}</p>{selected.description&&<p>{selected.description}</p>}{selected.accords.length>0&&<div className="sc-notes"><strong>MAIN ACCORDS</strong><p>{selected.accords.join(" · ")}</p></div>}{([["TOP NOTES",selected.top],["HEART NOTES",selected.heart],["BASE NOTES",selected.base],["OTHER NOTES",selected.notes]] as const).map(([label,arr])=>arr.length>0&&<div key={label} className="sc-notes"><strong>{label}</strong><p>{arr.join(" · ")}</p></div>)}<div className="sc-detail-actions"><button className="sc-primary" onClick={()=>openPrice(selected!)}>{isOwned(selected)?"Edit purchase price":"Add to my shelf"} <ArrowRight size={17}/></button><button className="sc-secondary" onClick={()=>wish(selected!)}><Heart size={18} fill={wishIds.has(selected.id)?"currentColor":"none"}/>{wishIds.has(selected.id)?"Wishlisted":"Wishlist"}</button>{selected.id.startsWith("manual:")&&<><button className="sc-secondary" onClick={()=>photoFileRef.current?.click()} disabled={photoBusy}><Upload size={17}/>{photoUrls[selected.id]?"Replace photo":"Upload photo"}</button>{photoUrls[selected.id]&&<button className="sc-secondary" onClick={deleteManualPhoto}>Remove photo</button>}<input ref={photoFileRef} hidden type="file" accept="image/*" onChange={replaceManualPhoto}/>{photoError&&<p className="sc-form-error">{photoError}</p>}</>}{isOwned(selected)&&<><button className="sc-danger" onClick={()=>remove(selected!)}><Trash2 size={17}/> Remove</button></>}</div></div></section></div>}
+    <nav className="sc-mobile-nav" aria-label="Mobile fragrance navigation">{([["collection",ShoppingBag,"Shelf"],["discover",Search,"Discover"],["wishlist",Heart,"Wishlist"],["worth",Wallet,"Spending"],["layer",Layers,"Layer"]] as const).map(([key,Icon,text])=><button key={key} className={page===key?"active":""} onClick={()=>go(key)}><Icon size={21}/><span>{text}</span></button>)}</nav>
+    {selected&&<div className="sc-overlay" role="presentation" onMouseDown={e=>{if(e.target===e.currentTarget)setSelected(null)}}><section className="sc-detail" role="dialog" aria-modal="true" aria-label={selected.name}><button className="sc-modal-close" onClick={()=>setSelected(null)} aria-label="Close"><X size={22}/></button><div className="sc-detail-art">{pic(selected,"hero",photoUrls[selected.id])}</div><div className="sc-detail-copy"><span className="sc-kicker">{selected.brand.toUpperCase()}</span><h2>{selected.name}</h2><p className="sc-detail-meta">{[selected.family,selected.year].filter(Boolean).join(" · ")||"Fragrance profile"}</p>{selected.description&&<p>{selected.description}</p>}<div className="sc-fact-box"><h3>Performance & Nigerian price</h3>
+  <div className="sc-fact-list">
+    <div><span>How long it lasts</span><strong>{store.insights[selected.id]?.longevity||selected.longevity||"Not rated"}</strong></div>
+    <div><span>How noticeable it is</span><strong>{store.insights[selected.id]?.projection||selected.projection||"Not rated"}</strong></div>
+    <div><span>Rating</span><strong>{selected.rating!==undefined?selected.rating.toFixed(1)+" / 5":"Not rated"}</strong></div>
+    <div><span>My ₦ price</span><strong>{store.insights[selected.id]?.priceNGN!==undefined?money(store.insights[selected.id]?.priceNGN??0,"NGN"):selectedBottle?.currency==="NGN"?money(selectedBottle.amount,"NGN"):"Not added"}</strong></div>
+  </div>
+  <p className="sc-fact-disclaimer">Performance figures are community perceptions when supplied by a catalogue, or your own entries. Price is only what you saved in ₦. Actual wear and Nigerian shop prices vary.</p>
+  {Boolean(selected.bestSeasons?.length)&&<p className="sc-fact-hint">Best seasons: {selected.bestSeasons?.join(" · ")}</p>}
+  {Boolean(selected.bestOccasions?.length)&&<p className="sc-fact-hint">Occasions: {selected.bestOccasions?.join(" · ")}</p>}
+  {insightEdit==="open"?<form className="sc-insight-form" onSubmit={saveMyInsight}>
+    <label>My ₦ price estimate / target <input type="number" inputMode="decimal" min="0" max="100000000" step="0.01" value={insightPrice} onChange={e=>setInsightPrice(e.target.value)} placeholder="e.g. 35000"/></label>
+    <label>My rating: how long it lasts<select value={insightLongevity} onChange={e=>setInsightLongevity(e.target.value)}><option value="">Use catalogue / not rated</option>{["Poor","Weak","Moderate","Long Lasting","Very Long Lasting"].map(x=><option key={x}>{x}</option>)}</select></label>
+    <label>My rating: how noticeable it is<select value={insightProjection} onChange={e=>setInsightProjection(e.target.value)}><option value="">Use catalogue / not rated</option>{["Intimate","Soft","Moderate","Strong","Enormous"].map(x=><option key={x}>{x}</option>)}</select></label>
+    <div className="sc-insight-actions"><button type="button" onClick={()=>setInsightEdit("closed")}>Cancel</button><button type="submit">Save my details</button></div>
+  </form>:<button className="sc-insight-open" type="button" onClick={()=>editMyInsight(selected)}>Add / edit my ₦ price & performance</button>}
+</div>{selected.accords.length>0&&<div className="sc-notes"><strong>SCENT STYLE</strong><p>{selected.accords.join(" · ")}</p></div>}{([["FIRST SMELL · TOP NOTES",selected.top],["AFTER IT SETTLES · HEART NOTES",selected.heart],["LASTING SMELL · BASE NOTES",selected.base],["OTHER SCENTS",selected.notes]] as const).map(([label,arr])=>arr.length>0&&<div key={label} className="sc-notes"><strong>{label}</strong><p>{arr.join(" · ")}</p></div>)}{selected.imageSource&&<p className="sc-source-credit">Photo: {selected.imageCredit} · <a href={selected.imageSource} target="_blank" rel="noreferrer">{selected.imageLicense||"View credit"}</a>{selected.imageLicenseUrl&&<> · <a href={selected.imageLicenseUrl} target="_blank" rel="noreferrer">Licence</a></>}</p>}<div className="sc-detail-actions"><button className="sc-primary" onClick={()=>openPrice(selected!,selectedBottle,Boolean(selectedCombo))}>{selectedCombo?"Buy another bottle":selectedBottle?"Edit purchase price":"Add to my shelf"} <ArrowRight size={17}/></button><button className="sc-secondary" onClick={()=>wish(selected!)}><Heart size={18} fill={wishIds.has(selected.id)?"currentColor":"none"}/>{wishIds.has(selected.id)?"Wishlisted":"Wishlist"}</button>{selected.id.startsWith("manual:")&&<><button className="sc-secondary" onClick={()=>photoFileRef.current?.click()} disabled={photoBusy}><Upload size={17}/>{photoUrls[selected.id]?"Replace photo":"Upload photo"}</button>{photoUrls[selected.id]&&<button className="sc-secondary" onClick={deleteManualPhoto}>Remove photo</button>}<input ref={photoFileRef} hidden type="file" accept="image/*" onChange={replaceManualPhoto}/>{photoError&&<p className="sc-form-error">{photoError}</p>}</>}{selectedBottle&&<><p className="sc-purchase-status">Bought {dateLabel(selectedBottle.added)}{selectedBottle.finishedAt?" · Finished "+dateLabel(selectedBottle.finishedAt):" · On my shelf"}</p><button className="sc-secondary" onClick={()=>changeBottleStatus(selectedBottle,selectedBottle.finishedAt?undefined:new Date().toISOString())}>{selectedBottle.finishedAt?"Return to shelf":"Mark finished"}</button><button className="sc-secondary" onClick={()=>openPrice(selected!,undefined,true)}>Buy again</button><button className="sc-secondary" onClick={()=>favorite(selectedBottle)}><Heart size={17} fill={selectedBottle.favorite?"currentColor":"none"}/> Favourite</button><button className="sc-danger" onClick={()=>remove(selectedBottle)}><Trash2 size={17}/> Delete purchase</button></>}{selectedCombo&&selectedCombo.target==="collection"&&<><p className="sc-purchase-status">From {selectedCombo.name} · {money(comboBottleCost(selectedCombo,selectedCombo.perfumes.findIndex(p=>p.id===selected.id)),"NGN")} share of combo price</p><button className="sc-secondary" onClick={()=>changeComboStatus(selectedCombo,selected!,selectedCombo.finishedPerfumes?.[selected.id]?undefined:new Date().toISOString())}>{selectedCombo.finishedPerfumes?.[selected.id]?"Return to shelf":"Mark finished"}</button></>}</div></div></section></div>}
     {comboOpen&&<div className="sc-overlay" onMouseDown={e=>{if(e.target===e.currentTarget&&!comboSaving)setComboOpen(false)}}><section className="sc-price-dialog sc-combo-dialog" role="dialog" aria-modal="true" aria-label={comboId?"Edit perfume combo":"Add perfume combo"}><button className="sc-modal-close" type="button" onClick={()=>setComboOpen(false)} aria-label="Close"><X size={22}/></button>
       <h2>{comboId?"Edit combo":"New combo"}</h2>
       <p className="sc-combo-hint">Group perfumes bought together or saved for later.</p>
       <form className="sc-combo-form" onSubmit={saveCombo}>
         <label>COMBO NAME (OPTIONAL)</label>
         <input value={comboName} onChange={e=>setComboName(e.target.value)} maxLength={80} placeholder="e.g. My weekend picks"/>
-        <div className="sc-manual-target sc-combo-target"><label><input type="radio" checked={comboTarget==="wishlist"} onChange={()=>setComboTarget("wishlist")}/> Wishlist</label><label><input type="radio" checked={comboTarget==="collection"} onChange={()=>setComboTarget("collection")}/> Collection</label></div>
+        <div className="sc-manual-target sc-combo-target"><label><input type="radio" disabled={Boolean(comboId&&store.combos.find(c=>c.id===comboId)?.target==="collection")} checked={comboTarget==="wishlist"} onChange={()=>setComboTarget("wishlist")}/> Wishlist</label><label><input type="radio" checked={comboTarget==="collection"} onChange={()=>setComboTarget("collection")}/> Collection</label></div>
         <label>PERFUMES ({comboPerfumes.length}/12) · MINIMUM 2</label>
         {comboPerfumes.length>0&&<div className="sc-combo-selected">{comboPerfumes.map(p=><div key={p.id}><span>{p.brand} <strong>{p.name}</strong></span><button type="button" title={"Remove "+p.name} onClick={()=>setComboPerfumes(v=>v.filter(x=>x.id!==p.id))}><X size={16}/></button></div>)}</div>}
+        <details className="sc-source-options"><summary>Choose a source (optional)</summary><div className="sc-combo-source"><label htmlFor="sc-combo-provider">Look in</label><select id="sc-combo-provider" value={comboSource} onChange={e=>setComboSource(e.target.value as CatalogSource)}>{SOURCES.map(s=><option key={s.id} value={s.id}>{s.name}</option>)}</select></div></details>
         <div className="sc-combo-search"><input value={comboFilter} onChange={e=>setComboFilter(e.target.value)} placeholder="Search or filter perfumes" aria-label="Find perfumes for combo" onKeyDown={e=>{if(e.key==="Enter"){e.preventDefault();void comboSearch()}}}/><button type="button" onClick={()=>void comboSearch()} disabled={comboSearching||comboFilter.trim().length<3}>{comboSearching?"...":"Search"}</button></div>
         {comboCandidates.length>0&&<div className="sc-combo-options">{comboCandidates.map(p=><button key={p.id} type="button" disabled={comboPerfumes.length>=12} onClick={()=>addComboPerfume(p)}><Plus size={14}/><span>{p.brand} <strong>{p.name}</strong></span></button>)}</div>}
         <p className="sc-combo-help">Can't find one? Add its name here—no API needed.</p>
@@ -521,10 +849,8 @@ function Fragrance(){
         {comboId&&!comboPreview&&photoUrls[comboId]&&<button type="button" className="sc-photo-clear" onClick={async()=>{
           try{
             await removeScentPhoto(comboId);
-            const existing=storedUrls.current.get(comboId);
-            if(existing)URL.revokeObjectURL(existing);
-            storedUrls.current.delete(comboId);
-            setPhotoUrls(prev=>{const next={...prev};delete next[comboId];return next;});
+            hideStoredPhoto(comboId);
+            photoDeleted(comboId);
           }catch{setComboError("Couldn't remove photo.");}
         }}>Remove combo photo</button>}
         {comboTarget==="collection"&&<><label>TOTAL PRICE PAID (₦)</label><div className="sc-money-input"><span className="sc-money-prefix">₦</span><input type="number" min="0" step="0.01" inputMode="decimal" required value={comboAmount} onChange={e=>setComboAmount(e.target.value)} placeholder="0.00"/></div></>}
@@ -533,7 +859,39 @@ function Fragrance(){
       </form>
     </section></div>}
     {manualOpen&&<div className="sc-overlay" onMouseDown={e=>{if(e.target===e.currentTarget)setManualOpen(false)}}><section className="sc-price-dialog" role="dialog" aria-modal="true" aria-label="Add perfume manually"><button className="sc-modal-close" onClick={()=>setManualOpen(false)} aria-label="Close"><X size={22}/></button><h2>Add manually</h2><form className="sc-manual-form" onSubmit={addUnlisted}><label>BRAND</label><input value={manualBrand} autoFocus onChange={e=>setManualBrand(e.target.value)} maxLength={80} placeholder="e.g. Lattafa" required/><label>PERFUME</label><input value={manualName} onChange={e=>setManualName(e.target.value)} maxLength={100} placeholder="Fragrance name" required/><label>PHOTO (OPTIONAL)</label><label className="sc-photo-picker"><input type="file" accept="image/*" onChange={chooseManualPhoto} disabled={photoBusy}/>{manualPreview?<img src={manualPreview} alt="Your selected perfume photo"/>:<span><Upload size={20}/> Upload bottle photo</span>}</label>{manualPhoto&&<button type="button" className="sc-photo-clear" onClick={()=>{setManualPhoto(null);setManualPreview(null)}}>Remove selected photo</button>}{photoError&&<p className="sc-form-error">{photoError}</p>}<div className="sc-manual-target"><label><input type="radio" checked={manualTarget==="collection"} onChange={()=>setManualTarget("collection")}/> Collection</label><label><input type="radio" checked={manualTarget==="wishlist"} onChange={()=>setManualTarget("wishlist")}/> Wishlist</label></div><button className="sc-primary" type="submit" disabled={photoBusy}>{photoBusy?"Saving photo...":manualTarget==="collection"?"Next: Enter ₦ price":"Save to wishlist"} <ArrowRight size={16}/></button></form></section></div>}
-    {priceOpen&&<div className="sc-overlay" onMouseDown={e=>{if(e.target===e.currentTarget)setPriceOpen(null)}}><section className="sc-price-dialog" role="dialog" aria-modal="true" aria-label="Save perfume price"><button className="sc-modal-close" onClick={()=>setPriceOpen(null)} aria-label="Close"><X size={22}/></button><h2>{ownedMap.has(priceOpen.id)?"Update purchase price":"Add to my collection"}</h2><p>{priceOpen.brand} · <strong>{priceOpen.name}</strong></p><form onSubmit={savePrice}><label>HOW MUCH DID YOU PAY?</label><div className="sc-money-input"><span className="sc-money-prefix">₦</span><input autoFocus type="number" inputMode="decimal" min="0" step="0.01" required value={price} onChange={e=>setPrice(e.target.value)} placeholder="0.00" /></div><button className="sc-primary" type="submit"><Check size={18}/> Save perfume</button></form></section></div>}
-    {backupOpen&&<div className="sc-overlay" onMouseDown={e=>{if(e.target===e.currentTarget)setBackupOpen(false)}}><section className="sc-price-dialog" role="dialog" aria-modal="true" aria-label="Backup your collection"><button className="sc-modal-close" onClick={()=>setBackupOpen(false)} aria-label="Close"><X size={22}/></button><h2>Backup & <em>restore.</em></h2><p>Your collection is saved in this browser. Export a backup before changing devices.</p><button className="sc-primary sc-block" onClick={exportBackup}><Download size={18}/> Download backup</button><button className="sc-secondary sc-block" onClick={()=>fileRef.current?.click()}><Upload size={18}/> Restore from JSON</button><input hidden ref={fileRef} type="file" accept="application/json,.json" onChange={importBackup}/><div className="sc-privacy-note"><CloudOff size={19}/><span>No automatic sync between devices.</span></div></section></div>}
+    {priceOpen&&<div className="sc-overlay" onMouseDown={e=>{if(e.target===e.currentTarget)setPriceOpen(null)}}><section className="sc-price-dialog" role="dialog" aria-modal="true" aria-label="Save perfume price"><button className="sc-modal-close" onClick={()=>setPriceOpen(null)} aria-label="Close"><X size={22}/></button><h2>{priceBottleId?"Update purchase price":"Add a new bottle"}</h2><p>{priceOpen.brand} · <strong>{priceOpen.name}</strong></p>{!priceBottleId&&<p className="sc-combo-hint">This saves a new purchase. Your earlier bottles and spending stay in your history.</p>}<form onSubmit={savePrice}><label>HOW MUCH DID YOU PAY?</label><div className="sc-money-input"><span className="sc-money-prefix">₦</span><input autoFocus type="number" inputMode="decimal" min="0" step="0.01" required value={price} onChange={e=>setPrice(e.target.value)} placeholder="0.00" /></div><button className="sc-primary" type="submit"><Check size={18}/> Save perfume</button></form></section></div>}
+    {syncOpen&&<div className="sc-overlay" onMouseDown={e=>{if(e.target===e.currentTarget)setSyncOpen(false)}}><section className="sc-price-dialog sc-sync-dialog" role="dialog" aria-modal="true" aria-label="Private cloud sync">
+      <button type="button" className="sc-modal-close" onClick={()=>setSyncOpen(false)} aria-label="Close cloud sync"><X size={22}/></button>
+      <Cloud size={27}/><h2>Private <em>sync.</em></h2>
+      <p className="sc-sync-intro">Keep your wishlist, shelf, spending history, combos and uploaded perfume photos in sync between Safari and your Home Screen app.</p>
+      <div className="sc-sync-state"><span className={"sc-sync-dot sc-sync-"+sync.status}/><strong>{({"loading":"Checking cloud connection","unavailable":"Cloud setup needed","setup":"Create your private account","signed-out":"Sign in to sync","synced":"Everything is synced","syncing":"Syncing your fragrances","offline":"Offline — local copy saved","conflict":"Choose which collection to keep","error":"Sync needs attention"} as Record<string,string>)[sync.status]}</strong></div>
+      {sync.message&&<p className="sc-sync-message">{sync.message}</p>}
+      {(sync.status==="signed-out"||sync.status==="setup")&&<form onSubmit={submitSync} className="sc-sync-form">
+        {sync.status==="setup"&&<><label htmlFor="sc-sync-setup">YOUR CLOUDFLARE SETUP CODE</label><input id="sc-sync-setup" value={syncSetupCode} onChange={e=>setSyncSetupCode(e.target.value)} type="password" autoComplete="off" placeholder="Code saved in Cloudflare" required/></>}
+        <label htmlFor="sc-sync-password">{sync.status==="setup"?"CREATE A PRIVATE PASSWORD":"YOUR PRIVATE PASSWORD"}</label>
+        <input id="sc-sync-password" value={syncPassword} onChange={e=>setSyncPassword(e.target.value)} type="password" autoComplete={sync.status==="setup"?"new-password":"current-password"} minLength={sync.status==="setup"?12:1} placeholder="Enter password" required/>
+        {sync.status==="setup"&&<p>Use 12 or more characters. Save the password somewhere safe; it cannot be recovered from the site.</p>}
+        {syncFormError&&<p role="alert" className="sc-form-error">{syncFormError}</p>}
+        <button className="sc-primary sc-block" type="submit" disabled={syncSubmitting}>{syncSubmitting?"Connecting…":sync.status==="setup"?"Create & connect":"Sign in & sync"}</button>
+      </form>}
+      {sync.status==="conflict"&&<div className="sc-sync-conflict">
+        <p>Both copies contain different data. To protect your existing perfumes, choose one. The cloud version is never overwritten without your permission.</p>
+        <button type="button" className="sc-primary sc-block" onClick={()=>void sync.resolveConflict("device")}>Keep this device's collection</button>
+        <button type="button" className="sc-secondary sc-block" onClick={()=>void sync.resolveConflict("cloud")}>Use the cloud collection instead</button>
+        <small>A recovery copy of this device's data is saved before a cloud copy replaces it. Download a full backup first if you're unsure.</small>
+      </div>}
+      {(sync.status==="synced"||sync.status==="offline"||sync.status==="error")&&<div className="sc-sync-actions">
+        <button type="button" className="sc-secondary" onClick={()=>void sync.syncNow()}><Cloud size={16}/> Sync now</button>
+        <button type="button" className="sc-secondary" onClick={()=>void sync.disconnect()}>Sign out</button>
+      </div>}
+      {(sync.status==="unavailable"||sync.status==="error"||sync.status==="loading")&&<button type="button" className="sc-secondary sc-block" onClick={()=>void sync.refresh()}>Check connection</button>}
+      {(sync.status==="synced"||sync.status==="syncing")&&<div className="sc-photo-cloud-box" role="status" aria-live="polite">
+        <span><Cloud size={17}/><strong>Uploaded perfume photos</strong></span>
+        <p>{photoCloudStatus==="syncing"?"Syncing photos…":photoCloudStatus==="checking"?"Checking photo storage…":photoCloudStatus==="ready"?photoCloudNote:photoCloudStatus==="unavailable"?photoCloudNote:photoCloudStatus==="error"?photoCloudNote:"Waiting for cloud photo sync."}</p>
+        {(photoCloudStatus==="ready"||photoCloudStatus==="error"||photoCloudStatus==="unavailable")&&<button type="button" className="sc-secondary" onClick={()=>void syncOwnerPhotos()}>Check photo sync</button>}
+      </div>}
+      <p className="sc-sync-footnote">Your collection and photos stay saved locally too. Keep downloadable JSON backups for an extra copy of everything.</p>
+    </section></div>}
+    {backupOpen&&<div className="sc-overlay" onMouseDown={e=>{if(e.target===e.currentTarget)setBackupOpen(false)}}><section className="sc-price-dialog" role="dialog" aria-modal="true" aria-label="Backup your collection"><button className="sc-modal-close" onClick={()=>setBackupOpen(false)} aria-label="Close"><X size={22}/></button><h2>Backup & <em>restore.</em></h2><p>Export a complete backup of your collection and manually uploaded photos. This is separate from automatic cloud sync.</p><button className="sc-primary sc-block" onClick={exportBackup}><Download size={18}/> Download backup</button><button className="sc-secondary sc-block" onClick={()=>fileRef.current?.click()}><Upload size={18}/> Restore from JSON</button><input hidden ref={fileRef} type="file" accept="application/json,.json" onChange={importBackup}/><div className="sc-privacy-note"><Cloud size={19}/><span>Manual backups remain available. Cloud sync only starts after you connect your private account.</span></div></section></div>}
   </main>;
 }
